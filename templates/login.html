@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: rgb(20, 99, 95);
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            height: 100vh;
+        }
+
+        .faixa-topo {
+            width: 100%;
+            background-color: white;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .faixa-topo img {
+            height: 175px;
+            margin-left: 0;
+        }
+
+        .login-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            margin-top: 40px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            background-color: rgb(20, 99, 95);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        input[type="submit"]:hover {
+            background-color: rgb(15, 80, 76);
+        }
+
+        a {
+            color: rgb(20, 99, 95);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho com logo -->
+    <div class="faixa-topo">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+    </div>
+
+    <!-- Formulário de login -->
+    <main class="login-box">
+        <h1>Entrar</h1>
+        <form method="POST">
+            {{ form.csrf_token }}
+
+            <label for="nomeForm">Usuário:</label><br>
+            <input type="text" name="nomeForm" required><br>
+
+            <label for="senhaForm">Senha:</label><br>
+            <input type="password" name="senhaForm" required><br>
+
+            <input type="submit" value="Entrar">
+        </form>
+
+        <p><a href="{{ url_for('auth.redefinir_senha') }}">Esqueci minha senha</a></p>
+        <p>Não tem conta? <a href="{{ url_for('auth.registrar') }}">Registrar</a></p>
+    </main>
+
+</body>
+</html>

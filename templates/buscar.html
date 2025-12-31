@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Produtos</title>
+        <style>
+            body {
+                background-color: rgb(20, 99, 95);
+                font-family: Arial, sans-serif;
+                color: white;
+                padding: 20px;
+            }
+
+            h1 {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .produtos-container {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+            }
+
+            .produto-box {
+                background: white;
+                color: black;
+                border-radius: 8px;
+                padding: 20px;
+                width: 220px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                text-align: center;
+            }
+
+            .produto-box img {
+                max-width: 100%;
+                border-radius: 8px;
+                margin-bottom: 10px;
+            }
+
+            .produto-box h3 {
+                margin: 10px 0 5px 0;
+                font-size: 18px;
+            }
+            .produto-box p {
+                font-size: 14px;
+                margin: 5px 0;
+            }
+            .produto-box strong {
+                display: block;
+                margin-top: 10px;
+                font-size: 16px;
+                color: green;
+            }
+
+            .produto-box a {
+                text-decoration: none;
+                color: inherit;
+            }
+            .produto-box a:hover {
+                text-decoration: underline;
+            }
+
+            .chat-btn {
+                display: inline-block;
+                margin-top: 10px;
+                background-color: rgb(20, 99, 95);
+                color: white;
+                padding: 8px 15px;
+                border-radius: 5px;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+            .chat-btn:hover {
+                background-color: rgb(15, 80, 76);
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Produtos disponíveis</h1>
+
+        <div class="produtos-container">
+            {% for p in produtos %}
+            <div class="produto-box">
+                <a href="{{ url_for('produto.pagina_produto', id=p.id) }}">
+                    <img
+                        src="{{ url_for('static', filename=p.imagem) if p.imagem else url_for('static', filename='img/sem_imagem.png') }}"
+                        alt="{{ p.nome }}"
+                    />
+                </a>
+                <h3>
+                    <a href="{{ url_for('produto.pagina_produto', id=p.id) }}"
+                        >{{ p.nome }}</a
+                    >
+                </h3>
+                <p>{{ p.descricao }}</p>
+                <strong>R$ {{ "%.2f"|format(p.preco) }}</strong>
+                {% if current_user.is_authenticated and current_user.id !=
+                p.usuario_id %}
+                <a
+                    href="{{ url_for('chat.chat', produto_id=p.id, outro_usuario_id=p.usuario_id) }}"
+                    class="chat-btn"
+                >
+                    Falar com vendedor
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </body>
+</html>

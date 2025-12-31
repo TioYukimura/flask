@@ -1,0 +1,76 @@
+{% extends "base_new.html" %}
+
+{% block title %}Pagamento PIX - Vale & Feira{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="text-primary mb-3">
+                            💳
+                        </div>
+                        <h4 class="fw-bold text-primary">Pagamento PIX</h4>
+                        <p class="text-muted">Preencha os dados para gerar o código PIX</p>
+                    </div>
+
+                    <form method="POST">
+                        {{ formulario.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ formulario.nome_completo.label(class="form-label fw-bold") }}
+                            {{ formulario.nome_completo(class="form-control" + (" is-invalid" if formulario.nome_completo.errors else "")) }}
+                            {% if formulario.nome_completo.errors %}
+                                {% for error in formulario.nome_completo.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ formulario.email.label(class="form-label fw-bold") }}
+                            {{ formulario.email(class="form-control" + (" is-invalid" if formulario.email.errors else "")) }}
+                            {% if formulario.email.errors %}
+                                {% for error in formulario.email.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ formulario.cpf.label(class="form-label fw-bold") }}
+                            {{ formulario.cpf(class="form-control" + (" is-invalid" if formulario.cpf.errors else ""), placeholder="000.000.000-00") }}
+                            {% if formulario.cpf.errors %}
+                                {% for error in formulario.cpf.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Resumo do Pedido -->
+                        <div class="bg-light p-3 rounded mb-4">
+                            <div class="d-flex justify-content-between">
+                                <strong>Total a pagar:</strong>
+                                <strong class="text-primary">R$ {{ "%.2f"|format(plano.preco) }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            {{ formulario.enviar(class="btn btn-primary btn-lg") }}
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            <i data-feather="shield" class="me-1" style="width: 14px; height: 14px;"></i>
+                            Pagamento seguro e criptografado
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

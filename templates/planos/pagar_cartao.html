@@ -1,0 +1,131 @@
+{% extends "base_new.html" %}
+
+{% block title %}Pagamento Cartão - Vale & Feira{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="text-primary mb-3">
+                            💳
+                        </div>
+                        <h4 class="fw-bold text-primary">Pagamento com Cartão</h4>
+                        <p class="text-muted">Preencha os dados do seu cartão de crédito</p>
+                    </div>
+
+                    <form method="POST">
+                        {{ formulario.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ formulario.nome_titular.label(class="form-label fw-bold") }}
+                            {{ formulario.nome_titular(class="form-control" + (" is-invalid" if formulario.nome_titular.errors else "")) }}
+                            {% if formulario.nome_titular.errors %}
+                                {% for error in formulario.nome_titular.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ formulario.numero.label(class="form-label fw-bold") }}
+                            {{ formulario.numero(class="form-control" + (" is-invalid" if formulario.numero.errors else ""), placeholder="0000 0000 0000 0000") }}
+                            {% if formulario.numero.errors %}
+                                {% for error in formulario.numero.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="mb-3">
+                                    {{ formulario.validade.label(class="form-label fw-bold") }}
+                                    {{ formulario.validade(class="form-control" + (" is-invalid" if formulario.validade.errors else ""), placeholder="12/28") }}
+                                    {% if formulario.validade.errors %}
+                                        {% for error in formulario.validade.errors %}
+                                            <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="mb-3">
+                                    {{ formulario.cvv.label(class="form-label fw-bold") }}
+                                    {{ formulario.cvv(class="form-control" + (" is-invalid" if formulario.cvv.errors else ""), placeholder="123") }}
+                                    {% if formulario.cvv.errors %}
+                                        {% for error in formulario.cvv.errors %}
+                                            <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            {{ formulario.parcelas.label(class="form-label fw-bold") }}
+                            {{ formulario.parcelas(class="form-select" + (" is-invalid" if formulario.parcelas.errors else "")) }}
+                            {% if formulario.parcelas.errors %}
+                                {% for error in formulario.parcelas.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Resumo do Pedido -->
+                        <div class="bg-light p-3 rounded mb-4">
+                            <div class="d-flex justify-content-between">
+                                <strong>Total a pagar:</strong>
+                                <strong class="text-primary">R$ {{ "%.2f"|format(plano.preco) }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            {{ formulario.enviar(class="btn btn-primary btn-lg") }}
+                        </div>
+                    </form>
+
+                    <!-- Security badges -->
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            <i data-feather="shield" class="me-1" style="width: 14px; height: 14px;"></i>
+                            Dados protegidos com criptografia SSL
+                        </small>
+                        <br>
+                        <div class="mt-2">
+                            <span class="badge bg-secondary me-2">VISA</span>
+                            <span class="badge bg-secondary me-2">MASTERCARD</span>
+                            <span class="badge bg-secondary">ELO</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Format card number input
+document.querySelector('input[name="numero"]').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+    e.target.value = value;
+});
+
+// Format expiry date input
+document.querySelector('input[name="validade"]').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+    }
+    e.target.value = value;
+});
+
+// Format CVV input
+document.querySelector('input[name="cvv"]').addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+});
+</script>
+{% endblock %}

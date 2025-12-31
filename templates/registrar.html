@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cadastro</title>
+  <style>
+    /* Reset básico */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: rgb(20, 99, 95);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      align-items: center;
+    }
+
+    /* Faixa topo */
+    .faixa-topo {
+      width: 100%;
+      background: white;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      padding-left: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .faixa-topo img {
+      height: 60px;
+    }
+
+    /* Caixa de registro */
+    .register-box {
+      background: white;
+      max-width: 400px;
+      width: 90%;
+      margin: 40px 0;
+      padding: 30px 25px;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      color: #333;
+      text-align: center;
+    }
+
+    .register-box h1 {
+      margin-bottom: 25px;
+      font-weight: 700;
+      color: rgb(20, 99, 95);
+    }
+
+    /* Labels e inputs */
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: rgb(20, 99, 95);
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 18px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="email"]:focus {
+      outline: none;
+      border-color: rgb(20, 99, 95);
+      box-shadow: 0 0 5px rgb(20, 99, 95, 0.5);
+    }
+
+    /* Botão submit */
+    button, input[type="submit"] {
+      width: 100%;
+      padding: 12px 0;
+      background-color: rgb(20, 99, 95);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+    }
+
+    button:hover, input[type="submit"]:hover {
+      background-color: rgb(15, 80, 76);
+    }
+
+    /* Links */
+    p {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    a {
+      color: rgb(20, 99, 95);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Mensagens flash */
+    ul.messages {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0 0;
+      text-align: left;
+    }
+
+    ul.messages li {
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    ul.messages li.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    ul.messages li.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    /* Mensagem de erro simples */
+    .erro {
+      margin-top: 15px;
+      color: #721c24;
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      padding: 12px 15px;
+      border-radius: 6px;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    /* Responsividade */
+    @media (max-width: 420px) {
+      .register-box {
+        padding: 20px 15px;
+        width: 95%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Faixa superior com logo -->
+  <div class="faixa-topo">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" />
+  </div>
+
+  <!-- Caixa de cadastro -->
+  <div class="register-box">
+      <h1>Cadastro</h1>
+
+      <form method="POST">
+    {{ form.hidden_tag() }}
+    <label for="nomeForm">Nome</label>
+    {{ form.nomeForm() }}
+
+
+    <label for="senhaForm">Senha</label>
+    {{ form.senhaForm() }}
+
+    <label for="cidadeForm">Cidade</label>
+    {{ form.cidadeForm() }}  <!-- NOVO CAMPO -->
+
+    {{ form.submit() }}
+</form>
+
+
+      <p>Já tem conta? <a href="{{ url_for('auth.login') }}">Entrar</a></p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+              <ul class="messages">
+                  {% for category, message in messages %}
+                      <li class="{{ category }}">{{ message }}</li>
+                  {% endfor %}
+              </ul>
+          {% endif %}
+      {% endwith %}
+
+      {% if erro %}
+          <div class="erro">{{ erro }}</div>
+      {% endif %}
+  </div>
+
+</body>
+</html>

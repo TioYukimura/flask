@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Adicionar Produto</title>
+        <style>
+            body {
+                background-color: rgb(20, 99, 95);
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .form-box {
+                background-color: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                width: 350px;
+            }
+            label {
+                display: block;
+                margin-top: 15px;
+                font-weight: bold;
+            }
+            input,
+            textarea,
+            select {
+                width: 100%;
+                margin-top: 10px;
+                padding: 8px;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                box-sizing: border-box;
+            }
+            button {
+                margin-top: 15px;
+                padding: 10px;
+                background-color: rgb(20, 99, 95);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                width: 100%;
+            }
+            button:hover {
+                background-color: rgb(15, 80, 76);
+            }
+            .erro {
+                color: red;
+                margin-top: 5px;
+                font-size: 14px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="form-box">
+            <h2>Adicionar Produto</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %} {%
+            if messages %}
+            <ul>
+                {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %} {% endwith %}
+
+           <form method="POST" enctype="multipart/form-data" action="{{ url_for('produto.adicionar_produtos') }}">
+    {{ form.hidden_tag() }}
+
+    <label for="nomeForm">Nome do Produto:</label>
+    {{ form.nomeForm() }}
+    {% for error in form.nomeForm.errors %}
+        <span class="erro">{{ error }}</span>
+    {% endfor %}
+
+    <label for="precoForm">Preço:</label>
+    {{ form.precoForm() }}
+    {% for error in form.precoForm.errors %}
+        <span class="erro">{{ error }}</span>
+    {% endfor %}
+
+    <label for="descricaoForm">Descrição:</label>
+    {{ form.descricaoForm(rows=4) }}
+    {% for error in form.descricaoForm.errors %}
+        <span class="erro">{{ error }}</span>
+    {% endfor %}
+
+    <label for="categoriaForm">Categoria:</label>
+    {{ form.categoriaForm() }}
+    {% for error in form.categoriaForm.errors %}
+        <span class="erro">{{ error }}</span>
+    {% endfor %}
+
+    <label for="cidadeForm">Cidade:</label>
+    {{ form.cidadeForm() }}
+    {% for error in form.cidadeForm.errors %}
+        <span class="erro">{{ error }}</span>
+    {% endfor %}
+
+    <label for="imagem">Imagem do Produto:</label>
+    {{ form.imagem() }}
+    {% for error in form.imagem.errors %}
+        <span class="erro">{{ error }}</span>
+    {% endfor %}
+
+    {{ form.submit() }}
+</form>
+
+        </div>
+    </body>
+</html>

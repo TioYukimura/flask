@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Chat - {{ produto.nome }}</title>
+        <style>
+            body {
+                margin: 0;
+                background-color: rgb(20, 99, 95);
+                font-family: Arial, Helvetica, sans-serif;
+                color: white;
+            }
+
+            .topo {
+                background-color: white;
+                height: 80px;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 20px;
+                box-sizing: border-box;
+            }
+
+            .login-link {
+                background-color: black;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: bold;
+                margin-left: 10px;
+            }
+
+            .login-link:hover {
+                background-color: gray;
+            }
+
+            .chat-container {
+                max-width: 800px;
+                margin: 30px auto;
+                background-color: white;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                overflow: hidden;
+                color: #333;
+            }
+
+            .chat-header {
+                background-color: rgb(20, 99, 95);
+                color: white;
+                padding: 15px;
+                text-align: center;
+            }
+
+            .chat-header h2 {
+                margin: 0;
+            }
+
+            .chat-header p {
+                margin: 5px 0 0;
+                font-size: 14px;
+            }
+
+            .chat-messages {
+                padding: 20px;
+                height: 400px;
+                overflow-y: auto;
+                background-color: #f9f9f9;
+            }
+
+            .message {
+                margin-bottom: 15px;
+                padding: 10px 15px;
+                border-radius: 8px;
+                max-width: 70%;
+                word-wrap: break-word;
+            }
+
+            .sent {
+                background-color: #e1ffc7;
+                margin-left: auto;
+                border-top-right-radius: 0;
+            }
+
+            .received {
+                background-color: #fff;
+                margin-right: auto;
+                border-top-left-radius: 0;
+                border: 1px solid #eee;
+            }
+
+            .message-info {
+                font-size: 12px;
+                color: #666;
+                margin-bottom: 5px;
+            }
+
+            .message-time {
+                font-size: 11px;
+                color: #999;
+                text-align: right;
+                margin-top: 5px;
+            }
+
+            .chat-form {
+                padding: 15px;
+                background-color: white;
+                border-top: 1px solid #eee;
+            }
+
+            .chat-form textarea {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                resize: none;
+                height: 80px;
+                margin-bottom: 10px;
+            }
+
+            .chat-form button {
+                background-color: rgb(20, 99, 95);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+            }
+
+            .chat-form button:hover {
+                background-color: rgb(15, 80, 76);
+            }
+
+            .back-link {
+                display: block;
+                text-align: center;
+                margin-top: 20px;
+                color: white;
+                text-decoration: none;
+            }
+
+            .back-link:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Topo -->
+        <div class="topo">
+            <img
+                src="{{ url_for('static', filename='img/logo.png') }}"
+                alt="Logo"
+                style="height: 60px; margin-left: 10px"
+            />
+            <div style="display: flex; align-items: center">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('perfil.perfil') }}" class="login-link"
+                    >Meu Perfil</a
+                >
+                <a href="{{ url_for('auth.logout') }}" class="login-link"
+                    >Sair</a
+                >
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="login-link"
+                    >Login</a
+                >
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Chat -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>{{ produto.nome }}</h2>
+                <p>Conversando com {{ outro_usuario.nome }}</p>
+            </div>
+
+            <div class="chat-messages">
+                {% for chat in chats %}
+                <div
+                    class="message {% if chat.remetente_id == current_user.id %}sent{% else %}received{% endif %}"
+                >
+                    <div class="message-info">
+                        {% if chat.remetente_id == current_user.id %} Você {%
+                        else %} {{ outro_usuario.nome }} {% endif %}
+                    </div>
+                    <div class="message-text">{{ chat.mensagem }}</div>
+                    <div class="message-time">
+                        {{ chat.data_criacao.strftime('%d/%m/%Y %H:%M') }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <form method="POST" class="chat-form">
+                {{ form.hidden_tag() }} {{ form.message(placeholder="Digite sua
+                mensagem...") }} {{ form.submit() }}
+            </form>
+        </div>
+
+        <a href="{{ url_for('chat.meus_chats') }}" class="back-link"
+            >Voltar para meus chats</a
+        >
+    </body>
+</html>

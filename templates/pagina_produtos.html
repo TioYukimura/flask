@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{{ produto.nome }}</title>
+        <style>
+            body {
+                background-color: rgb(20, 99, 95);
+                font-family: Arial, sans-serif;
+                color: white;
+                padding: 20px;
+            }
+
+            .produto-box {
+                background: white;
+                color: black;
+                border-radius: 8px;
+                padding: 20px;
+                max-width: 600px;
+                margin: auto;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                text-align: center;
+            }
+
+            .produto-box img {
+                max-width: 100%;
+                border-radius: 8px;
+                margin-bottom: 15px;
+            }
+
+            .produto-box h2 {
+                margin: 10px 0;
+            }
+
+            .produto-box p {
+                font-size: 16px;
+                margin: 5px 0;
+            }
+
+            .produto-box strong {
+                color: green;
+                font-size: 18px;
+            }
+
+            .voltar {
+                display: block;
+                margin-top: 20px;
+                text-decoration: none;
+                background-color: rgb(20, 99, 95);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 8px;
+                font-weight: bold;
+            }
+
+            .voltar:hover {
+                background-color: rgb(15, 80, 76);
+            }
+
+            .chat-btn {
+                display: inline-block;
+                margin-top: 15px;
+                background-color: rgb(20, 99, 95);
+                color: white;
+                padding: 10px 15px;
+                border-radius: 5px;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+            .chat-btn:hover {
+                background-color: rgb(15, 80, 76);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="produto-box">
+            {% if produto.imagem %}
+            <img
+                src="{{ url_for('static', filename=produto.imagem) }}"
+                alt="{{ produto.nome }}"
+            />
+            {% else %}
+            <img
+                src="{{ url_for('static', filename='img/sem_imagem.png') }}"
+                alt="Sem imagem"
+            />
+            {% endif %}
+            <h2>{{ produto.nome }}</h2>
+            <p>{{ produto.descricao }}</p>
+            <strong>R$ {{ '%.2f'|format(produto.preco) }}</strong>
+
+            {% if current_user.is_authenticated and current_user.id !=
+            produto.usuario_id %}
+            <a
+                href="{{ url_for('chat.chat', produto_id=produto.id, outro_usuario_id=produto.usuario_id) }}"
+                class="chat-btn"
+            >
+                Falar com vendedor
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('main.home') }}" class="voltar"
+                >Voltar para lista</a
+            >
+        </div>
+    </body>
+</html>

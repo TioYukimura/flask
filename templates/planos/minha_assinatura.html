@@ -1,0 +1,158 @@
+{% extends "base_new.html" %}
+
+{% block title %}Minha Assinatura - Vale & Feira{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-white fw-bold mb-4">
+                <i data-feather="star" class="me-2"></i>
+                Minha Assinatura
+            </h2>
+        </div>
+    </div>
+
+    {% if assinatura %}
+    <!-- Active Subscription -->
+    <div class="row mb-4">
+        <div class="col-12 col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h4 class="text-primary fw-bold mb-1">
+                                Plano {{ assinatura.plano.nome }}
+                                {% if assinatura.esta_ativo %}
+                                    <span class="badge bg-success ms-2">ATIVO</span>
+                                {% else %}
+                                    <span class="badge bg-danger ms-2">EXPIRADO</span>
+                                {% endif %}
+                            </h4>
+                            <p class="text-muted mb-0">{{ assinatura.plano.descricao or 'Seus produtos em destaque' }}</p>
+                        </div>
+                        <div class="text-end">
+                            <div class="h5 text-primary mb-0">R$ {{ "%.2f"|format(assinatura.valor_pago) }}</div>
+                            <small class="text-muted">{{ assinatura.metodo_pagamento.upper() }}</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <strong class="text-muted small">DATA DE INÍCIO</strong>
+                            <div>{{ assinatura.data_inicio.strftime('%d/%m/%Y') }}</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <strong class="text-muted small">VÁLIDO ATÉ</strong>
+                            <div>{{ assinatura.data_fim.strftime('%d/%m/%Y') }}</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <strong class="text-muted small">DIAS RESTANTES</strong>
+                            <div class="{% if assinatura.dias_restantes <= 7 %}text-warning{% else %}text-success{% endif %}">
+                                {{ assinatura.dias_restantes }} dias
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if assinatura.dias_restantes <= 7 and assinatura.esta_ativo %}
+                    <div class="alert alert-warning mt-3">
+                        <i data-feather="alert-triangle" class="me-2"></i>
+                        <strong>Seu plano expira em breve!</strong>
+                        <a href="{{ url_for('planos.lista_planos') }}" class="alert-link">Renovar agora</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="text-primary mb-3">
+                        <i data-feather="award" style="width: 48px; height: 48px;"></i>
+                    </div>
+                    <h5 class="fw-bold">Status Premium</h5>
+                    <p class="text-muted mb-3">Seus produtos estão sendo destacados na plataforma!</p>
+                    <a href="{{ url_for('main.meus_produtos') }}" class="btn btn-outline-primary btn-sm">
+                        Ver Meus Produtos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- No Active Subscription -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="text-muted mb-4">
+                        <i data-feather="star" style="width: 64px; height: 64px;"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Nenhum plano ativo</h4>
+                    <p class="text-muted mb-4">
+                        Assine um plano premium para destacar seus produtos e aumentar suas vendas!
+                    </p>
+                    <a href="{{ url_for('planos.lista_planos') }}" class="btn btn-primary">
+                        Ver Planos Disponíveis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Subscription History -->
+    {% if historico %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="fw-bold text-primary mb-4">
+                        <i data-feather="clock" class="me-2"></i>
+                        Histórico de Assinaturas
+                    </h5>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Plano</th>
+                                    <th>Período</th>
+                                    <th>Valor</th>
+                                    <th>Pagamento</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sub in historico %}
+                                <tr>
+                                    <td class="fw-bold">{{ sub.plano.nome }}</td>
+                                    <td>
+                                        {{ sub.data_inicio.strftime('%d/%m/%Y') }}
+                                        -
+                                        {{ sub.data_fim.strftime('%d/%m/%Y') }}
+                                    </td>
+                                    <td class="text-primary fw-bold">R$ {{ "%.2f"|format(sub.valor_pago) }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ sub.metodo_pagamento.upper() }}</span>
+                                    </td>
+                                    <td>
+                                        {% if sub.esta_ativo %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Expirado</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "base_new.html" %}
+
+{% block title %}Planos Premium - Vale & Feira{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold text-white mb-3">
+                    <i data-feather="star" class="me-2"></i>
+                    Planos Premium
+                </h2>
+                <p class="text-white fs-5 mb-4">
+                    Destaque seus produtos e aumente suas vendas com nossos planos premium!
+                </p>
+                {% if assinatura_usuario %}
+                    <div class="alert alert-info d-inline-block">
+                        <i data-feather="check-circle" class="me-2"></i>
+                        Você já tem um plano ativo: <strong>{{ assinatura_usuario.plano.nome }}</strong>
+                        <br>
+                        <small>Válido até {{ assinatura_usuario.data_fim.strftime('%d/%m/%Y') }}</small>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <!-- Basic Plan -->
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="plano-card">
+                <div class="mb-4">
+                    <i data-feather="package" style="width: 48px; height: 48px; color: #14635f;"></i>
+                </div>
+                <h3 class="fw-bold text-primary">Básico</h3>
+                <div class="plano-preco">
+                    R$ 19,90
+                    <small>/mês</small>
+                </div>
+                <ul class="list-unstyled text-start mb-4">
+                    <li class="mb-2">
+                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
+                        Destaque para 5 produtos
+                    </li>
+                    <li class="mb-2">
+                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
+                        Aparecer no topo das buscas
+                    </li>
+                    <li class="mb-2">
+                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
+                        Badge "Premium" no perfil
+                    </li>
+                    <li class="mb-2">
+                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
+                        Suporte prioritário
+                    </li>
+                </ul>
+                {% if not assinatura_usuario %}
+                    <a href="{{ url_for('planos.escolher_pagamento', id_plano=1) }}" class="btn btn-outline-primary w-100">
+                        Escolher Plano
+                    </a>
+                {% else %}
+                    <button class="btn btn-secondary w-100" disabled>Plano Ativo</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Premium Plan -->
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="plano-card plano-destaque">
+                <div class="mb-4">
+                    <i data-feather="award" style="width: 48px; height: 48px; color: #14635f;"></i>
+                </div>
+                <h3 class="fw-bold text-primary">Premium</h3>
+                <div class="plano-preco">
+                    R$ 39,90
+                    <small>/mês</small>
+                </div>
+                <ul class="list-unstyled text-start mb-4">
+                    <li class="mb-2">
+                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
+                        Destaque para produtos ilimitados
+                    </li>
+                    <li class="mb-2">
+                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
+                        Aparecer sempre no topo
+                    </li>
+                    <li class="mb-2">
+                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
+                        Badge "Premium Gold"
+                    </li>
+                    <li class="mb-2">
+                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
+                        Suporte 24/7
+                    </li>
+                    <li class="mb-2">
+                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
+                        Relatórios de vendas
+                    </li>
+                </ul>
+                {% if not assinatura_usuario %}
+                    <a href="{{ url_for('planos.escolher_pagamento', id_plano=2) }}" class="btn btn-primary w-100">
+                        Escolher Plano
+                    </a>
+                {% else %}
+                    <button class="btn btn-secondary w-100" disabled>Plano Ativo</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <h3 class="fw-bold text-primary mb-4">Por que escolher um plano premium?</h3>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-primary mb-3">
+                                <i data-feather="trending-up" style="width: 48px; height: 48px;"></i>
+                            </div>
+                            <h5>Mais Visibilidade</h5>
+                            <p class="text-muted">Seus produtos aparecem primeiro nos resultados de busca</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-primary mb-3">
+                                <i data-feather="message-circle" style="width: 48px; height: 48px;"></i>
+                            </div>
+                            <h5>Mais Contatos</h5>
+                            <p class="text-muted">Receba mais mensagens de interessados em seus produtos</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-primary mb-3">
+                                <i data-feather="dollar-sign" style="width: 48px; height: 48px;"></i>
+                            </div>
+                            <h5>Mais Vendas</h5>
+                            <p class="text-muted">Aumente significativamente suas chances de venda</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

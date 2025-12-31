@@ -1,0 +1,95 @@
+{% extends "base_new.html" %}
+
+{% block title %}Escolher Pagamento - {{ plano.nome }} - Vale & Feira{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('planos.lista_planos') }}" class="text-decoration-none text-white">
+                            Planos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active text-white">Pagamento</li>
+                </ol>
+            </nav>
+
+            <!-- Plan Summary -->
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h4 class="text-primary fw-bold">Plano {{ plano.nome }}</h4>
+                    <div class="h2 text-primary my-3">
+                        R$ {{ "%.2f"|format(plano.preco) }}
+                        <small class="text-muted">/mês</small>
+                    </div>
+                    <p class="text-muted mb-0">{{ plano.descricao or 'Destaque seus produtos e venda mais!' }}</p>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="text-center text-primary fw-bold mb-4">
+                        <i data-feather="credit-card" class="me-2"></i>
+                        Escolha a forma de pagamento
+                    </h5>
+
+                    <div class="row">
+                        <!-- PIX Payment -->
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ url_for('planos.pagar_pix', plano_id=plano.id) }}" class="payment-method d-block text-decoration-none">
+                                <div class="payment-icon">
+                                    💳
+                                </div>
+                                <h5 class="fw-bold">PIX</h5>
+                                <p class="mb-0">Pagamento instantâneo</p>
+                                <small class="text-success">✓ Aprovação imediata</small>
+                            </a>
+                        </div>
+
+                        <!-- Credit Card Payment -->
+                        <div class="col-md-6 mb-3">
+                            <a href="{{ url_for('planos.pagar_cartao', plano_id=plano.id) }}" class="payment-method d-block text-decoration-none">
+                                <div class="payment-icon">
+                                    💳
+                                </div>
+                                <h5 class="fw-bold">Cartão de Crédito</h5>
+                                <p class="mb-0">Parcele em até 12x</p>
+                                <small class="text-info">✓ Todas as bandeiras</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Info -->
+            <div class="card mt-4">
+                <div class="card-body text-center">
+                    <h6 class="text-primary fw-bold mb-3">
+                        <i data-feather="shield" class="me-2"></i>
+                        Pagamento 100% Seguro
+                    </h6>
+                    <div class="row text-muted small">
+                        <div class="col-md-4 mb-2">
+                            <i data-feather="lock" class="me-1"></i>
+                            SSL Criptografado
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <i data-feather="shield-check" class="me-1"></i>
+                            Dados Protegidos
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <i data-feather="check-circle" class="me-1"></i>
+                            PCI Compliance
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

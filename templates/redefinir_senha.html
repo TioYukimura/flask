@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Redefinir Senha</title>
+        <style>
+            body {
+                background-color: rgb(20, 99, 95);
+                font-family: Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .reset-box {
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                width: 350px;
+                text-align: center;
+            }
+            input[type="text"],
+            input[type="password"],
+            input[type="submit"] {
+                width: 100%;
+                padding: 10px;
+                margin-top: 15px;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                box-sizing: border-box;
+            }
+            input[type="submit"] {
+                background-color: rgb(20, 99, 95);
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+            input[type="submit"]:hover {
+                background-color: rgb(15, 80, 76);
+            }
+            a {
+                color: rgb(20, 99, 95);
+                text-decoration: none;
+                display: block;
+                margin-top: 20px;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+            .erro {
+                color: red;
+                margin-top: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="reset-box">
+            <h2>Redefinir Senha</h2>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <!-- Isso inclui o campo CSRF -->
+
+                <label for="nome">Nome de usuário:</label>
+                {{ form.nomeForm(id="nome") }}
+
+                <label for="nova_senha">Nova senha:</label>
+                {{ form.novaSenhaForm(id="nova_senha") }}
+
+                <label for="confirma_senha">Confirme a nova senha:</label>
+                {{ form.confirmaSenhaForm(id="confirma_senha") }} {{
+                form.submit() }}
+            </form>
+            {% with messages = get_flashed_messages(with_categories=true) %} {%
+            if messages %} {% for category, message in messages %}
+            <div class="erro">{{ message }}</div>
+            {% endfor %} {% endif %} {% endwith %}
+            <a href="{{ url_for('auth.login') }}">Voltar para Login</a>
+        </div>
+    </body>
+</html>

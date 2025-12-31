@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <title>Perfil do Usuário</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: rgb(20, 99, 95);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .topo {
+            background-color: white;
+            height: 80px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px 0 0;
+            box-sizing: border-box;
+        }
+
+        .login-link {
+            background-color: black;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .login-link:hover {
+            background-color: gray;
+        }
+
+        .conteudo {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        h1, h2 {
+            color: #143f3d;
+        }
+
+        .produtos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+            margin-top: 20px;
+        }
+
+        .produto {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            width: 200px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .botao-excluir {
+            background-color: #c00;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-weight: bold;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+
+        .botao-excluir:hover {
+            background-color: #a00;
+        }
+
+        .chat-btn {
+            display: inline-block;
+            margin-top: 10px;
+            background-color: rgb(20, 99, 95);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+        }
+
+        .chat-btn:hover {
+            background-color: rgb(15, 80, 76);
+        }
+
+        .mensagens {
+            margin-top: 20px;
+        }
+
+        .mensagens li {
+            list-style: none;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+
+        .botao-add {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: rgb(20, 99, 95);
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .botao-add:hover {
+            background-color: rgb(15, 80, 76);
+        }
+    </style>
+<body>
+
+<div class="topo">
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="height: 175px; margin-left: -10px;">
+    <div> <a href="{{ url_for('chat.meus_chats') }}" class="login-link">Meus Chats</a>
+        
+        <a href="{{ url_for('planos.minha_assinatura') }}" class="login-link">Minha Assinatura</a>
+        <a href="{{ url_for('planos.lista_planos') }}" class="login-link">Ver Planos</a>
+        
+        <a href="{{ url_for('auth.logout') }}" class="login-link">Sair</a>
+    </div>
+</div>
+
+<div class="conteudo">
+    <h1>Olá, {{ current_user.nome }}</h1>
+    <p><strong>Email:</strong> {{ current_user.email or 'Não informado' }}</p>
+    <p><strong>Cidade:</strong> {{ current_user.cidade or 'Não informado' }}</p>
+
+    <div class="mensagens">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    </div>
+
+    <h2>Seus Produtos</h2>
+    {% if produtos %}
+    <div class="produtos">
+        {% for produto in produtos %}
+        <div class="produto">
+            <strong>{{ produto.nome }}</strong><br>
+            {{ produto.descricao or "Sem descrição" }}<br>
+            <span>R$ {{ "%.2f"|format(produto.preco) }}</span>
+            <form action="{{ url_for('produto.excluir_produto', id=produto.id) }}" method="post" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="botao-excluir">Excluir</button>
+            </form>
+            <a href="{{ url_for('chat.chat', produto_id=produto.id, outro_usuario_id=produto.usuario_id) }}" class="chat-btn">
+                Ver conversas
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p>Você ainda não cadastrou produtos.</p>
+    {% endif %}
+
+    <a href="{{ url_for('produto.adicionar_produtos') }}" class="botao-add">+ Adicionar Produto</a>
+</div>
+
+</body>
+</html>

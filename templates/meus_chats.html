@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Meus Chats</title>
+        <style>
+            body {
+                margin: 0;
+                background-color: rgb(20, 99, 95);
+                font-family: Arial, Helvetica, sans-serif;
+                color: white;
+            }
+
+            .topo {
+                background-color: white;
+                height: 80px;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0 20px;
+                box-sizing: border-box;
+            }
+
+            .login-link {
+                background-color: black;
+                color: white;
+                padding: 8px 16px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: bold;
+                margin-left: 10px;
+            }
+
+            .login-link:hover {
+                background-color: gray;
+            }
+
+            .container {
+                max-width: 800px;
+                margin: 30px auto;
+                padding: 20px;
+            }
+
+            h1 {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+
+            .chat-list {
+                background-color: white;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                overflow: hidden;
+                color: #333;
+            }
+
+            .chat-item {
+                padding: 15px;
+                border-bottom: 1px solid #eee;
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+                color: inherit;
+            }
+
+            .chat-item:last-child {
+                border-bottom: none;
+            }
+
+            .chat-item:hover {
+                background-color: #f9f9f9;
+            }
+
+            .chat-avatar {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background-color: rgb(20, 99, 95);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                margin-right: 15px;
+                flex-shrink: 0;
+            }
+
+            .chat-content {
+                flex-grow: 1;
+            }
+
+            .chat-header {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 5px;
+            }
+
+            .chat-user {
+                font-weight: bold;
+                color: rgb(20, 99, 95);
+            }
+
+            .chat-product {
+                font-weight: bold;
+            }
+
+            .chat-preview {
+                font-size: 14px;
+                color: #666;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .chat-time {
+                font-size: 12px;
+                color: #999;
+            }
+
+            .unread-count {
+                background-color: red;
+                color: white;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                margin-left: 10px;
+            }
+
+            .no-chats {
+                text-align: center;
+                padding: 30px;
+                color: #666;
+            }
+
+            .back-link {
+                display: block;
+                text-align: center;
+                margin-top: 20px;
+                color: white;
+                text-decoration: none;
+            }
+
+            .back-link:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Topo -->
+        <div class="topo">
+            <img
+                src="{{ url_for('static', filename='img/logo.png') }}"
+                alt="Logo"
+                style="height: 60px; margin-left: 10px"
+            />
+            <div style="display: flex; align-items: center">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('perfil.perfil') }}" class="login-link"
+                    >Meu Perfil</a
+                >
+                <a href="{{ url_for('auth.logout') }}" class="login-link"
+                    >Sair</a
+                >
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="login-link"
+                    >Login</a
+                >
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Lista de chats -->
+        <div class="container">
+            <h1>Minhas Conversas</h1>
+
+            <div class="chat-list">
+                {% if grupos_chat %} {% for grupo in grupos_chat %}
+                <a
+                    href="{{ url_for('chat.chat', produto_id=grupo['produto'].id, outro_usuario_id=grupo['outro_usuario'].id) }}"
+                    class="chat-item"
+                >
+                    <div class="chat-avatar">
+                        {{ grupo['outro_usuario'].nome[0]|upper }}
+                    </div>
+                    <div class="chat-content">
+                        <div class="chat-header">
+                            <span class="chat-user"
+                                >{{ grupo['outro_usuario'].nome }}</span
+                            >
+                            <span class="chat-time"
+                                >{{
+                                grupo['ultimo_chat'].data_criacao.strftime('%d/%m/%Y
+                                %H:%M') }}</span
+                            >
+                        </div>
+                        <div class="chat-product">
+                            {{ grupo['produto'].nome }}
+                        </div>
+                        <div class="chat-preview">
+                            {{ grupo['ultimo_chat'].obter_preview() }}
+                        </div>
+                    </div>
+                    {% if grupo['nao_lidas'] > 0 %}
+                    <div class="unread-count">{{ grupo['nao_lidas'] }}</div>
+                    {% endif %}
+                </a>
+                {% endfor %} {% else %}
+                <div class="no-chats">Você não tem nenhuma conversa ativa.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <a href="{{ url_for('main.home') }}" class="back-link"
+            >Voltar para a página inicial</a
+        >
+    </body>
+</html>
