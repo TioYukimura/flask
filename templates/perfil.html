@@ -1,189 +1,461 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8" />
-    <title>Perfil do Usuário</title>
+    <meta charset="UTF-8">
+    <title>Perfil - Vale & Feira</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        body {
+        /* --- RESET E FONTE --- */
+        * {
             margin: 0;
-            background-color: rgb(20, 99, 95);
-            font-family: Arial, Helvetica, sans-serif;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
         }
 
-        .topo {
-            background-color: white;
-            height: 80px;
-            width: 100%;
+        body {
+            background: #eef6ee;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER IGUAL AO SITE (SEM BUSCA) --- */
+        .topbar {
+            background: #eef7ee;
+            padding: 15px 50px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px 0 0;
-            box-sizing: border-box;
+            border-bottom: 1px solid #ddd;
         }
 
-        .login-link {
-            background-color: black;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
-        .login-link:hover {
-            background-color: gray;
-        }
-
-        .conteudo {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
-
-        h1, h2 {
-            color: #143f3d;
-        }
-
-        .produtos {
+        .logo-container {
             display: flex;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #1f5c4d;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        /* LINKS DE NAVEGAÇÃO */
+        .nav-links {
+            display: flex;
+            align-items: center;
             gap: 20px;
-            justify-content: flex-start;
-            margin-top: 20px;
+            flex-shrink: 0;
         }
 
-        .produto {
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            padding: 15px;
-            width: 200px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        .nav-links a {
+            text-decoration: none;
+            color:#adaaa6;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: 0.3s;
             position: relative;
         }
 
-        .botao-excluir {
-            background-color: #c00;
+        .nav-links a:hover {
+            color: #1f5c4d;
+        }
+        .nav-planoslink a {
+            text-decoration: none;
+            color:rgb(0, 76, 9);
+            font-size: 0.9rem;
+            font-weight: 900;
+            transition: 0.3s;
+            position: relative;
+        }
+        .bolinha-notificacao {
+            background-color: #d32f2f;
             color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 6px 12px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 50%;
+            margin-left: 5px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .btn-login { color: #1f5c4d; font-weight: bold; }
+        .btn-cadastro {
+            background: #1f5c4d; color: white !important;
+            padding: 8px 18px; border-radius: 20px;
+        }
+        .btn-cadastro:hover { background: #164238; }
+
+        /* Estilos específicos para Planos e Sair */
+        .planos { color: #0b6b5c !important; font-weight: bold; }
+        .sair { color: #ff4d4d !important; font-weight: bold; }
+
+        /* --- CONTAINER PRINCIPAL --- */
+        .container {
+            padding: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+        
+        /* MENSAGENS FLASH */
+        .flash-msg {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .flash-success { background-color: #dcedc8; color: #33691e; border: 1px solid #c5e1a5; }
+        .flash-error { background-color: #ffcdd2; color: #b71c1c; border: 1px solid #ef9a9a; }
+        .flash-info { background-color: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
+
+        /* PERFIL BOX */
+        .perfil-box {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            position: relative;
+        }
+        
+        .badge-plano {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .bg-premium { background: #fff8e1; color: #f57c00; border: 1px solid #ffe0b2; }
+        .bg-free { background: #f5f5f5; color: #777; border: 1px solid #eee; }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background-color: #4f7d5b;
+            border-radius: 50%;
+            margin-right: 20px;
             cursor: pointer;
-            font-weight: bold;
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 3px solid #eef6ee;
+            position: relative;
+        }
+        
+        .avatar:hover { opacity: 0.9; border-color: #2d5a4c; }
+        
+        .avatar-initial { color: white; font-size: 2rem; font-weight: bold; }
+        
+        .avatar-edit-icon {
+            position: absolute; bottom: 0; right: 0;
+            background: rgba(0,0,0,0.5); color: white; width: 100%;
+            text-align: center; font-size: 0.7rem; padding: 2px 0;
+            display: none;
+        }
+        .avatar:hover .avatar-edit-icon { display: block; }
+
+        /* Nome do usuário */
+        .info h2 { 
+            color: #2d5a4c; /* Verde escuro igual aos botões */
+            margin-bottom: 8px; 
+        }
+        .info p { color: #555; margin-top: 3px; font-size: 0.95rem; }
+
+        /* CARDS */
+        .cards { display: flex; gap: 25px; flex-wrap: wrap; }
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 25px;
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .botao-excluir:hover {
-            background-color: #a00;
+        /* Títulos dos Cards */
+        .card h3 { color: #2d5a4c; margin-bottom: 10px; }
+        .card p { color: #666; margin-bottom: 20px; font-size: 0.9rem; }
+        
+        /* Botões dos Cards */
+        .btn-card {
+            background: #2d5a4c; color: #fff; border: none;
+            padding: 10px 20px; border-radius: 20px; cursor: pointer;
+            text-decoration: none; display: inline-block; font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .btn-card:hover { background: #1f4036; }
+
+        /* MEUS PRODUTOS */
+        .meus-produtos { margin-top: 40px; }
+        
+        /* Título da seção */
+        .titulo-secao {
+            color: #2d5a4c; margin-bottom: 20px; padding-bottom: 10px;
+            border-bottom: 2px solid #e0eadd;
+        }
+        
+        .grid-produtos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .prod-item {
+            background: white; border-radius: 12px; padding: 15px;
+            display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        
+        .prod-img {
+            width: 60px; height: 60px; border-radius: 8px;
+            object-fit: cover; background: #f0f0f0;
+        }
+        
+        .prod-info { flex: 1; }
+        .prod-info h4 { font-size: 1rem; color: #333; margin-bottom: 4px; }
+        
+        /* Preço do Produto */
+        .prod-price { color: #2d5a4c; font-weight: bold; font-size: 0.9rem; }
+        
+        .prod-actions { margin-top: 5px; font-size: 0.8rem; }
+        
+        /* Link Visualizar */
+        .btn-ver { color: #2d5a4c; text-decoration: none; font-weight: bold; margin-right: 10px; }
+        
+        /* Link Editar (NOVO) */
+        .btn-editar { color: #f57c00; text-decoration: none; font-weight: bold; margin-right: 10px; }
+        
+        .btn-del { 
+            color: #d32f2f; background: none; border: none; 
+            cursor: pointer; font-weight: bold; font-size: 0.8rem;
         }
 
-        .chat-btn {
-            display: inline-block;
-            margin-top: 10px;
-            background-color: rgb(20, 99, 95);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
+        /* --- FOOTER --- */
+        .footer {
+            margin-top: 60px;
+            background: #2d5a4c;
+            color: #c2d6cf;
+            padding: 60px 10% 20px;
         }
 
-        .chat-btn:hover {
-            background-color: rgb(15, 80, 76);
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 40px;
         }
 
-        .mensagens {
-            margin-top: 20px;
+        .footer-col h4 { color: #ffffff; margin-bottom: 20px; font-size: 1.1rem; }
+        .footer-col p { line-height: 1.6; margin-bottom: 10px; font-size: 0.9rem; }
+
+        .footer-col a {
+            display: block; color: #c2d6cf; text-decoration: none;
+            margin-bottom: 12px; font-size: 0.9rem; transition: 0.3s;
+        }
+        .footer-col a:hover { color: #ffffff; padding-left: 5px; }
+
+        .footer-bottom {
+            text-align: center; padding-top: 20px; font-size: 0.8rem; color: #8da69e;
         }
 
-        .mensagens li {
-            list-style: none;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-
-        .success { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: #721c24; }
-        .info { background-color: #d1ecf1; color: #0c5460; }
-
-        .botao-add {
-            display: inline-block;
-            margin-top: 20px;
-            background-color: rgb(20, 99, 95);
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-
-        .botao-add:hover {
-            background-color: rgb(15, 80, 76);
+        @media (max-width: 768px) {
+            .topbar { padding: 20px; flex-direction: column; gap: 15px; }
+            .perfil-box { flex-direction: column; text-align: center; }
+            .avatar { margin-right: 0; margin-bottom: 15px; }
+            .badge-plano { position: static; margin-bottom: 15px; display: inline-block; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
         }
     </style>
+</head>
 <body>
 
-<div class="topo">
-    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="height: 175px; margin-left: -10px;">
-    <div> <a href="{{ url_for('chat.meus_chats') }}" class="login-link">Meus Chats</a>
+<form id="form-foto" action="{{ url_for('perfil.upload_foto') }}" method="POST" enctype="multipart/form-data" style="display: none;">
+    <input type="file" id="input-foto" name="foto" accept="image/*" onchange="document.getElementById('form-foto').submit()">
+</form>
+
+<header class="topbar">
+    <a href="{{ url_for('main.home') }}" class="logo-container">
+        <img src="{{ url_for('static', filename='img/logo.png') }}" 
+             alt="Vale&Feira" 
+             class="logo-img"
+             style="height: 55px; width: auto; object-fit: contain;">
         
-        <a href="{{ url_for('planos.minha_assinatura') }}" class="login-link">Minha Assinatura</a>
-        <a href="{{ url_for('planos.lista_planos') }}" class="login-link">Ver Planos</a>
-        
-        <a href="{{ url_for('auth.logout') }}" class="login-link">Sair</a>
-    </div>
-</div>
+        <span class="logo-text">Vale&Feira</span>
+    </a>
 
-<div class="conteudo">
-    <h1>Olá, {{ current_user.nome }}</h1>
-    <p><strong>Email:</strong> {{ current_user.email or 'Não informado' }}</p>
-    <p><strong>Cidade:</strong> {{ current_user.cidade or 'Não informado' }}</p>
-
-    <div class="mensagens">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-          {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    </div>
-
-    <h2>Seus Produtos</h2>
-    {% if produtos %}
-    <div class="produtos">
-        {% for produto in produtos %}
-        <div class="produto">
-            <strong>{{ produto.nome }}</strong><br>
-            {{ produto.descricao or "Sem descrição" }}<br>
-            <span>R$ {{ "%.2f"|format(produto.preco) }}</span>
-            <form action="{{ url_for('produto.excluir_produto', id=produto.id) }}" method="post" style="display:inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="botao-excluir">Excluir</button>
-            </form>
-            <a href="{{ url_for('chat.chat', produto_id=produto.id, outro_usuario_id=produto.usuario_id) }}" class="chat-btn">
-                Ver conversas
+    <nav class="nav-links">
+        <a href="{{ url_for('main.home') }}">Início</a>
+        <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('chat.meus_chats') }}">
+                Conversas
+                {% if mensagens_nao_lidas is defined and mensagens_nao_lidas > 0 %}
+                    <span class="bolinha-notificacao">{{ mensagens_nao_lidas }}</span>
+                {% endif %}
             </a>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-        <p>Você ainda não cadastrou produtos.</p>
-    {% endif %}
+            <nav class="nav-planoslink">
+                <a href="{{ url_for('planos.lista_planos') }}">🌟Planos🌟</a>
+            </nav>
+            <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+            <a href="{{ url_for('auth.logout') }}" style="color: #ff6b6b;">Sair</a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}" class="btn-login">Login</a>
+            <a href="{{ url_for('auth.registrar') }}" class="btn-cadastro">Cadastrar</a>
+        {% endif %}
+    </nav>
+</header>
 
-    <a href="{{ url_for('produto.adicionar_produtos') }}" class="botao-add">+ Adicionar Produto</a>
-</div>
+<main class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-msg flash-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <section class="perfil-box">
+        {% if current_user.tem_plano_ativo() %}
+            <span class="badge-plano bg-premium">⭐ Premium</span>
+        {% else %}
+            <span class="badge-plano bg-free">Sem plano</span>
+        {% endif %}
+
+        <div class="avatar" onclick="document.getElementById('input-foto').click()" 
+             title="Alterar foto"
+             style="{% if current_user.foto_perfil %}background-image: url('{{ url_for('static', filename='uploads/' + current_user.foto_perfil) }}');{% endif %}">
+            
+            {% if not current_user.foto_perfil %}
+                <span class="avatar-initial">{{ current_user.nome[0]|upper }}</span>
+            {% endif %}
+            
+            <div class="avatar-edit-icon">📷 Alterar</div>
+        </div>
+
+        <div class="info">
+            <h2>{{ current_user.nome }}</h2>
+            <p>Cliente desde {{ current_user.data_cadastro.strftime('%b de %Y') }}</p>
+            <p>📧 {{ current_user.email }}</p>
+            <p>📍 {{ current_user.cidade or 'Cidade não informada' }}</p> 
+        </div>
+    </section>
+
+    <section class="cards">
+        <div class="card">
+            <h3>👤 Meus Dados</h3>
+            <p>Visualize e edite suas informações pessoais.</p>
+            <a href="{{ url_for('perfil.editar_perfil') }}" class="btn-card">Editar Dados</a>
+        </div>
+
+        <div class="card">
+            <h3>➕ Adicionar produto</h3>
+            <p>Adicione seus produtos para venda na plataforma.</p>
+            <a href="{{ url_for('produto.adicionar_produtos') }}" class="btn-card">Adicionar Produto</a>
+        </div>
+
+        <div class="card">
+            <h3>💬 Conversas</h3>
+            <p>Acesse suas conversas com outros produtores.</p>
+            <a href="{{ url_for('chat.meus_chats') }}" class="btn-card">Ver Conversas</a>
+        </div>
+        
+        <div class="card">
+            <h3>⭐ Planos ⭐</h3>
+            <p>Gerencie sua assinatura e benefícios.</p>
+            <a href="{{ url_for('planos.minha_assinatura') }}" class="btn-card">Ver Assinatura</a>
+        </div>
+    </section>
+
+    <section class="meus-produtos">
+        <h3 class="titulo-secao"> Meus Produtos adicionados</h3>
+        
+        {% if produtos %}
+            <div class="grid-produtos">
+                {% for produto in produtos %}
+                <div class="prod-item">
+                    <img src="{{ url_for('static', filename=produto.imagem) if produto.imagem else url_for('static', filename='img/sem_imagem.png') }}" class="prod-img" alt="Foto">
+                    <div class="prod-info">
+                        <h4>{{ produto.nome }}</h4>
+                        <div class="prod-price">R$ {{ "%.2f"|format(produto.preco) }}</div>
+                        <div class="prod-actions">
+                            <a href="{{ url_for('produto.pagina_produto', id=produto.id) }}" class="btn-ver">Visualizar</a>
+                            <a href="{{ url_for('produto.editar_produto', id=produto.id) }}" class="btn-editar">Editar</a>
+                            <form action="{{ url_for('produto.excluir_produto', id=produto.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir?');">
+                                <button type="submit" class="btn-del">Excluir</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 30px; background: white; border-radius: 12px; color: #888;">
+                <p>Você ainda não cadastrou nenhum produto.</p>
+            </div>
+        {% endif %}
+    </section>
+
+</main>
+
+<footer class="footer">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Vale&Feira</h4>
+            <p>Conectando produtores e consumidores através da tecnologia e sustentabilidade.</p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Links Rápidos</h4>
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            <a href="{{ url_for('produto.adicionar_produtos') }}">Adicionar Produto</a> 
+            <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+            {% endif %}
+        </div>
+
+        <div class="footer-col">
+            <h4>Suporte</h4>
+            <a href="#">Central de Ajuda</a>
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Termos de Uso</a>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contato & Suporte</h4>
+            <a>📧contato@valefeira.com.br </a>
+            <a>📧suportevaleefeira@gmail.com</a>
+            <a href="#">📱 (38) 3333-4444</a>
+            <p>📍 Vale do Jequitinhonha, MG</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        &copy; 2026 Vale&Feira. Todos os direitos reservados.
+    </div>
+</footer>
 
 </body>
 </html>

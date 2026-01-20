@@ -64,8 +64,16 @@
         .form-box h2 {
             color: #1f5c4d;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             font-size: 1.5rem;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
 
         .form-group {
@@ -127,12 +135,6 @@
             border: 1px solid #ef9a9a;
         }
 
-        .flash-success {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #a5d6a7;
-        }
-
         .flash-info {
             background-color: #e3f2fd;
             color: #0d47a1;
@@ -148,19 +150,11 @@
             font-size: 0.8rem;
         }
 
-        .passos {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 25px;
-            color: #ccc;
-            font-size: 0.9rem;
-        }
-
-        .passo-ativo {
-            color: #1f5c4d;
-            font-weight: bold;
-            border-bottom: 2px solid #1f5c4d;
+        .error-msg {
+            color: #d32f2f;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: block;
         }
     </style>
 </head>
@@ -170,19 +164,13 @@
             <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Vale&Feira">
             <span>Vale&Feira</span>
         </a>
-        <a href="{{ url_for('auth.cancelar_recuperacao') }}" style="color: #666; font-size: 0.85rem; text-decoration: none;">Cancelar</a>
+        <a href="{{ url_for('auth.login') }}" style="color: #1f5c4d; font-weight: 600; text-decoration: none;">Voltar</a>
     </header>
 
     <main class="container">
         <div class="form-box">
-            
-            <div class="passos">
-                <span class="{{ 'passo-ativo' if etapa == 1 }}">1. E-mail</span>
-                <span>&rarr;</span>
-                <span class="{{ 'passo-ativo' if etapa == 2 }}">2. Código</span>
-                <span>&rarr;</span>
-                <span class="{{ 'passo-ativo' if etapa == 3 }}">3. Senha</span>
-            </div>
+            <h2>Esqueci minha senha</h2>
+            <p class="subtitulo">Informe seu e-mail. Enviaremos um código de autorização para o seu email.</p>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -192,50 +180,19 @@
                 {% endif %}
             {% endwith %}
 
-            {% if etapa == 1 %}
-                <h2>Recuperar Acesso</h2>
-                <form method="POST">
-                    {{ form_email.hidden_tag() }}
-                    <div class="form-group">
-                        <label>Informe seu E-mail</label>
-                        {{ form_email.emailForm(class="form-control", placeholder="seu@email.com") }}
-                    </div>
-                    {{ form_email.submit(class="btn-submit") }}
-                </form>
-
-            {% elif etapa == 2 %}
-                <h2>Código de Segurança</h2>
-                <p style="text-align: center; font-size: 0.9rem; color: #666; margin-bottom: 20px;">
-                    Verifique seu e-mail e digite o código abaixo.
-                </p>
-                <form method="POST">
-                    {{ form_codigo.hidden_tag() }}
-                    <div class="form-group">
-                        <label>Código Recebido</label>
-                        {{ form_codigo.codigoForm(class="form-control", placeholder="Ex: 123456") }}
-                    </div>
-                    {{ form_codigo.submit(class="btn-submit") }}
-                </form>
-
-            {% elif etapa == 3 %}
-                <h2>Criar Nova Senha</h2>
-                <form method="POST">
-                    {{ form_senha.hidden_tag() }}
-                    <div class="form-group">
-                        <label>Nova Senha</label>
-                        {{ form_senha.novaSenhaForm(class="form-control", placeholder="Mínimo 6 caracteres") }}
-                    </div>
-                    <div class="form-group">
-                        <label>Confirmar Nova Senha</label>
-                        {{ form_senha.confirmaSenhaForm(class="form-control", placeholder="Repita a senha") }}
-                    </div>
-                    {{ form_senha.submit(class="btn-submit") }}
-                </form>
-            {% endif %}
-
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    <label>E-mail Cadastrado</label>
+                    {{ form.emailForm(class="form-control", placeholder="seu@email.com") }}
+                    {% if form.emailForm.errors %}
+                        <span class="error-msg">{{ form.emailForm.errors[0] }}</span>
+                    {% endif %}
+                </div>
+                {{ form.submit(class="btn-submit") }}
+            </form>
         </div>
     </main>
-
     <footer class="footer">&copy; 2026 Vale&Feira.</footer>
 </body>
 </html>

@@ -1,216 +1,246 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cadastro</title>
-  <style>
-    /* Reset básico */
-    * {
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <title>Criar Conta - Vale & Feira</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        body {
+            background: #eef6ee;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: rgb(20, 99, 95);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      align-items: center;
-    }
+        .topo {
+            background: #eef7ee;
+            padding: 18px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
 
-    /* Faixa topo */
-    .faixa-topo {
-      width: 100%;
-      background: white;
-      height: 80px;
-      display: flex;
-      align-items: center;
-      padding-left: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f5c4d;
+            text-decoration: none;
+        }
 
-    .faixa-topo img {
-      height: 60px;
-    }
+        .logo-area img {
+            width: 35px;
+            height: 35px;
+        }
 
-    /* Caixa de registro */
-    .register-box {
-      background: white;
-      max-width: 400px;
-      width: 90%;
-      margin: 40px 0;
-      padding: 30px 25px;
-      border-radius: 10px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-      color: #333;
-      text-align: center;
-    }
+        .topo a.link-login {
+            color: #1f5c4d;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
 
-    .register-box h1 {
-      margin-bottom: 25px;
-      font-weight: 700;
-      color: rgb(20, 99, 95);
-    }
+        .topo a.link-login:hover {
+            text-decoration: underline;
+        }
 
-    /* Labels e inputs */
-    label {
-      display: block;
-      text-align: left;
-      margin-bottom: 6px;
-      font-weight: 600;
-      color: rgb(20, 99, 95);
-    }
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
 
-    input[type="text"],
-    input[type="password"],
-    input[type="email"] {
-      width: 100%;
-      padding: 10px 12px;
-      margin-bottom: 18px;
-      border: 2px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-      transition: border-color 0.3s ease;
-    }
+        .form-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 500px;
+        }
 
-    input[type="text"]:focus,
-    input[type="password"]:focus,
-    input[type="email"]:focus {
-      outline: none;
-      border-color: rgb(20, 99, 95);
-      box-shadow: 0 0 5px rgb(20, 99, 95, 0.5);
-    }
+        .form-box h2 {
+            color: #1f5c4d;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
 
-    /* Botão submit */
-    button, input[type="submit"] {
-      width: 100%;
-      padding: 12px 0;
-      background-color: rgb(20, 99, 95);
-      border: none;
-      border-radius: 6px;
-      color: white;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin-top: 10px;
-    }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a4a4a;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
 
-    button:hover, input[type="submit"]:hover {
-      background-color: rgb(15, 80, 76);
-    }
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+            background: #fdfdfd;
+        }
 
-    /* Links */
-    p {
-      margin-top: 20px;
-      font-size: 14px;
-      color: #555;
-    }
+        .form-control:focus {
+            border-color: #1f5c4d;
+            background: white;
+        }
 
-    a {
-      color: rgb(20, 99, 95);
-      text-decoration: none;
-      font-weight: 600;
-    }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #1f5c4d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
 
-    a:hover {
-      text-decoration: underline;
-    }
+        .btn-submit:hover {
+            background: #164238;
+        }
 
-    /* Mensagens flash */
-    ul.messages {
-      list-style: none;
-      padding: 0;
-      margin: 20px 0 0;
-      text-align: left;
-    }
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
 
-    ul.messages li {
-      padding: 12px 15px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 14px;
-    }
+        .form-footer a {
+            color: #1f5c4d;
+            font-weight: bold;
+            text-decoration: none;
+        }
 
-    ul.messages li.success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
+        .error-msg {
+            color: #d32f2f;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: block;
+        }
 
-    ul.messages li.error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
+        .footer {
+            background: #2d5a4c;
+            color: #c2d6cf;
+            padding: 40px 10% 20px;
+            margin-top: auto;
+        }
 
-    /* Mensagem de erro simples */
-    .erro {
-      margin-top: 15px;
-      color: #721c24;
-      background-color: #f8d7da;
-      border: 1px solid #f5c6cb;
-      padding: 12px 15px;
-      border-radius: 6px;
-      font-weight: 600;
-      text-align: left;
-    }
-
-    /* Responsividade */
-    @media (max-width: 420px) {
-      .register-box {
-        padding: 20px 15px;
-        width: 95%;
-      }
-    }
-  </style>
+        .footer-bottom {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #8da69e;
+        }
+        
+        @media (max-width: 600px) {
+            .topo {
+                padding: 15px 20px;
+            }
+            .form-box {
+                padding: 25px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Faixa superior com logo -->
-  <div class="faixa-topo">
-      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" />
-  </div>
+    <header class="topo">
+        <a href="{{ url_for('main.home') }}" class="logo-area">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Vale&Feira">
+            <span>Vale&Feira</span>
+        </a>
+        <a href="{{ url_for('auth.login') }}" class="link-login">Já tenho conta &rarr;</a>
+    </header>
 
-  <!-- Caixa de cadastro -->
-  <div class="register-box">
-      <h1>Cadastro</h1>
+    <main class="container">
+        <div class="form-box">
+            <h2>Crie sua conta</h2>
 
-      <form method="POST">
-    {{ form.hidden_tag() }}
-    <label for="nomeForm">Nome</label>
-    {{ form.nomeForm() }}
+            <form method="POST">
+                {{ form.hidden_tag() }}
 
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    {{ form.nomeForm(class="form-control", placeholder="Ex: Maria Silva") }}
+                    {% if form.nomeForm.errors %}
+                        <span class="error-msg">{{ form.nomeForm.errors[0] }}</span>
+                    {% endif %}
+                </div>
 
-    <label for="senhaForm">Senha</label>
-    {{ form.senhaForm() }}
+                <div class="form-group">
+                    <label>E-mail</label>
+                    {{ form.emailForm(class="form-control", placeholder="seu@email.com") }}
+                    {% if form.emailForm.errors %}
+                        <span class="error-msg">{{ form.emailForm.errors[0] }}</span>
+                    {% endif %}
+                </div>
 
-    <label for="cidadeForm">Cidade</label>
-    {{ form.cidadeForm() }}  <!-- NOVO CAMPO -->
+                <div class="form-group">
+                    <label>Cidade</label>
+                    {{ form.cidadeForm(class="form-control", placeholder="Ex: Araçuaí") }}
+                    {% if form.cidadeForm.errors %}
+                        <span class="error-msg">{{ form.cidadeForm.errors[0] }}</span>
+                    {% endif %}
+                </div>
 
-    {{ form.submit() }}
-</form>
+                <div class="form-group">
+                    <label>Senha</label>
+                    {{ form.senhaForm(class="form-control", placeholder="Crie uma senha segura") }}
+                    {% if form.senhaForm.errors %}
+                        <span class="error-msg">{{ form.senhaForm.errors[0] }}</span>
+                    {% endif %}
+                </div>
 
+                <div class="form-group">
+                    <label>Confirmar Senha</label>
+                    {{ form.confirmaSenhaForm(class="form-control", placeholder="Digite a senha novamente") }}
+                    {% if form.confirmaSenhaForm.errors %}
+                        <span class="error-msg">{{ form.confirmaSenhaForm.errors[0] }}</span>
+                    {% endif %}
+                </div>
 
-      <p>Já tem conta? <a href="{{ url_for('auth.login') }}">Entrar</a></p>
+                {{ form.submit(class="btn-submit") }}
 
-      {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-              <ul class="messages">
-                  {% for category, message in messages %}
-                      <li class="{{ category }}">{{ message }}</li>
-                  {% endfor %}
-              </ul>
-          {% endif %}
-      {% endwith %}
+                <div class="form-footer">
+                    Ao se cadastrar, você aceita nossos <a href="#">Termos de Uso</a>.<br><br>
+                    Já tem uma conta? <a href="{{ url_for('auth.login') }}">Fazer Login</a>
+                </div>
+            </form>
+        </div>
+    </main>
 
-      {% if erro %}
-          <div class="erro">{{ erro }}</div>
-      {% endif %}
-  </div>
+    <footer class="footer">
+        <div class="footer-bottom">
+            &copy; 2026 Vale&Feira. Todos os direitos reservados.
+        </div>
+    </footer>
 
 </body>
 </html>

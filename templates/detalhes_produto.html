@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ produto.nome }} - Vale & Feira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --verde-fundo: #edf7ed;
+            --verde-escuro: #2d5a4c;
+            --verde-primario: #3a6351;
+            --branco: #ffffff;
+            --texto-cor: #4a4a4a;
+            --cinza-texto: #7a7a7a;
+            --vermelho-notificacao: #ff6b6b;
+            --whatsapp-color: #25D366;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--verde-fundo);
+            color: var(--texto-cor);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background: transparent;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .logo-img {
+            height: 35px;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+        }
+        
+        .barra-busca {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 30px;
+        }
+
+        .barra-busca form {
+            display: flex;
+            background: var(--branco);
+            padding: 5px 15px;
+            border-radius: 30px;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e0eee0;
+        }
+
+        .barra-busca input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            padding: 8px;
+            outline: none;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .barra-busca button {
+            background: var(--verde-escuro);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .barra-busca button:hover {
+            background: var(--verde-primario);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--cinza-texto);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--verde-escuro);
+        }
+
+        .nav-planoslink a {
+            text-decoration: none;
+            color:rgb(0, 76, 9);
+            font-size: 0.9rem;
+            font-weight: 900;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .bolinha-notificacao {
+            background-color: var(--vermelho-notificacao);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 50%;
+            margin-left: 5px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .btn-login {
+            border: 2px solid var(--verde-escuro);
+            color: var(--verde-escuro) !important;
+            padding: 8px 20px !important;
+            border-radius: 20px;
+            font-weight: 700 !important;
+        }
+
+        .btn-login:hover {
+            background: var(--verde-escuro);
+            color: white !important;
+        }
+
+        .btn-cadastro {
+            background-color: var(--verde-escuro);
+            color: white !important;
+            padding: 10px 22px !important;
+            border-radius: 20px;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 10px rgba(45, 90, 76, 0.2);
+        }
+
+        .btn-cadastro:hover {
+            background: var(--verde-primario);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+        
+        .btn-voltar-topo {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--verde-escuro);
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .btn-voltar-topo:hover {
+            transform: translateX(-5px);
+        }
+
+        .detalhes-grid {
+            display: grid; 
+            grid-template-columns: 1fr 1.2fr; 
+            gap: 50px; 
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        }
+        
+        .img-container { 
+            text-align: center; 
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .img-container img { 
+            width: 100%; 
+            max-height: 500px; 
+            object-fit: cover; 
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .info-container {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tags-topo {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .categoria-tag {
+            background: #dceada;
+            color: var(--verde-escuro);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        
+        .disponibilidade-tag {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .disp-ok {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .disp-encomenda {
+            background: #fff3e0;
+            color: #e65100;
+            border: 1px solid #ffe0b2;
+        }
+
+        h1 {
+            color: var(--verde-escuro);
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            line-height: 1.2;
+        }
+        
+        .produtor-row {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .produtor-nome {
+            font-size: 1.1rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .produtor-detalhes {
+            font-size: 0.9rem;
+            color: var(--cinza-texto);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .preco-area {
+            margin-bottom: 25px;
+        }
+
+        .preco-antigo {
+            text-decoration: line-through;
+            color: #ccc;
+            font-size: 1.1rem;
+            margin-right: 10px;
+        }
+
+        .preco-atual {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+        }
+
+        .desconto-badge {
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .tag {
+            background: #e8f5e9;
+            color: var(--verde-escuro);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .descricao-box {
+            background: #fdfcf8;
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid #efebe0;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .descricao-label {
+            font-weight: 700;
+            color: var(--verde-escuro);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .action-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn-chat {
+            background: var(--verde-escuro);
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-chat:hover {
+            background: var(--verde-primario);
+            transform: translateY(-2px);
+        }
+        
+        .btn-whatsapp {
+            background: var(--whatsapp-color);
+            color: white;
+            text-align: center;
+            padding: 16px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-whatsapp:hover {
+            background: #1ebc57;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            text-align: center;
+            padding: 16px;
+            border-radius: 15px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .footer {
+            background: var(--verde-escuro);
+            color: #c2d6cf;
+            padding: 60px 10% 20px;
+            margin-top: auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 40px;
+        }
+
+        .footer-col h4 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .footer-col p {
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .footer-col a {
+            display: block;
+            color: #c2d6cf;
+            text-decoration: none;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+
+        .footer-col a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 25px;
+            font-size: 0.8rem;
+            color: #c2d6cf;
+        }
+
+        @media (max-width: 900px) {
+            .topbar {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .barra-busca {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+            }
+
+            .detalhes-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="{{ url_for('main.home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" class="logo-img" alt="Logo">
+            <span class="logo-text">Vale&Feira</span>
+        </a>
+
+        <div class="barra-busca">
+            <form method="get" action="{{ url_for('produto.buscar_produtos') }}">
+                <input type="text" name="q" placeholder="Buscar produto..." value="{{ busca|default('') }}">
+                <button type="submit">Buscar</button>
+            </form>
+        </div>
+
+        <nav class="nav-links">
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('chat.meus_chats') }}">
+                    Conversas
+                    {% if mensagens_nao_lidas is defined and mensagens_nao_lidas > 0 %}
+                        <span class="bolinha-notificacao">{{ mensagens_nao_lidas }}</span>
+                    {% endif %}
+                </a>
+                  <nav class="nav-planoslink">
+                <a href="{{ url_for('planos.lista_planos') }}">🌟Planos🌟</a>
+        </nav>
+                <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+                <a href="{{ url_for('auth.logout') }}" style="color: #ff6b6b;">Sair</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-login">Login</a>
+                <a href="{{ url_for('auth.registrar') }}" class="btn-cadastro">Cadastrar</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="container">
+        
+        <a href="{{ url_for('main.home') }}" class="btn-voltar-topo">⬅ Voltar</a>
+
+        <div class="detalhes-grid">
+            <div class="img-container">
+                <img src="{{ url_for('static', filename=produto.imagem) if produto.imagem else url_for('static', filename='img/sem_imagem.png') }}" alt="{{ produto.nome }}">
+            </div>
+
+            <div class="info-container">
+                
+                <div class="tags-topo">
+                    <div class="categoria-tag">{{ produto.categoria or 'Geral' }}</div>
+                    
+                    {% if produto.disponibilidade == 'sob_encomenda' %}
+                        <div class="disponibilidade-tag disp-encomenda">📦 Sob Encomenda</div>
+                    {% else %}
+                        <div class="disponibilidade-tag disp-ok">✅ Disponível para Entrega</div>
+                    {% endif %}
+                </div>
+                
+                <h1>{{ produto.nome }}</h1>
+                
+                <div class="produtor-row">
+                    <div class="produtor-nome">
+                        👤 Produzido por: <strong>{{ produto.nome_produtor if produto.nome_produtor else (produto.dono.nome if produto.dono else 'Produtor Local') }}</strong>
+                    </div>
+                    <div class="produtor-detalhes">
+                        <span class="info-item"> Cidade: {{ produto.cidade }}</span>
+                        {% if produto.tempo_experiencia %}
+                            <span class="info-item">🏆 Exp: {{ produto.tempo_experiencia }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if produto.quantidade and produto.unidade %}
+                    <div style="margin-bottom: 15px;">
+                        <span style="background: #e0eee0; color: #2d5a4c; padding: 6px 15px; border-radius: 20px; font-weight: 700; font-size: 0.9rem;">
+                             📦Estoque: {{ produto.quantidade }} {{ produto.unidade }}
+                        </span>
+                    </div>
+                {% endif %}
+
+                <div class="preco-area">
+                    {% if produto.desconto and produto.desconto > 0 %}
+                        {% set preco_antigo = produto.preco / (1 - (produto.desconto / 100)) %}
+                        <span class="preco-antigo">R$ {{ "%.2f"|format(preco_antigo) }}</span>
+                        <span class="preco-atual">R$ {{ "%.2f"|format(produto.preco) }}</span>
+                        <span class="desconto-badge">-{{ produto.desconto }}% OFF</span>
+                    {% else %}
+                        <span class="preco-atual">R$ {{ "%.2f"|format(produto.preco) }}</span>
+                    {% endif %}
+                </div>
+
+                {% if produto.caracteristicas %}
+                <div class="tags-list">
+                    {% for tag in produto.caracteristicas.split(',') %}
+                        <span class="tag">✔ {{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if produto.historia_produtor %}
+                <div class="descricao-box" style="background: #fffbf2; border-color: #fcebc2;">
+                    <span class="descricao-label" style="color: #b08d57;">📜 História do Produtor:</span>
+                    {{ produto.historia_produtor }}
+                </div>
+                {% endif %}
+
+                <div class="descricao-box">
+                    <span class="descricao-label">Sobre o Produto:</span>
+                    {{ produto.descricao }}
+                </div>
+
+                <div class="action-area">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.id != produto.usuario_id %}
+                            
+                            <a href="{{ url_for('chat.chat', produto_id=produto.id, outro_usuario_id=produto.usuario_id) }}" class="btn-chat">
+                                💬 Conversar com Produtor
+                            </a>
+
+                            {% if produto.whatsapp %}
+                                <div style="display: flex; flex-direction: column; gap: 5px;">
+                                    <div style="text-align: center; color: #555; font-weight: 600; font-size: 0.95rem;">
+                                        📞 Número: {{ produto.whatsapp }}
+                                    </div>
+                                    <a href="https://wa.me/55{{ produto.whatsapp|replace('(', '')|replace(')', '')|replace('-', '')|replace(' ', '') }}" target="_blank" class="btn-whatsapp">
+                                         WhatsApp
+                                    </a>
+                                </div>
+                            {% endif %}
+
+                        {% else %}
+                            <div class="btn-disabled">Este produto é seu</div>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn-chat">
+                            🔒 Entre para Ver Contatos
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Vale&Feira</h4>
+            <p>Conectando produtores e consumidores através da tecnologia e sustentabilidade.</p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Links Rápidos</h4>
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            <a href="{{ url_for('produto.adicionar_produtos') }}">Adicionar Produto</a> <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+            {% endif %}
+        </div>
+
+        <div class="footer-col">
+            <h4>Suporte</h4>
+            <a href="#">Central de Ajuda</a>
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Termos de Uso</a>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contato & Suporte</h4>
+            <a>📧contato@valefeira.com.br </a>
+            <a>📧suportevaleefeira@gmail.com</a>
+            <a href="#">📱 (38) 3333-4444</a>
+            <p>📍 Vale do Jequitinhonha, MG</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        &copy; 2026 Vale&Feira. Todos os direitos reservados.
+    </div>
+</footer>
+
+</body>
+</html>

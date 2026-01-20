@@ -14,7 +14,9 @@ class Chat(db.Model):
     _mensagem_criptografada = db.Column('mensagem', db.Text, nullable=False)
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     lida = db.Column(db.Boolean, default=False)
-
+    
+    data_criacao = db.Column(db.DateTime, default=datetime.now)
+    lida = db.Column(db.Boolean, default=False)
     
     produto = db.relationship('Produto', backref='chats')
     remetente = db.relationship('Usuario', foreign_keys=[remetente_id], backref='chats_enviados')
@@ -43,3 +45,4 @@ class Chat(db.Model):
 
     def __repr__(self):
         return f'<Chat {self.id}: {self.obter_preview()}>'
+    

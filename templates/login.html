@@ -1,108 +1,259 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
-
+    <title>Login - Vale & Feira</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
-            background-color: rgb(20, 99, 95);
-            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        body {
+            background: #eef6ee;
             display: flex;
             flex-direction: column;
-            align-items: center;
             min-height: 100vh;
-            height: 100vh;
         }
 
-        .faixa-topo {
-            width: 100%;
-            background-color: white;
-            height: 80px;
+        .topo {
+            background: #eef7ee;
+            padding: 18px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .logo-area {
             display: flex;
             align-items: center;
-            padding-left: 10px;
-            box-sizing: border-box;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .faixa-topo img {
-            height: 175px;
-            margin-left: 0;
-        }
-
-        .login-box {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            margin-top: 40px;
-            width: 90%;
-            max-width: 400px;
-        }
-
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        input[type="submit"] {
-            background-color: rgb(20, 99, 95);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin-top: 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        input[type="submit"]:hover {
-            background-color: rgb(15, 80, 76);
-        }
-
-        a {
-            color: rgb(20, 99, 95);
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f5c4d;
             text-decoration: none;
         }
 
-        a:hover {
+        .logo-area img {
+            width: 35px;
+            height: 35px;
+        }
+
+        .link-cadastro {
+            color: #1f5c4d;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .link-cadastro:hover {
             text-decoration: underline;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .form-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .form-box h2 {
+            color: #1f5c4d;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .subtitulo {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a4a4a;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+            background: #fdfdfd;
+        }
+
+        .form-control:focus {
+            border-color: #1f5c4d;
+            background: white;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #1f5c4d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: #164238;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .form-footer a {
+            color: #1f5c4d;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .error-msg {
+            color: #d32f2f;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .flash-msg {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .flash-error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        .flash-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+
+        .footer {
+            background: #2d5a4c;
+            color: #c2d6cf;
+            padding: 30px 10%;
+            margin-top: auto;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #8da69e;
+        }
+        
+        @media (max-width: 600px) {
+            .topo {
+                padding: 15px 20px;
+            }
+            .form-box {
+                padding: 25px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Cabeçalho com logo -->
-    <div class="faixa-topo">
-        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
-    </div>
+    <header class="topo">
+        <a href="{{ url_for('main.home') }}" class="logo-area">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Vale&Feira">
+            <span>Vale&Feira</span>
+        </a>
+        <a href="{{ url_for('auth.registrar') }}" class="link-cadastro">Criar conta</a>
+    </header>
 
-    <!-- Formulário de login -->
-    <main class="login-box">
-        <h1>Entrar</h1>
-        <form method="POST">
-            {{ form.csrf_token }}
+    <main class="container">
+        <div class="form-box">
+            <h2>Bem-vindo de volta!</h2>
+            <p class="subtitulo">Insira seus dados para acessar sua conta.</p>
 
-            <label for="nomeForm">Usuário:</label><br>
-            <input type="text" name="nomeForm" required><br>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-            <label for="senhaForm">Senha:</label><br>
-            <input type="password" name="senhaForm" required><br>
+            <form method="POST">
+                {{ form.hidden_tag() }}
 
-            <input type="submit" value="Entrar">
-        </form>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    {{ form.emailForm(class="form-control", placeholder="seu@email.com") }}
+                    {% if form.emailForm.errors %}
+                        <span class="error-msg">{{ form.emailForm.errors[0] }}</span>
+                    {% endif %}
+                </div>
 
-        <p><a href="{{ url_for('auth.redefinir_senha') }}">Esqueci minha senha</a></p>
-        <p>Não tem conta? <a href="{{ url_for('auth.registrar') }}">Registrar</a></p>
+                <div class="form-group">
+                    <label>Senha</label>
+                    {{ form.senhaForm(class="form-control", placeholder="Sua senha") }}
+                    {% if form.senhaForm.errors %}
+                        <span class="error-msg">{{ form.senhaForm.errors[0] }}</span>
+                    {% endif %}
+                </div>
+
+                {{ form.submit(class="btn-submit") }}
+
+                <div class="form-footer">
+                    Ainda não tem uma conta? <a href="{{ url_for('auth.registrar') }}">Cadastre-se</a>
+                    <br><br>
+                    <a href="{{ url_for('auth.redefinir_senha') }}" style="font-size: 0.85rem; color: #666; font-weight: normal; text-decoration: underline;">Esqueci minha senha</a>
+                </div>
+            </form>
+        </div>
     </main>
+
+    <footer class="footer">
+        <div class="footer-bottom">
+            &copy; 2026 Vale&Feira. Todos os direitos reservados.
+        </div>
+    </footer>
 
 </body>
 </html>

@@ -1,223 +1,345 @@
-<!doctype html>
-<html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Meus Chats</title>
-        <style>
-            body {
-                margin: 0;
-                background-color: rgb(20, 99, 95);
-                font-family: Arial, Helvetica, sans-serif;
-                color: white;
-            }
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Conversas - Vale & Feira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --verde-fundo: #edf7ed;
+            --verde-escuro: #2d5a4c;
+            --verde-primario: #3a6351;
+            --branco: #ffffff;
+            --texto-cor: #4a4a4a;
+            --cinza-texto: #7a7a7a;
+            --vermelho-notificacao: #ff6b6b;
+        }
 
-            .topo {
-                background-color: white;
-                height: 80px;
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0 20px;
-                box-sizing: border-box;
-            }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-            .login-link {
-                background-color: black;
-                color: white;
-                padding: 8px 16px;
-                border-radius: 8px;
-                text-decoration: none;
-                font-weight: bold;
-                margin-left: 10px;
-            }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--verde-fundo);
+            color: var(--texto-cor);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-            .login-link:hover {
-                background-color: gray;
-            }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background: transparent;
+        }
 
-            .container {
-                max-width: 800px;
-                margin: 30px auto;
-                padding: 20px;
-            }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 8px;
+            flex-shrink: 0;
+        }
 
-            h1 {
-                text-align: center;
-                margin-bottom: 30px;
-            }
+        .logo-img {
+            height: 35px;
+        }
 
-            .chat-list {
-                background-color: white;
-                border-radius: 10px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-                overflow: hidden;
-                color: #333;
-            }
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+        }
 
-            .chat-item {
-                padding: 15px;
-                border-bottom: 1px solid #eee;
-                display: flex;
-                align-items: center;
-                text-decoration: none;
-                color: inherit;
-            }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--cinza-texto);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
 
-            .chat-item:last-child {
-                border-bottom: none;
-            }
+        .nav-links a:hover {
+            color: var(--verde-escuro);
+        }
 
-            .chat-item:hover {
-                background-color: #f9f9f9;
-            }
+        .nav-planoslink a {
+            text-decoration: none;
+            color:rgb(0, 76, 9);
+            font-size: 0.9rem;
+            font-weight: 900;
+            transition: 0.3s;
+            position: relative;
+        }
 
-            .chat-avatar {
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                background-color: rgb(20, 99, 95);
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: bold;
-                margin-right: 15px;
-                flex-shrink: 0;
-            }
+        .bolinha-notificacao {
+            background-color: var(--vermelho-notificacao);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 50%;
+            margin-left: 5px;
+            display: inline-block;
+        }
 
-            .chat-content {
-                flex-grow: 1;
-            }
+        .container {
+            flex: 1;
+            padding: 40px 10%;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
 
-            .chat-header {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 5px;
-            }
+        h2 {
+            color: var(--verde-escuro);
+            font-size: 1.8rem;
+        }
 
-            .chat-user {
-                font-weight: bold;
-                color: rgb(20, 99, 95);
-            }
+        .btn-voltar-home {
+            background: var(--verde-escuro);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
 
-            .chat-product {
-                font-weight: bold;
-            }
+        .btn-voltar-home:hover {
+            background: var(--verde-primario);
+        }
 
-            .chat-preview {
-                font-size: 14px;
-                color: #666;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
+        .lista-conversas {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-            .chat-time {
-                font-size: 12px;
-                color: #999;
-            }
+        .card-conversa {
+            background: var(--branco);
+            padding: 25px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            border: 1px solid transparent;
+        }
 
-            .unread-count {
-                background-color: red;
-                color: white;
-                border-radius: 50%;
-                width: 20px;
-                height: 20px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 12px;
-                margin-left: 10px;
-            }
+        .card-conversa:hover {
+            transform: translateY(-3px);
+            border-color: var(--verde-escuro);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+        }
 
-            .no-chats {
-                text-align: center;
-                padding: 30px;
-                color: #666;
-            }
+        .info-conversa {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
 
-            .back-link {
-                display: block;
-                text-align: center;
-                margin-top: 20px;
-                color: white;
-                text-decoration: none;
-            }
+        .nome-produto {
+            font-weight: 700;
+            color: var(--verde-escuro);
+            font-size: 1.1rem;
+        }
 
-            .back-link:hover {
-                text-decoration: underline;
-            }
-        </style>
-    </head>
-    <body>
-        <!-- Topo -->
-        <div class="topo">
-            <img
-                src="{{ url_for('static', filename='img/logo.png') }}"
-                alt="Logo"
-                style="height: 60px; margin-left: 10px"
-            />
-            <div style="display: flex; align-items: center">
-                {% if current_user.is_authenticated %}
-                <a href="{{ url_for('perfil.perfil') }}" class="login-link"
-                    >Meu Perfil</a
-                >
-                <a href="{{ url_for('auth.logout') }}" class="login-link"
-                    >Sair</a
-                >
-                {% else %}
-                <a href="{{ url_for('auth.login') }}" class="login-link"
-                    >Login</a
-                >
+        .nome-usuario {
+            font-size: 0.9rem;
+            color: var(--cinza-texto);
+            font-weight: 600;
+        }
+
+        .ultima-msg {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .meta-conversa {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .data-msg {
+            font-size: 0.75rem;
+            color: #bbb;
+        }
+        
+        .badge-notificacao {
+            background: var(--vermelho-notificacao);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .footer {
+            background: var(--verde-escuro);
+            color: #c2d6cf;
+            padding: 60px 10% 20px;
+            margin-top: auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-col h4 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .footer-col p {
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .footer-col a {
+            display: block;
+            color: #c2d6cf;
+            text-decoration: none;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 25px;
+            font-size: 0.8rem;
+            color: #c2d6cf;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="{{ url_for('main.home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" class="logo-img" alt="Logo">
+            <span class="logo-text">Vale&Feira</span>
+        </a>
+        <nav class="nav-links">
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            <a href="{{ url_for('chat.meus_chats') }}">
+                Conversas
+                {% if mensagens_nao_lidas is defined and mensagens_nao_lidas > 0 %}
+                    <span class="bolinha-notificacao">{{ mensagens_nao_lidas }}</span>
                 {% endif %}
-            </div>
+            </a>
+              <nav class="nav-planoslink">
+                <a href="{{ url_for('planos.lista_planos') }}">🌟Planos🌟</a>
+        </nav>
+            <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+            <a href="{{ url_for('auth.logout') }}" style="color: #ff6b6b;">Sair</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="header-section">
+            <h2>💬 Minhas Conversas</h2>
+            <a href="{{ url_for('main.home') }}" class="btn-voltar-home">🏠 Voltar ao Início</a>
         </div>
 
-        <!-- Lista de chats -->
-        <div class="container">
-            <h1>Minhas Conversas</h1>
-
-            <div class="chat-list">
-                {% if grupos_chat %} {% for grupo in grupos_chat %}
-                <a
-                    href="{{ url_for('chat.chat', produto_id=grupo['produto'].id, outro_usuario_id=grupo['outro_usuario'].id) }}"
-                    class="chat-item"
-                >
-                    <div class="chat-avatar">
-                        {{ grupo['outro_usuario'].nome[0]|upper }}
+        <div class="lista-conversas">
+            {% if chats %}
+                {% for chat in chats %}
+                <a href="{{ url_for('chat.chat', produto_id=chat.produto.id, outro_usuario_id=chat.outro_usuario.id) }}" class="card-conversa">
+                    <div class="info-conversa">
+                        <span class="nome-produto">{{ chat.produto.nome }}</span>
+                        <span class="nome-usuario">Vendedor: {{ chat.outro_usuario.nome }}</span>
+                        <span class="ultima-msg">{{ chat.ultima_mensagem.mensagem|truncate(50) }}</span>
                     </div>
-                    <div class="chat-content">
-                        <div class="chat-header">
-                            <span class="chat-user"
-                                >{{ grupo['outro_usuario'].nome }}</span
-                            >
-                            <span class="chat-time"
-                                >{{
-                                grupo['ultimo_chat'].data_criacao.strftime('%d/%m/%Y
-                                %H:%M') }}</span
-                            >
-                        </div>
-                        <div class="chat-product">
-                            {{ grupo['produto'].nome }}
-                        </div>
-                        <div class="chat-preview">
-                            {{ grupo['ultimo_chat'].obter_preview() }}
-                        </div>
+                    
+                    <div class="meta-conversa">
+                        <span class="data-msg">{{ chat.ultima_mensagem.data_criacao.strftime('%d/%m %H:%M') }}</span>
+                        {% if chat.nao_lidas > 0 %}
+                            <span class="badge-notificacao">{{ chat.nao_lidas }} nova(s)</span>
+                        {% endif %}
                     </div>
-                    {% if grupo['nao_lidas'] > 0 %}
-                    <div class="unread-count">{{ grupo['nao_lidas'] }}</div>
-                    {% endif %}
                 </a>
-                {% endfor %} {% else %}
-                <div class="no-chats">Você não tem nenhuma conversa ativa.</div>
-                {% endif %}
-            </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align: center; padding: 60px 0;">
+                    <p style="color: #aaa; font-size: 1.1rem; margin-bottom: 20px;">Você ainda não possui conversas ativas.</p>
+                    <a href="{{ url_for('produto.buscar_produtos') }}" style="color: var(--verde-escuro); font-weight: 700; text-decoration: none; border: 2px solid var(--verde-escuro); padding: 12px 25px; border-radius: 30px;">Explorar Produtos</a>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer class="footer">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Vale&Feira</h4>
+            <p>Conectando produtores e consumidores através da tecnologia e sustentabilidade.</p>
         </div>
 
-        <a href="{{ url_for('main.home') }}" class="back-link"
-            >Voltar para a página inicial</a
-        >
-    </body>
+        <div class="footer-col">
+            <h4>Links Rápidos</h4>
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            <a href="{{ url_for('produto.adicionar_produtos') }}">Adicionar Produto</a> <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+            {% endif %}
+        </div>
+
+        <div class="footer-col">
+            <h4>Suporte</h4>
+            <a href="#">Central de Ajuda</a>
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Termos de Uso</a>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contato & Suporte</h4>
+            <a>📧contato@valefeira.com.br </a>
+            <a>📧suportevaleefeira@gmail.com</a>
+            <a href="#">📱 (38) 3333-4444</a>
+            <p>📍 Vale do Jequitinhonha, MG</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        &copy; 2026 Vale&Feira. Todos os direitos reservados.
+    </div>
+</footer>
+</body>
 </html>

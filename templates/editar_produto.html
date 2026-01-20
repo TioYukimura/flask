@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Produto - Vale & Feira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* (Mesmo CSS do adicionar_produtos.html) */
+        :root { --verde-fundo: #edf7ed; --verde-escuro: #2d5a4c; --verde-primario: #3a6351; --branco: #ffffff; --texto-cor: #4a4a4a; --borda: #e0eee0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Montserrat', sans-serif; background-color: var(--verde-fundo); color: var(--texto-cor); line-height: 1.6; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 10%; }
+        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--verde-escuro); text-decoration: none; }
+        .container { max-width: 850px; margin: 0 auto 60px; padding: 0 20px; }
+        .form-card { background: var(--branco); border-radius: 30px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-top: 20px; }
+        .section-title { font-size: 1.1rem; font-weight: 700; color: var(--verde-escuro); margin: 30px 0 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: span 2; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--verde-escuro); margin-bottom: 8px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; border: 1px solid var(--borda); border-radius: 12px; outline: none; }
+        .btn-publish { background: var(--verde-escuro); color: white; padding: 12px 40px; border-radius: 15px; font-weight: 700; border: none; cursor: pointer; display: block; margin: 40px auto 0; }
+        .check-item { background: #f9fdf9; border: 1px solid var(--borda); padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .characteristics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .link-voltar { color: #666; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="{{ url_for('main.home') }}" class="logo-text">Vale&Feira</a>
+        <a href="{{ url_for('perfil.perfil') }}" class="link-voltar">Cancelar</a>
+    </header>
+
+    <main class="container">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: var(--verde-escuro);">Editar Produto</h1>
+        </div>
+
+        <div class="form-card">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+
+                <div class="section-title">👨‍🌾 Dados do Produtor</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome do Produtor/Propriedade</label>
+                        <input type="text" name="nome_produtor" value="{{ produto.nome_produtor or '' }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tempo de Experiência</label>
+                        <select name="tempo_experiencia">
+                            <option value="">Selecione</option>
+                            <option value="Iniciante" {% if produto.tempo_experiencia == 'Iniciante' %}selected{% endif %}>Iniciante</option>
+                            <option value="1-2 anos" {% if produto.tempo_experiencia == '1-2 anos' %}selected{% endif %}>1-2 anos</option>
+                            <option value="Tradição Familiar" {% if produto.tempo_experiencia == 'Tradição Familiar' %}selected{% endif %}>Tradição Familiar</option>
+                            <option value="Mais de 10 anos" {% if produto.tempo_experiencia == 'Mais de 10 anos' %}selected{% endif %}>Mais de 10 anos</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cidade/Região</label>
+                        {{ form.cidadeForm(value=produto.cidade) }}
+                    </div>
+                    <div class="form-group">
+                        <label>WhatsApp</label>
+                        <input type="text" name="whatsapp" value="{{ produto.whatsapp or '' }}" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>História (Opcional)</label>
+                        <textarea name="historia_produtor" rows="3">{{ produto.historia_produtor or '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="section-title">🛍️ Informações do Produto</div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Nome do Produto</label>
+                        {{ form.nomeForm(value=produto.nome) }}
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <select name="categoriaForm" required>
+                            <option value="">Selecione...</option>
+                            {% for cat in ['Vegetais e Verduras', 'Frutas Frescas', 'Mel e Derivados', 'Grãos e Cereais', 'Queijos e Laticínios', 'Conservas e Doces', 'Artesanato Local', 'Outros'] %}
+                                <option value="{{ cat }}" {% if produto.categoria == cat %}selected{% endif %}>{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Disponibilidade</label>
+                        <select name="disponibilidade">
+                            <option value="disponivel" {% if produto.disponibilidade == 'disponivel' %}selected{% endif %}>✅ Disponível</option>
+                            <option value="sob_encomenda" {% if produto.disponibilidade == 'sob_encomenda' %}selected{% endif %}>📦 Sob Encomenda</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantidade</label>
+                        <input type="number" name="quantidade" value="{{ produto.quantidade or '' }}" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Unidade</label>
+                        <select name="unidade" required>
+                            {% for uni in ['Quilograma', 'Grama', 'Litro', 'Mililitro', 'Unidade', 'Maço', 'Caixa', 'Saca', 'Duzia'] %}
+                                <option value="{{ uni }}" {% if produto.unidade == uni %}selected{% endif %}>{{ uni }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Descrição</label>
+                        {{ form.descricaoForm }}
+                    </div>
+                    <div class="form-group">
+                        <label>Preço Original (R$)</label>
+                        {{ form.precoForm(id="precoInput") }}
+                    </div>
+                    <div class="form-group">
+                        <label>Desconto (%)</label>
+                        {{ form.descontoForm(id="descontoInput") }}
+                        <div id="resultadoCalculo" style="margin-top: 10px; font-size: 0.9rem; color: #2e7d32; font-weight: bold;">
+                            Vender por: R$ <span id="precoFinalDisplay">--,--</span>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Alterar Foto (Deixe vazio para manter a atual)</label>
+                        {{ form.imagem }}
+                        {% if produto.imagem %}
+                            <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">Imagem atual: {{ produto.imagem }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="section-title">🏷️ Características</div>
+                <div class="characteristics-grid">
+                    <label class="check-item"><input type="checkbox" name="c1" {% if 'Orgânico' in (produto.caracteristicas or '') %}checked{% endif %}> 🌿 Orgânico</label>
+                    <label class="check-item"><input type="checkbox" name="c2" {% if 'Artesanal' in (produto.caracteristicas or '') %}checked{% endif %}> 🏆 Artesanal</label>
+                    <label class="check-item"><input type="checkbox" name="c3" {% if 'Fresco' in (produto.caracteristicas or '') %}checked{% endif %}> 🌱 Fresco</label>
+                    <label class="check-item"><input type="checkbox" name="c4" {% if 'Local' in (produto.caracteristicas or '') %}checked{% endif %}> 🏠 Local</label>
+                    <label class="check-item"><input type="checkbox" name="c5" {% if 'Sustentável' in (produto.caracteristicas or '') %}checked{% endif %}> ♻️ Sustentável</label>
+                    <label class="check-item"><input type="checkbox" name="c6" {% if 'Tradicional' in (produto.caracteristicas or '') %}checked{% endif %}> 📜 Tradicional</label>
+                </div>
+
+                <button type="submit" class="btn-publish">Salvar Alterações</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const precoInput = document.getElementById('precoInput');
+        const descontoInput = document.getElementById('descontoInput');
+        const resultadoDiv = document.getElementById('resultadoCalculo');
+        const precoFinalSpan = document.getElementById('precoFinalDisplay');
+
+        function calcularPreco() {
+            let precoStr = precoInput.value.toString().replace(',', '.');
+            let preco = parseFloat(precoStr);
+            let desconto = parseInt(descontoInput.value);
+
+            if (!isNaN(preco) && !isNaN(desconto) && desconto > 0) {
+                let precoFinal = preco * (1 - (desconto / 100));
+                precoFinalSpan.innerText = precoFinal.toFixed(2).replace('.', ',');
+                resultadoDiv.style.display = 'block';
+            } else if (!isNaN(preco)) {
+                precoFinalSpan.innerText = preco.toFixed(2).replace('.', ',');
+                resultadoDiv.style.display = 'block';
+            } else {
+                resultadoDiv.style.display = 'none';
+            }
+        }
+
+        precoInput.addEventListener('input', calcularPreco);
+        descontoInput.addEventListener('input', calcularPreco);
+        // Calcula ao carregar a página
+        window.addEventListener('load', calcularPreco);
+    </script>
+
+</body>
+</html>

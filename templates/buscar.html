@@ -1,113 +1,565 @@
-<!doctype html>
-<html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Produtos</title>
-        <style>
-            body {
-                background-color: rgb(20, 99, 95);
-                font-family: Arial, sans-serif;
-                color: white;
-                padding: 20px;
-            }
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Produtos - Vale & Feira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --verde-fundo: #edf7ed;
+            --verde-escuro: #2d5a4c;
+            --verde-primario: #3a6351;
+            --branco: #ffffff;
+            --texto-cor: #4a4a4a;
+            --cinza-texto: #7a7a7a;
+            --vermelho-notificacao: #ff6b6b;
+        }
 
-            h1 {
-                text-align: center;
-                margin-bottom: 30px;
-            }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-            .produtos-container {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--verde-fundo);
+            color: var(--texto-cor);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+       .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background: transparent;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .logo-img { height: 35px; }
+        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--verde-escuro); }
+        
+        .barra-busca {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 30px;
+        }
+
+        .barra-busca form {
+            display: flex;
+            background: var(--branco);
+            padding: 5px 15px;
+            border-radius: 30px;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e0eee0;
+        }
+
+        .barra-busca input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            padding: 8px;
+            outline: none;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+
+        .barra-busca button {
+            background: var(--verde-escuro);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .barra-busca button:hover {
+            background: var(--verde-primario);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color:#adaaa6;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--verde-escuro);
+        }
+
+        .nav-planoslink a {
+            text-decoration: none;
+            color:rgb(0, 76, 9);
+            font-size: 0.9rem;
+            font-weight: 900;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .bolinha-notificacao {
+            background-color: var(--vermelho-notificacao);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 50%;
+            margin-left: 5px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .btn-login {
+            border: 2px solid var(--verde-escuro);
+            color: var(--verde-escuro) !important;
+            padding: 8px 20px !important;
+            border-radius: 20px;
+            font-weight: 700 !important;
+        }
+
+        .btn-login:hover {
+            background: var(--verde-escuro);
+            color: white !important;
+        }
+
+        .btn-cadastro {
+            background-color: var(--verde-escuro);
+            color: white !important;
+            padding: 10px 22px !important;
+            border-radius: 20px;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 10px rgba(45, 90, 76, 0.2);
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 40px 20px 20px;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            color: var(--verde-escuro);
+        }
+
+        .container {
+            padding: 20px 10% 80px 10%;
+            flex: 1;
+        }
+
+        .produtos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .produto-card {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .produto-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-img-area {
+            background: #fdf5d7;
+            border-radius: 15px;
+            height: 160px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-img-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .tag-overlay {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            font-size: 0.6rem;
+            color: #b08d57;
+            font-weight: bold;
+            background: rgba(255,255,255,0.9);
+            padding: 3px 8px;
+            border-radius: 8px;
+        }
+
+        .disp-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 10px;
+            z-index: 10;
+        }
+
+        .disp-tag.verde {
+            background: rgba(232, 245, 233, 0.95);
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .disp-tag.laranja {
+            background: rgba(255, 243, 224, 0.95);
+            color: #e65100;
+            border: 1px solid #ffe0b2;
+        }
+
+        .produto-card h3 {
+            font-size: 1rem;
+            color: var(--verde-escuro);
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .produtor-info {
+            font-size: 0.75rem;
+            color: var(--cinza-texto);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .tag-item {
+            background: #e8f5e9;
+            color: var(--verde-escuro);
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .desc-curta {
+            font-size: 0.8rem;
+            color: #777;
+            margin-bottom: 15px;
+            min-height: 35px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .preco-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .preco-antigo {
+            text-decoration: line-through;
+            color: #bbb;
+            font-size: 0.75rem;
+        }
+
+        .preco-novo {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+        }
+
+        .descontent-tag {
+            background: #ff6b6b;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+        }
+
+        .btn-conversa {
+            background: var(--verde-escuro);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .btn-conversa:hover {
+            background: var(--verde-primario);
+        }
+
+        .btn-detalhes {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            margin-top: 10px;
+            border: 2px solid var(--verde-escuro);
+            border-radius: 12px;
+            color: var(--verde-escuro);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-detalhes:hover {
+            background-color: var(--verde-escuro);
+            color: white;
+        }
+
+        .footer {
+            background: #2d5a4c;
+            color: #c2d6cf;
+            padding: 60px 10% 20px;
+            margin-top: auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 40px;
+        }
+
+        .footer-col h4 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .footer-col p {
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .footer-col a {
+            display: block;
+            color: #c2d6cf;
+            text-decoration: none;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+
+        .footer-col a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 25px;
+            font-size: 0.8rem;
+            color: #c2d6cf;
+        }
+
+        @media (max-width: 900px) {
+            .topbar {
+                flex-direction: column;
                 gap: 20px;
-            }
-
-            .produto-box {
-                background: white;
-                color: black;
-                border-radius: 8px;
                 padding: 20px;
-                width: 220px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-                text-align: center;
             }
 
-            .produto-box img {
+            .barra-busca {
+                width: 100%;
                 max-width: 100%;
-                border-radius: 8px;
-                margin-bottom: 10px;
+                margin: 0;
             }
-
-            .produto-box h3 {
-                margin: 10px 0 5px 0;
-                font-size: 18px;
-            }
-            .produto-box p {
-                font-size: 14px;
-                margin: 5px 0;
-            }
-            .produto-box strong {
-                display: block;
-                margin-top: 10px;
-                font-size: 16px;
-                color: green;
-            }
-
-            .produto-box a {
-                text-decoration: none;
-                color: inherit;
-            }
-            .produto-box a:hover {
-                text-decoration: underline;
-            }
-
-            .chat-btn {
-                display: inline-block;
-                margin-top: 10px;
-                background-color: rgb(20, 99, 95);
-                color: white;
-                padding: 8px 15px;
-                border-radius: 5px;
-                text-decoration: none;
-                font-weight: bold;
-            }
-
-            .chat-btn:hover {
-                background-color: rgb(15, 80, 76);
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Produtos disponíveis</h1>
-
-        <div class="produtos-container">
-            {% for p in produtos %}
-            <div class="produto-box">
-                <a href="{{ url_for('produto.pagina_produto', id=p.id) }}">
-                    <img
-                        src="{{ url_for('static', filename=p.imagem) if p.imagem else url_for('static', filename='img/sem_imagem.png') }}"
-                        alt="{{ p.nome }}"
-                    />
-                </a>
-                <h3>
-                    <a href="{{ url_for('produto.pagina_produto', id=p.id) }}"
-                        >{{ p.nome }}</a
-                    >
-                </h3>
-                <p>{{ p.descricao }}</p>
-                <strong>R$ {{ "%.2f"|format(p.preco) }}</strong>
-                {% if current_user.is_authenticated and current_user.id !=
-                p.usuario_id %}
-                <a
-                    href="{{ url_for('chat.chat', produto_id=p.id, outro_usuario_id=p.usuario_id) }}"
-                    class="chat-btn"
-                >
-                    Falar com vendedor
-                </a>
-                {% endif %}
-            </div>
-            {% endfor %}
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <a href="{{ url_for('main.home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" class="logo-img" alt="Logo">
+            <span class="logo-text">Vale&Feira</span>
+        </a>
+        <div class="barra-busca">
+            <form method="get" action="{{ url_for('produto.buscar_produtos') }}">
+                <input type="text" name="q" placeholder="Buscar produto..." value="{{ busca|default('') }}">
+                <button type="submit">Buscar</button>
+            </form>
         </div>
-    </body>
+        <nav class="nav-links">
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            {% if current_user.is_authenticated %}
+            
+                <a href="{{ url_for('chat.meus_chats') }}">
+                    Conversas
+                    {% if mensagens_nao_lidas is defined and mensagens_nao_lidas > 0 %}
+                        <span class="bolinha-notificacao">{{ mensagens_nao_lidas }}</span>
+                    {% endif %}
+                </a>
+                <nav class="nav-planoslink">
+                <a href="{{ url_for('planos.lista_planos') }}">🌟Planos🌟</a>
+            </nav>
+                <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+                <a href="{{ url_for('auth.logout') }}" style="color: #ff6b6b;">Sair</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-login">Login</a>
+                <a href="{{ url_for('auth.registrar') }}" class="btn-cadastro">Cadastrar</a>
+            {% endif %}
+        </nav>
+    </header>
+    <div class="page-header">
+        <h1>Produtos Disponíveis</h1>
+    </div>
+    <main class="container">
+        <div class="produtos-grid">
+            {% if produtos %}
+                {% for produto in produtos %}
+                <div class="produto-card">
+                    <div class="card-img-area">
+                        <img src="{{ url_for('static', filename=produto.imagem) if produto.imagem else url_for('static', filename='img/sem_imagem.png') }}" alt="{{ produto.nome }}">
+                        
+                        <div class="tag-overlay">{{ produto.categoria or 'Geral' }}</div>
+
+                        {% if produto.disponibilidade == 'sob_encomenda' %}
+                            <div class="disp-tag laranja">📦 Sob Encomenda</div>
+                        {% else %}
+                            <div class="disp-tag verde">✅ Pronta Entrega</div>
+                        {% endif %}
+                    </div>
+                    
+                    <h3>{{ produto.nome }}</h3>
+                    
+                    <div class="produtor-info">
+                        👤 {{ produto.nome_produtor if produto.nome_produtor else (produto.dono.nome if produto.dono else 'Produtor Local') }}
+                        {% if produto.cidade %} • Cidade: {{ produto.cidade }} {% endif %}
+                    </div>
+
+                    {% if produto.caracteristicas %}
+                    <div class="tags-container">
+                        {% for tag in produto.caracteristicas.split(',') %}
+                            <span class="tag-item">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <p class="desc-curta">{{ produto.descricao|truncate(80) }}</p>
+                    
+                    {% if produto.quantidade and produto.unidade %}
+                        <div style="font-size: 0.85rem; color: #3a6351; font-weight: 600; margin-bottom: 15px; background: #e0eee0; padding: 5px 10px; border-radius: 10px; display: inline-block;">
+                            📦 {{ produto.quantidade }} {{ produto.unidade }}
+                        </div>
+                    {% endif %}
+
+                    <div class="preco-container">
+                        {% if produto.desconto and produto.desconto > 0 %}
+                            {% set preco_antigo = produto.preco / (1 - (produto.desconto / 100)) %}
+                            <span class="preco-antigo">R$ {{ "%.2f"|format(preco_antigo) }}</span>
+                            <span class="preco-novo">R$ {{ "%.2f"|format(produto.preco) }}</span>
+                            <span class="descontent-tag">-{{ produto.desconto }}%</span>
+                        {% else %}
+                            <span class="preco-novo">R$ {{ "%.2f"|format(produto.preco) }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.id != produto.usuario_id %}
+                            <a href="{{ url_for('chat.chat', produto_id=produto.id, outro_usuario_id=produto.usuario_id) }}" class="btn-conversa">💬 Conversar com o Produtor </a>
+                        {% else %}
+                            <span class="btn-conversa" style="background: #ccc; cursor: not-allowed;">Seu Produto</span>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn-conversa">🔒 Login</a>
+                    {% endif %}
+
+                    <a href="{{ url_for('produto.pagina_produto', id=produto.id) }}" class="btn-detalhes">
+                         Ver Detalhes
+                    </a>
+
+                </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align: center; width: 100%; grid-column: 1 / -1; padding: 50px;">
+                    <p style="font-size: 1.1rem; color: #888;">Nenhum produto encontrado para sua busca.</p>
+                    <a href="{{ url_for('main.home') }}" style="color: var(--verde-escuro); font-weight: 700; text-decoration: none;">Ver todos os produtos →</a>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+    <footer class="footer">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Vale&Feira</h4>
+            <p>Conectando produtores e consumidores através da tecnologia e sustentabilidade.</p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Links Rápidos</h4>
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            <a href="{{ url_for('produto.adicionar_produtos') }}">Adicionar Produto</a> <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+            {% endif %}
+        </div>
+
+        <div class="footer-col">
+            <h4>Suporte</h4>
+            <a href="#">Central de Ajuda</a>
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Termos de Uso</a>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contato & Suporte</h4>
+            <a>📧contato@valefeira.com.br </a>
+            <a>📧suportevaleefeira@gmail.com</a>
+            <a href="#">📱 (38) 3333-4444</a>
+            <p>📍 Vale do Jequitinhonha, MG</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        &copy; 2026 Vale&Feira. Todos os direitos reservados.
+    </div>
+</footer>
+</body>
 </html>

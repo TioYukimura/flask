@@ -1,101 +1,170 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from flask_login import login_user, logout_user, login_required
+from flask_mail import Message
 import hashlib
+import random
+import string
+from datetime import datetime, timedelta
 from models.usuario import Usuario
 from database import db
-from .forms import LoginForm, RegistrarForm, RedefinirSenhaForm
 
-# Um único blueprint para todas as rotas de autenticação
+# Tente importar 'mail' de onde você configurou (app.py ou extensions.py)
+try:
+    from extensions import mail
+except ImportError:
+    from app import mail
+
+# Seus formulários
+from .forms import LoginForm, RegistrarForm, FormEsqueciEmail, FormVerificarCodigo, FormNovaSenha
+
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    """
-    Renderiza a página de login e processa o formulário de login.
-    Usa WTForms para validação e segurança.
-    """
     form = LoginForm()
     if form.validate_on_submit():
-        nome = form.nomeForm.data
-        senha = form.senhaForm.data
-        usuario = Usuario.query.filter_by(nome=nome).first()
-
-        if usuario:
-            # Compara o hash da senha fornecida com o hash armazenado no banco
-            senha_hash = hashlib.sha256(senha.encode()).hexdigest()
-            if usuario.senha_hash == senha_hash:
-                login_user(usuario)
-                flash(f'Bem-vindo, {usuario.nome}!', 'success')
-                return redirect(url_for('main.home'))
-            else:
-                flash('Senha incorreta.', 'error')
+        usuario = Usuario.query.filter_by(email=form.emailForm.data).first()
+        if usuario and usuario.senha_hash == hashlib.sha256(form.senhaForm.data.encode()).hexdigest():
+            login_user(usuario)
+            return redirect(url_for('main.home'))
         else:
-            flash('Usuário não encontrado.', 'error')
-
+            flash('E-mail ou senha incorretos.', 'error')
     return render_template('login.html', form=form)
 
 @auth_bp.route('/registrar', methods=['GET', 'POST'])
 def registrar():
     form = RegistrarForm()
     if form.validate_on_submit():
-        nome = form.nomeForm.data
-        senha = form.senhaForm.data
-        email = form.emailForm.data
-        cidade = form.cidadeForm.data  # <-- pega a cidade
-
-        if Usuario.query.filter_by(nome=nome).first():
-            flash('Nome de usuário já existe.', 'error')
+        if Usuario.query.filter_by(email=form.emailForm.data).first():
+            flash('E-mail já cadastrado.', 'error')
         else:
-            senha_hash = hashlib.sha256(senha.encode()).hexdigest()
             novo_usuario = Usuario(
-                nome=nome,
-                senha_hash=senha_hash,
-                email=email or None,
-                cidade=cidade  # <-- passa a cidade pro modelo
+                nome=form.nomeForm.data,
+                senha_hash=hashlib.sha256(form.senhaForm.data.encode()).hexdigest(),
+                email=form.emailForm.data,
+                cidade=form.cidadeForm.data
             )
             try:
                 db.session.add(novo_usuario)
                 db.session.commit()
-                flash('Conta criada com sucesso! Você pode fazer login agora.', 'success')
+                flash('Conta criada!', 'success')
                 return redirect(url_for('auth.login'))
-            except Exception as e:
+            except:
                 db.session.rollback()
-                flash(f'Erro ao criar conta: {e}', 'error')
-
     return render_template('registrar.html', form=form)
 
 @auth_bp.route('/logout')
 @login_required
 def logout():
-    """
-    Faz o logout do usuário e o redireciona para a página inicial.
-    """
     logout_user()
-    flash('Você saiu com sucesso.', 'info')
+    flash('Você saiu.', 'info')
     return redirect(url_for('main.home'))
+
+# --- FLUXO DE RECUPERAÇÃO DE SENHA ---
 
 @auth_bp.route('/redefinir_senha', methods=['GET', 'POST'])
 def redefinir_senha():
-    """
-    Renderiza e processa o formulário de redefinição de senha.
-    """
-    form = RedefinirSenhaForm()
-    if form.validate_on_submit():
-        nome = form.nomeForm.data
-        nova_senha = form.novaSenhaForm.data
-        usuario = Usuario.query.filter_by(nome=nome).first()
+    # Pega a etapa atual da sessão (se não tiver, começa na 1)
+    etapa = session.get('reset_etapa', 1)
+    
+    # Instancia os formulários
+    form_email = FormEsqueciEmail()
+    form_codigo = FormVerificarCodigo()
+    form_senha = FormNovaSenha()
 
-        if not usuario:
-            flash('Usuário não encontrado.', 'error')
-        else:
-            # Atualiza o hash da senha no banco de dados
-            usuario.senha_hash = hashlib.sha256(nova_senha.encode()).hexdigest()
+    # --- ETAPA 1: Enviar E-mail ---
+    if etapa == 1 and form_email.validate_on_submit():
+        email = form_email.emailForm.data
+        usuario = Usuario.query.filter_by(email=email).first()
+        
+        if usuario:
+            # Gera código de 6 números
+            codigo = ''.join(random.choices(string.digits, k=6))
+            
+            # Define validade: AGORA + 15 minutos
+            validade = datetime.now() + timedelta(minutes=15)
+            
+            # Salva na sessão
+            session['reset_codigo'] = codigo
+            session['reset_email'] = email
+            session['reset_validade'] = validade.timestamp()
+            
+            # Envia E-mail Bonito
             try:
-                db.session.commit()
-                flash('Senha redefinida com sucesso! Você pode fazer login agora.', 'success')
-                return redirect(url_for('auth.login'))
-            except Exception:
-                db.session.rollback()
-                flash('Erro ao redefinir senha. Tente novamente.', 'error')
+                msg = Message(
+                    'Código de Recuperação - Vale & Feira',
+                    sender='noreply@valefeira.com', 
+                    recipients=[email]
+                )
+                # Renderiza o template HTML
+                msg.html = render_template('emails/recuperar_senha.html', 
+                                         usuario=usuario, 
+                                         codigo=codigo)
+                mail.send(msg)
+                
+                flash(f'Código enviado para {email}.', 'info')
+                session['reset_etapa'] = 2 
+                return redirect(url_for('auth.redefinir_senha'))
+                
+            except Exception as e:
+                print(f"Erro ao enviar email: {e}")
+                flash(f'Erro ao enviar e-mail. Tente novamente.', 'error')
+        else:
+            flash('E-mail não encontrado.', 'error')
 
-    return render_template('redefinir_senha.html', form=form)
+    # --- ETAPA 2: Verificar Código ---
+    elif etapa == 2 and form_codigo.validate_on_submit():
+        codigo_digitado = form_codigo.codigoForm.data
+        codigo_correto = session.get('reset_codigo')
+        validade_timestamp = session.get('reset_validade')
+
+        # Verifica se existe código na sessão
+        if not codigo_correto or not validade_timestamp:
+            flash('Solicitação inválida. Comece novamente.', 'error')
+            return redirect(url_for('auth.cancelar_recuperacao'))
+
+        # Verifica se o tempo expirou
+        if datetime.now().timestamp() > validade_timestamp:
+            flash('O código expirou (passaram-se 15 minutos).', 'error')
+            return redirect(url_for('auth.cancelar_recuperacao'))
+
+        # Verifica se o código está certo
+        if codigo_digitado == codigo_correto:
+            flash('Código validado! Crie sua nova senha.', 'success')
+            session['reset_etapa'] = 3
+            return redirect(url_for('auth.redefinir_senha'))
+        else:
+            flash('Código incorreto.', 'error')
+
+    # --- ETAPA 3: Nova Senha ---
+    elif etapa == 3 and form_senha.validate_on_submit():
+        email = session.get('reset_email')
+        usuario = Usuario.query.filter_by(email=email).first()
+        
+        if usuario:
+            nova_senha = form_senha.novaSenhaForm.data
+            usuario.senha_hash = hashlib.sha256(nova_senha.encode()).hexdigest()
+            db.session.commit()
+            
+            # Limpa sessão
+            session.pop('reset_codigo', None)
+            session.pop('reset_email', None)
+            session.pop('reset_etapa', None)
+            session.pop('reset_validade', None)
+            
+            flash('Senha alterada com sucesso!', 'success')
+            return redirect(url_for('auth.login'))
+
+    return render_template('redefinir_senha.html', 
+                           etapa=etapa,
+                           form_email=form_email,
+                           form_codigo=form_codigo,
+                           form_senha=form_senha)
+
+@auth_bp.route('/cancelar_recuperacao')
+def cancelar_recuperacao():
+    session.pop('reset_etapa', None)
+    session.pop('reset_codigo', None)
+    session.pop('reset_email', None)
+    session.pop('reset_validade', None)
+    return redirect(url_for('auth.login'))

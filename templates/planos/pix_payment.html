@@ -1,106 +1,84 @@
-{% extends "base_new.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIX Gerado | Vale & Feira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Montserrat', sans-serif; background-color: #f5f7fa; padding: 20px; }
+        .pix-container { max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        
+        .qr-box {
+            background: #ffffff; padding: 30px; border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05); text-align: center; margin-bottom: 30px;
+        }
 
-{% block title %}PIX Gerado - Vale & Feira{% endblock %}
+        .check-icon { font-size: 4rem; color: #2e7d32; display: block; margin-bottom: 10px; }
+        
+        .btn-confirmar {
+            background-color: #2e7d32; color: white; padding: 15px; border: none;
+            border-radius: 30px; font-weight: 700; font-size: 1.1rem; width: 100%;
+            cursor: pointer; text-decoration: none; display: block; transition: 0.3s; margin-top: 20px;
+        }
+        .btn-confirmar:hover { background-color: #1b5e20; }
+        
+        .input-copy-group { display: flex; gap: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-6">
-            <div class="card">
-                <div class="card-body text-center">
-                    <div class="text-success mb-4">
-                        <i data-feather="check-circle" style="width: 64px; height: 64px;"></i>
-                    </div>
-                    <h4 class="fw-bold text-primary mb-3">PIX Gerado com Sucesso!</h4>
-                    <p class="text-muted mb-4">
-                        Escaneie o código QR ou copie o código PIX para realizar o pagamento
-                    </p>
+    <main class="pix-container">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <span class="check-icon">✅</span>
+            <h1 style="color: #2e7d32; font-size: 1.8rem; margin: 0;">PIX Gerado!</h1>
+            <p style="color: #666;">Pague para liberar seu plano <strong>imediatamente</strong>.</p>
+        </div>
 
-                    <!-- Simulated QR Code -->
-                    <div class="qr-code-container mb-4">
-                        <div class="bg-light p-4 rounded">
-                            <div style="width: 200px; height: 200px; background: #f0f0f0; border: 2px dashed #ccc; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;">
-                                <div class="text-center">
-                                    <i data-feather="square" style="width: 48px; height: 48px; color: #ccc;"></i>
-                                    <br>
-                                    <small class="text-muted">QR Code PIX</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- PIX Code -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Código PIX (Copiar):</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" 
-                                   value="{{ pagamento.qr_code_data[:50] }}..." 
-                                   id="pixCode" readonly>
-                            <button class="btn btn-outline-primary" onclick="copyPixCode()">
-                                <i data-feather="copy" style="width: 16px; height: 16px;"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Payment Info -->
-                    <div class="bg-light p-3 rounded mb-4 text-start">
-                        <div class="row">
-                            <div class="col-6">
-                                <strong>Valor:</strong><br>
-                                <span class="text-primary">R$ {{ "%.2f"|format(pagamento.valor) }}</span>
-                            </div>
-                            <div class="col-6">
-                                <strong>Código:</strong><br>
-                                <span class="text-muted">{{ pagamento.codigo_transacao }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('planos.confirmar_pix', payment_id=pagamento.id) }}" 
-                           class="btn btn-success btn-lg">
-                            <i data-feather="check-circle" class="me-2"></i>
-                            Já Paguei - Confirmar
-                        </a>
-                        <a href="{{ url_for('planos.lista_planos') }}" 
-                           class="btn btn-outline-secondary">
-                            Voltar aos Planos
-                        </a>
-                    </div>
-
-                    <!-- Instructions -->
-                    <div class="alert alert-info mt-4 text-start">
-                        <h6 class="fw-bold">Como pagar com PIX:</h6>
-                        <ol class="mb-0 small">
-                            <li>Abra o app do seu banco</li>
-                            <li>Escolha a opção PIX</li>
-                            <li>Escaneie o QR Code ou cole o código</li>
-                            <li>Confirme os dados e o valor</li>
-                            <li>Clique em "Já Paguei" acima</li>
-                        </ol>
-                    </div>
+        <div class="qr-box">
+            
+            <div style="margin: 0 auto 20px; width: 220px; height: 220px; display: flex; justify-content: center; align-items: center;">
+                {% if qr_imagem %}
+                    <img src="data:image/jpeg;base64,{{ qr_imagem }}" 
+                         alt="QR Code PIX" 
+                         style="width: 100%; border-radius: 10px; border: 2px solid #2e7d32;">
+                {% else %}
+                    <p style="color: #888;">Use o código Copia e Cola abaixo.</p>
+                {% endif %}
+            </div>
+            
+            <div style="text-align: left;">
+                <label style="font-weight: 600; color: #555;">Copia e Cola:</label>
+                <div class="input-copy-group">
+                    <input type="text" id="pixCode" value="{{ pagamento.dados_qr_code }}" readonly 
+                           style="flex-grow: 1; padding: 12px; border: 2px solid #eee; border-radius: 10px; background: #f8f9fa;">
+                    <button onclick="copyPixCode()" id="btnCopy" 
+                            style="background: #2e7d32; color: white; border: none; padding: 0 20px; border-radius: 10px; cursor: pointer; font-weight: 700;">
+                        Copiar
+                    </button>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-<script>
-function copyPixCode() {
-    const pixCode = document.getElementById('pixCode');
-    pixCode.select();
-    pixCode.setSelectionRange(0, 99999); // For mobile devices
-    navigator.clipboard.writeText(pixCode.value);
-    
-    // Show success message
-    const button = event.target.closest('button');
-    const originalText = button.innerHTML;
-    button.innerHTML = '<i data-feather="check" style="width: 16px; height: 16px;"></i>';
-    setTimeout(() => {
-        button.innerHTML = originalText;
-        feather.replace();
-    }, 2000);
-}
-</script>
-{% endblock %}
+            <p style="margin-top: 20px; color: #555; font-size: 1.2rem; font-weight: bold;">
+                Valor: R$ {{ "%.2f"|format(pagamento.valor)|replace('.', ',') }}
+            </p>
+
+            <a href="{{ url_for('planos.confirmar_pix', id_pagamento=pagamento.id) }}" class="btn-confirmar">
+                Já fiz o pagamento
+            </a>
+        </div>
+    </main>
+
+    <script>
+        function copyPixCode() {
+            const pixInput = document.getElementById('pixCode');
+            const btn = document.getElementById('btnCopy');
+            pixInput.select();
+            pixInput.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(pixInput.value);
+            btn.innerText = 'Copiado!';
+            setTimeout(() => { btn.innerText = 'Copiar'; }, 2000);
+        }
+    </script>
+</body>
+</html>

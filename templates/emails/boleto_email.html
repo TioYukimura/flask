@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Boleto Vale & Feira</title>
+    <style>
+        body { font-family: 'Helvetica', Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0; }
+        .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .header { background-color: #2d5a4c; padding: 25px; text-align: center; }
+        .header img { height: 40px; }
+        .header h2 { color: white; margin: 10px 0 0; font-size: 20px; font-weight: 600; }
+        
+        .content { padding: 30px; color: #444; }
+        .texto-ola { font-size: 16px; margin-bottom: 20px; }
+        
+        .box-boleto { 
+            background-color: #fcfcfc; 
+            border: 2px dashed #ccc; 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin: 20px 0; 
+            text-align: center; 
+        }
+        
+        .valor-label { font-size: 12px; text-transform: uppercase; color: #888; font-weight: bold; margin-bottom: 5px; }
+        .valor-grande { font-size: 32px; color: #2d5a4c; font-weight: bold; margin-bottom: 20px; }
+        
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .info-label { font-size: 13px; color: #666; }
+        .info-value { font-size: 14px; font-weight: bold; color: #333; }
+        
+        .linha-digitavel {
+            background: #eee;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+        
+        .footer { background-color: #eef6ee; padding: 20px; text-align: center; font-size: 12px; color: #666; }
+        
+        .btn {
+            display: inline-block;
+            background-color: #2d5a4c;
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="color: white; font-size: 24px; font-weight: bold;">Vale & Feira</div>
+            <h2>Boleto Bancário Gerado</h2>
+        </div>
+        
+        <div class="content">
+            <p class="texto-ola">Olá, <strong>{{ usuario.nome }}</strong>!</p>
+            <p>Seu pedido de assinatura do plano <strong>{{ plano.nome }}</strong> foi recebido.</p>
+            <p>Utilize os dados abaixo para realizar o pagamento pelo aplicativo do seu banco ou internet banking.</p>
+            
+            <div class="box-boleto">
+                <div class="valor-label">Valor a Pagar</div>
+                <div class="valor-grande">R$ {{ "%.2f"|format(plano.preco)|replace('.', ',') }}</div>
+                
+                <div class="info-row">
+                    <span class="info-label">Vencimento</span>
+                    <span class="info-value">{{ data_vencimento }}</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-label">Beneficiário</span>
+                    <span class="info-value">Vale & Feira Ltda.</span>
+                </div>
+
+                <div style="text-align: left; margin-top: 15px;">
+                    <span class="valor-label">Linha Digitável (Copie e Cole):</span>
+                    <div class="linha-digitavel">{{ codigo_barras }}</div>
+                </div>
+            </div>
+
+            <p style="font-size: 13px; color: #777; text-align: center;">
+                A liberação do seu plano ocorrerá automaticamente em até 3 dias úteis após a compensação do pagamento.
+            </p>
+            
+            <div style="text-align: center;">
+                <a href="#" class="btn">Baixar PDF</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            &copy; 2026 Vale & Feira. Todos os direitos reservados.<br>
+            Este é um e-mail automático, por favor não responda.
+        </div>
+    </div>
+</body>
+</html>

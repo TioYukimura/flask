@@ -1,158 +1,295 @@
-{% extends "base_new.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planos Premium | Vale & Feira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Reset e Base para garantir o visual sem herança */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            font-family: 'Montserrat', sans-serif;
+        }
 
-{% block title %}Minha Assinatura - Vale & Feira{% endblock %}
+        .planos-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="text-white fw-bold mb-4">
-                <i data-feather="star" class="me-2"></i>
-                Minha Assinatura
-            </h2>
+        .header-planos {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header-planos h1 {
+            color: #2e7d32;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .header-planos p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .alerta-assinatura {
+            display: inline-block;
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid #bbdefb;
+            font-size: 0.95rem;
+        }
+
+        .planos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .plano-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .plano-card:hover {
+            transform: translateY(-10px);
+            border-color: #2e7d32;
+        }
+
+        .plano-destaque {
+            border-color: #f57c00;
+            position: relative;
+        }
+
+        .plano-destaque::before {
+            content: "RECOMENDADO";
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f57c00;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .plano-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .plano-nome {
+            font-size: 1.6rem;
+            color: #2e7d32;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .plano-preco {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .plano-preco small {
+            font-size: 1rem;
+            color: #888;
+            font-weight: 400;
+        }
+
+        .plano-lista {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 30px 0;
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .plano-lista li {
+            margin-bottom: 12px;
+            color: #555;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .plano-lista li::before {
+            content: "✓";
+            color: #2e7d32;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .btn-plano {
+            display: block;
+            padding: 15px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: 0.3s;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-plano:hover {
+            background: #1b5e20;
+            box-shadow: 0 5px 15px rgba(46,125,50,0.3);
+        }
+
+        .btn-destaque {
+            background: #f57c00;
+        }
+
+        .btn-destaque:hover {
+            background: #e65100;
+            box-shadow: 0 5px 15px rgba(245,124,0,0.3);
+        }
+
+        .btn-desativado {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Seção de Benefícios */
+        .beneficios-box {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .beneficios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .beneficio-item h4 {
+            color: #2e7d32;
+            margin: 15px 0 10px;
+        }
+
+        .beneficio-item p {
+            font-size: 0.9rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="{{ url_for('main.home') }}">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Vale & Feira" class="logo">
+        </a>
+        <nav class="topbar-center">
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('perfil.perfil') }}">Meu Perfil</a>
+            <a href="{{ url_for('auth.logout') }}">Sair</a>
+        </nav>
+    </header>
+
+    <main class="planos-container">
+        
+        <div class="header-planos">
+            <h1>Planos Premium</h1>
+            <p>Destaque seus produtos e aumente suas vendas com nossos planos exclusivos!</p>
+            
+            {% if assinatura_usuario %}
+                <div class="alerta-assinatura">
+                    <strong>Plano Ativo: {{ assinatura_usuario.plano.nome }}</strong><br>
+                    Válido até {{ assinatura_usuario.data_fim.strftime('%d/%m/%Y') }}
+                </div>
+            {% endif %}
         </div>
-    </div>
 
-    {% if assinatura %}
-    <!-- Active Subscription -->
-    <div class="row mb-4">
-        <div class="col-12 col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div>
-                            <h4 class="text-primary fw-bold mb-1">
-                                Plano {{ assinatura.plano.nome }}
-                                {% if assinatura.esta_ativo %}
-                                    <span class="badge bg-success ms-2">ATIVO</span>
-                                {% else %}
-                                    <span class="badge bg-danger ms-2">EXPIRADO</span>
-                                {% endif %}
-                            </h4>
-                            <p class="text-muted mb-0">{{ assinatura.plano.descricao or 'Seus produtos em destaque' }}</p>
-                        </div>
-                        <div class="text-end">
-                            <div class="h5 text-primary mb-0">R$ {{ "%.2f"|format(assinatura.valor_pago) }}</div>
-                            <small class="text-muted">{{ assinatura.metodo_pagamento.upper() }}</small>
-                        </div>
-                    </div>
+        <div class="planos-grid">
+            <div class="plano-card">
+                <span class="plano-icon">📦</span>
+                <div class="plano-nome">Básico</div>
+                <div class="plano-preco">R$ 19,90 <small>/mês</small></div>
+                <ul class="plano-lista">
+                    <li>Destaque para 5 produtos</li>
+                    <li>Topo das buscas</li>
+                    <li>Badge "Premium" no perfil</li>
+                    <li>Suporte prioritário</li>
+                </ul>
+                {% if not assinatura_usuario %}
+                    <a href="{{ url_for('planos.escolher_pagamento', id_plano=1) }}" class="btn-plano">Escolher Plano</a>
+                {% else %}
+                    <button class="btn-plano btn-desativado" disabled>Plano Ativo</button>
+                {% endif %}
+            </div>
 
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <strong class="text-muted small">DATA DE INÍCIO</strong>
-                            <div>{{ assinatura.data_inicio.strftime('%d/%m/%Y') }}</div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong class="text-muted small">VÁLIDO ATÉ</strong>
-                            <div>{{ assinatura.data_fim.strftime('%d/%m/%Y') }}</div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong class="text-muted small">DIAS RESTANTES</strong>
-                            <div class="{% if assinatura.dias_restantes <= 7 %}text-warning{% else %}text-success{% endif %}">
-                                {{ assinatura.dias_restantes }} dias
-                            </div>
-                        </div>
-                    </div>
+            <div class="plano-card plano-destaque">
+                <span class="plano-icon">🌟</span>
+                <div class="plano-nome">Premium</div>
+                <div class="plano-preco">R$ 39,90 <small>/mês</small></div>
+                <ul class="plano-lista">
+                    <li>Produtos ilimitados</li>
+                    <li>Sempre no topo das buscas</li>
+                    <li>Badge "Premium Gold"</li>
+                    <li>Suporte 24/7</li>
+                    <li>Relatórios de vendas</li>
+                </ul>
+                {% if not assinatura_usuario %}
+                    <a href="{{ url_for('planos.escolher_pagamento', id_plano=2) }}" class="btn-plano btn-destaque">Escolher Plano</a>
+                {% else %}
+                    <button class="btn-plano btn-desativado" disabled>Plano Ativo</button>
+                {% endif %}
+            </div>
+        </div>
 
-                    {% if assinatura.dias_restantes <= 7 and assinatura.esta_ativo %}
-                    <div class="alert alert-warning mt-3">
-                        <i data-feather="alert-triangle" class="me-2"></i>
-                        <strong>Seu plano expira em breve!</strong>
-                        <a href="{{ url_for('planos.lista_planos') }}" class="alert-link">Renovar agora</a>
-                    </div>
-                    {% endif %}
+        <div class="beneficios-box">
+            <h2 style="color: #2e7d32; margin-bottom: 10px;">Por que ser Premium?</h2>
+            <div class="beneficios-grid">
+                <div class="beneficio-item">
+                    <span style="font-size: 2.5rem;">📈</span>
+                    <h4>Mais Visibilidade</h4>
+                    <p>Seus produtos aparecem primeiro para quem busca.</p>
+                </div>
+                <div class="beneficio-item">
+                    <span style="font-size: 2.5rem;">💬</span>
+                    <h4>Mais Contatos</h4>
+                    <p>Receba mais mensagens de interessados reais.</p>
+                </div>
+                <div class="beneficio-item">
+                    <span style="font-size: 2.5rem;">💰</span>
+                    <h4>Mais Vendas</h4>
+                    <p>Aumente suas chances de fechar negócio rápido.</p>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-md-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <div class="text-primary mb-3">
-                        <i data-feather="award" style="width: 48px; height: 48px;"></i>
-                    </div>
-                    <h5 class="fw-bold">Status Premium</h5>
-                    <p class="text-muted mb-3">Seus produtos estão sendo destacados na plataforma!</p>
-                    <a href="{{ url_for('main.meus_produtos') }}" class="btn btn-outline-primary btn-sm">
-                        Ver Meus Produtos
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% else %}
-    <!-- No Active Subscription -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body text-center py-5">
-                    <div class="text-muted mb-4">
-                        <i data-feather="star" style="width: 64px; height: 64px;"></i>
-                    </div>
-                    <h4 class="fw-bold mb-3">Nenhum plano ativo</h4>
-                    <p class="text-muted mb-4">
-                        Assine um plano premium para destacar seus produtos e aumentar suas vendas!
-                    </p>
-                    <a href="{{ url_for('planos.lista_planos') }}" class="btn btn-primary">
-                        Ver Planos Disponíveis
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
+    </main>
 
-    <!-- Subscription History -->
-    {% if historico %}
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="fw-bold text-primary mb-4">
-                        <i data-feather="clock" class="me-2"></i>
-                        Histórico de Assinaturas
-                    </h5>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Plano</th>
-                                    <th>Período</th>
-                                    <th>Valor</th>
-                                    <th>Pagamento</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for sub in historico %}
-                                <tr>
-                                    <td class="fw-bold">{{ sub.plano.nome }}</td>
-                                    <td>
-                                        {{ sub.data_inicio.strftime('%d/%m/%Y') }}
-                                        -
-                                        {{ sub.data_fim.strftime('%d/%m/%Y') }}
-                                    </td>
-                                    <td class="text-primary fw-bold">R$ {{ "%.2f"|format(sub.valor_pago) }}</td>
-                                    <td>
-                                        <span class="badge bg-secondary">{{ sub.metodo_pagamento.upper() }}</span>
-                                    </td>
-                                    <td>
-                                        {% if sub.esta_ativo %}
-                                            <span class="badge bg-success">Ativo</span>
-                                        {% else %}
-                                            <span class="badge bg-secondary">Expirado</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-</div>
-{% endblock %}
+    <footer style="text-align: center; padding: 50px 0; color: #aaa; font-size: 0.8rem;">
+        &copy; 2024 Vale & Feira - O melhor da terra para você.
+    </footer>
+
+</body>
+</html>

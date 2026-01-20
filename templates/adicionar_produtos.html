@@ -1,115 +1,319 @@
-<!doctype html>
-<html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Adicionar Produto</title>
-        <style>
-            body {
-                background-color: rgb(20, 99, 95);
-                font-family: Arial, sans-serif;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-            }
-            .form-box {
-                background-color: white;
-                padding: 30px;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-                width: 350px;
-            }
-            label {
-                display: block;
-                margin-top: 15px;
-                font-weight: bold;
-            }
-            input,
-            textarea,
-            select {
-                width: 100%;
-                margin-top: 10px;
-                padding: 8px;
-                border-radius: 4px;
-                border: 1px solid #ccc;
-                box-sizing: border-box;
-            }
-            button {
-                margin-top: 15px;
-                padding: 10px;
-                background-color: rgb(20, 99, 95);
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                width: 100%;
-            }
-            button:hover {
-                background-color: rgb(15, 80, 76);
-            }
-            .erro {
-                color: red;
-                margin-top: 5px;
-                font-size: 14px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="form-box">
-            <h2>Adicionar Produto</h2>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Novo Produto - Vale & Feira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --verde-fundo: #edf7ed;
+            --verde-escuro: #2d5a4c;
+            --verde-primario: #3a6351;
+            --branco: #ffffff;
+            --texto-cor: #4a4a4a;
+            --cinza-texto: #7a7a7a;
+            --borda: #e0eee0;
+            --vermelho-erro: #d32f2f;
+            --vermelho-sair: #ff6b6b;
+        }
 
-            {% with messages = get_flashed_messages(with_categories=true) %} {%
-            if messages %}
-            <ul>
-                {% for category, message in messages %}
-                <li class="{{ category }}">{{ message }}</li>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--verde-fundo);
+            color: var(--texto-cor);
+            line-height: 1.6;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background: transparent;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 10px;
+        }
+
+        .logo-img { height: 30px; width: auto; }
+        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--verde-escuro); }
+
+        .nav-links { display: flex; align-items: center; gap: 25px; }
+        .nav-links a { text-decoration: none; color: var(--cinza-texto); font-size: 0.95rem; font-weight: 500; transition: 0.3s; }
+        .nav-links a:hover { color: var(--verde-escuro); }
+        .nav-links .sair { color: var(--vermelho-sair); }
+        .nav-links .sair:hover { color: #d32f2f; }
+        .nav-planoslink a {
+            text-decoration: none;
+            color:rgb(0, 76, 9);
+            font-size: 0.9rem;
+            font-weight: 900;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .page-header { text-align: center; padding: 40px 20px; }
+        .page-header h1 { font-size: 2.2rem; color: var(--verde-escuro); margin-bottom: 15px; }
+        .page-header p { color: var(--cinza-texto); max-width: 600px; margin: 0 auto; }
+
+        .container { max-width: 850px; margin: 0 auto 60px; padding: 0 20px; }
+        .form-card { background: var(--branco); border-radius: 30px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+            margin: 30px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title:first-child { margin-top: 0; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: span 2; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--verde-escuro); margin-bottom: 8px; }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--borda);
+            border-radius: 12px; font-family: inherit; outline: none; transition: 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--verde-escuro); background: #f9fdf9; }
+
+        .characteristics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
+        .check-item { background: #f9fdf9; border: 1px solid var(--borda); padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px; font-size: 0.8rem; cursor: pointer; transition: 0.3s; }
+        .check-item:hover { border-color: var(--verde-escuro); }
+        .check-item input { width: auto; }
+
+        .action-btns { display: flex; justify-content: center; gap: 15px; margin-top: 40px; }
+        .btn-publish { background: var(--verde-escuro); color: white; padding: 12px 40px; border-radius: 15px; font-weight: 700; border: none; cursor: pointer; transition: 0.3s; }
+        .btn-publish:hover { background: var(--verde-primario); transform: translateY(-2px); }
+
+        .tips-box { background: #dceada; border-radius: 20px; padding: 30px; margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .tip-item { display: flex; align-items: center; gap: 12px; font-size: 0.8rem; }
+        .tip-icon { font-size: 1.2rem; }
+
+        .footer { background: #2d5a4c; color: #c2d6cf; padding: 60px 10% 20px; margin-top: auto; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 40px; }
+        .footer-col h4 { color: white; margin-bottom: 20px; font-size: 1.1rem; }
+        .footer-col p { font-size: 0.8rem; line-height: 1.6; }
+        .footer-col a { display: block; color: #c2d6cf; text-decoration: none; margin-bottom: 12px; font-size: 0.85rem; transition: 0.3s; }
+        .footer-col a:hover { color: white; padding-left: 5px; }
+        .footer-bottom { text-align: center; padding-top: 25px; font-size: 0.8rem; color: #c2d6cf; }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="{{ url_for('main.home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" class="logo-img" alt="Logo">
+            <span class="logo-text">Vale&Feira</span>
+        </a>
+
+        <nav class="nav-links">
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+              <nav class="nav-planoslink">
+                <a href="{{ url_for('planos.lista_planos') }}">🌟Planos🌟</a>
+        </nav>
+            <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+            <a href="{{ url_for('auth.logout') }}" class="sair">Sair</a>
+        </nav>
+    </header>
+
+    <div class="page-header">
+        <h1> Adicionar Novo Produto</h1>
+        <p>Compartilhe seus produtos com toda a comunidade do Vale do Jequitinhonha.</p>
+    </div>
+
+    <main class="container">
+
+        {% if form.errors %}
+            <div style="background: #ffebee; border: 1px solid #ffcdd2; color: #b71c1c; padding: 15px; border-radius: 15px; margin-bottom: 20px;">
+                <strong>🛑 Ops! Verifique os campos abaixo:</strong>
+                <ul style="margin-left: 20px; margin-top: 5px;">
+                {% for field, errors in form.errors.items() %}
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
                 {% endfor %}
-            </ul>
-            {% endif %} {% endwith %}
+                </ul>
+            </div>
+        {% endif %}
 
-           <form method="POST" enctype="multipart/form-data" action="{{ url_for('produto.adicionar_produtos') }}">
-    {{ form.hidden_tag() }}
+        <div class="form-card">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
 
-    <label for="nomeForm">Nome do Produto:</label>
-    {{ form.nomeForm() }}
-    {% for error in form.nomeForm.errors %}
-        <span class="erro">{{ error }}</span>
-    {% endfor %}
+                <div class="section-title">👨‍🌾 Dados do Produtor</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome do Produtor/Propriedade *</label>
+                        <input type="text" name="nome_produtor" placeholder="Ex: João Silva ou Sítio Boa Vista" required>
+                    </div>
 
-    <label for="precoForm">Preço:</label>
-    {{ form.precoForm() }}
-    {% for error in form.precoForm.errors %}
-        <span class="erro">{{ error }}</span>
-    {% endfor %}
+                    <div class="form-group">
+                        <label>Tempo de Experiência</label>
+                        <select name="tempo_experiencia">
+                            <option value="">Selecione</option>
+                            <option value="Iniciante">Iniciante</option>
+                            <option value="1-2 anos">1-2 anos</option>
+                            <option value="Tradição Familiar">Tradição Familiar</option>
+                            <option value="Mais de 10 anos">Mais de 10 anos</option>
+                        </select>
+                    </div>
 
-    <label for="descricaoForm">Descrição:</label>
-    {{ form.descricaoForm(rows=4) }}
-    {% for error in form.descricaoForm.errors %}
-        <span class="erro">{{ error }}</span>
-    {% endfor %}
+                    <div class="form-group">
+                        <label>Cidade/Região *</label>
+                        <input type="text" name="cidadeForm" placeholder="Ex: Diamantina, MG" required>
+                    </div>
 
-    <label for="categoriaForm">Categoria:</label>
-    {{ form.categoriaForm() }}
-    {% for error in form.categoriaForm.errors %}
-        <span class="erro">{{ error }}</span>
-    {% endfor %}
+                    <div class="form-group">
+                        <label>WhatsApp para Contato *</label>
+                        <input type="text" name="whatsapp" placeholder="(38) 99999-9999" required>
+                    </div>
 
-    <label for="cidadeForm">Cidade:</label>
-    {{ form.cidadeForm() }}
-    {% for error in form.cidadeForm.errors %}
-        <span class="erro">{{ error }}</span>
-    {% endfor %}
+                    <div class="form-group full-width">
+                        <label>História do Produtor (Opcional)</label>
+                        <textarea name="historia_produtor" rows="3" placeholder="Conte um pouco sobre sua produção..."></textarea>
+                    </div>
+                </div>
 
-    <label for="imagem">Imagem do Produto:</label>
-    {{ form.imagem() }}
-    {% for error in form.imagem.errors %}
-        <span class="erro">{{ error }}</span>
-    {% endfor %}
+                <div class="section-title">🛍️ Informações do Produto</div>
+                <div class="form-grid">
+                    
+                    <div class="form-group full-width">
+                        <label>Nome do Produto *</label>
+                        <input type="text" name="nomeForm" placeholder="Ex: Mel Artesanal do Jequitinhonha" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Categoria *</label>
+                        <select name="categoriaForm" required>
+                            <option value="">Selecione...</option>
+                            <option value="Vegetais e Verduras">Vegetais e Verduras</option>
+                            <option value="Frutas Frescas">Frutas Frescas</option>
+                            <option value="Mel e Derivados">Mel e Derivados</option>
+                            <option value="Grãos e Cereais">Grãos e Cereais</option>
+                            <option value="Queijos e Laticínios">Queijos e Laticínios</option>
+                            <option value="Conservas e Doces">Conservas e Doces</option>
+                            <option value="Artesanato Local">Artesanato Local</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
 
-    {{ form.submit() }}
-</form>
+                    <div class="form-group">
+                        <label>Disponibilidade *</label>
+                        <select name="disponibilidade" required>
+                            <option value="disponivel">✅ Disponível</option>
+                            <option value="sob_encomenda">📦 Sob Encomenda</option>
+                        </select>
+                    </div>
 
+                    <div class="form-group">
+                        <label>Quantidade Disponível *</label>
+                        <input type="number" name="quantidade" placeholder="Ex: 10" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Unidade de Medida *</label>
+                        <select name="unidade" required>
+                            <option value="">Selecione...</option>
+                            <option value="Quilograma">Quilograma (kg)</option>
+                            <option value="Grama">Grama (g)</option>
+                            <option value="Litro">Litro (L)</option>
+                            <option value="Mililitro">Mililitro (ml)</option>
+                            <option value="Unidade">Unidade</option>
+                            <option value="Maço">Maço</option>
+                            <option value="Caixa">Caixa</option>
+                            <option value="Saca">Saca</option>
+                            <option value="Duzia">Dúzia</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Descrição Detalhada *</label>
+                        <textarea name="descricaoForm" rows="4" placeholder="Descreva seu produto..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preço (R$) *</label>
+                        <input type="text" id="precoInput" name="precoForm" placeholder="0,00" required>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Foto do Produto *</label>
+                        <input type="file" name="imagem" accept="image/*" required>
+                    </div>
+                </div>
+
+                <div class="section-title">🏷️ Características</div>
+                <div class="characteristics-grid">
+                    <label class="check-item"><input type="checkbox" name="c1"> 🌿 Orgânico</label>
+                    <label class="check-item"><input type="checkbox" name="c2"> 🏆 Artesanal</label>
+                    <label class="check-item"><input type="checkbox" name="c3"> 🌱 Fresco</label>
+                    <label class="check-item"><input type="checkbox" name="c4"> 🏠 Local</label>
+                    <label class="check-item"><input type="checkbox" name="c5"> ♻️ Sustentável</label>
+                    <label class="check-item"><input type="checkbox" name="c6"> 📜 Tradicional</label>
+                </div>
+
+                <div class="action-btns">
+                    <button type="submit" class="btn-publish"> Publicar Produto</button>
+                </div>
+            </form>
+
+            <div class="tips-box">
+                <div class="tip-item"><span class="tip-icon">📸</span> <strong>Fotos:</strong> Use fotos claras.</div>
+                <div class="tip-item"><span class="tip-icon">💰</span> <strong>Preço:</strong> Preço justo atrai mais.</div>
+            </div>
         </div>
-    </body>
+    </main>
+
+    <footer class="footer">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Vale&Feira</h4>
+            <p>Conectando produtores e consumidores através da tecnologia e sustentabilidade.</p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Links Rápidos</h4>
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            <a href="{{ url_for('produto.adicionar_produtos') }}">Adicionar Produto</a> <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+            {% endif %}
+        </div>
+
+        <div class="footer-col">
+            <h4>Suporte</h4>
+            <a href="#">Central de Ajuda</a>
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Termos de Uso</a>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contato & Suporte</h4>
+            <a>📧contato@valefeira.com.br </a>
+            <a>📧suportevaleefeira@gmail.com</a>
+            <a href="#">📱 (38) 3333-4444</a>
+            <p>📍 Vale do Jequitinhonha, MG</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        &copy; 2026 Vale&Feira. Todos os direitos reservados.
+    </div>
+</footer>
+
+</body>
 </html>

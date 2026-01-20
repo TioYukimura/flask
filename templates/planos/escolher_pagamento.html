@@ -1,95 +1,296 @@
-{% extends "base_new.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Assinatura | Vale & Feira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Reset e Fontes --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        
+        body {
+            background-color: #eef6ee; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-{% block title %}Escolher Pagamento - {{ plano.nome }} - Vale & Feira{% endblock %}
+        /* --- Container do Checkout --- */
+        .checkout-container {
+            background: white;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(45, 90, 76, 0.08);
+            border: 1px solid #e0eee0;
+        }
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-8">
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="{{ url_for('planos.lista_planos') }}" class="text-decoration-none text-white">
-                            Planos
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item active text-white">Pagamento</li>
-                </ol>
-            </nav>
+        .btn-close {
+            position: absolute; top: 20px; right: 20px;
+            text-decoration: none; font-size: 1.5rem;
+            color: #aaa; transition: 0.3s;
+            line-height: 1;
+        }
+        .btn-close:hover { color: #d32f2f; }
 
-            <!-- Plan Summary -->
-            <div class="card mb-4">
-                <div class="card-body text-center">
-                    <h4 class="text-primary fw-bold">Plano {{ plano.nome }}</h4>
-                    <div class="h2 text-primary my-3">
-                        R$ {{ "%.2f"|format(plano.preco) }}
-                        <small class="text-muted">/mês</small>
-                    </div>
-                    <p class="text-muted mb-0">{{ plano.descricao or 'Destaque seus produtos e venda mais!' }}</p>
+        h2 { color: #2d5a4c; margin-bottom: 5px; font-size: 1.6rem; text-align: center; }
+        .subtitulo { color: #666; font-size: 0.9rem; margin-bottom: 30px; text-align: center; }
+        .destaque-preco { color: #2d5a4c; font-weight: 700; font-size: 1.1rem; }
+
+        /* --- Opções de Pagamento --- */
+        .metodo-pagamento-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 25px;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        .metodo-pagamento-label:hover { border-color: #b2dfdb; background: #fafafa; }
+        
+        .metodo-pagamento-label.active {
+            border-color: #2d5a4c;
+            background-color: #f1f8e9;
+            box-shadow: 0 4px 10px rgba(45, 90, 76, 0.1);
+        }
+
+        .metodo-info { display: flex; align-items: center; gap: 15px; }
+        .metodo-icon { font-size: 1.4rem; color: #2d5a4c; width: 30px; text-align: center; }
+        .metodo-texto h4 { color: #333; font-size: 1rem; margin-bottom: 3px; }
+        .metodo-texto p { color: #888; font-size: 0.8rem; margin: 0; }
+
+        input[type="radio"] { accent-color: #2d5a4c; transform: scale(1.2); }
+
+        /* --- Formulários Expansíveis --- */
+        .form-section {
+            display: none;
+            margin-top: 15px;
+            padding: 25px;
+            background: #fafafa;
+            border-radius: 15px;
+            border: 1px solid #eee;
+            animation: fadeIn 0.4s ease;
+        }
+        .form-section.visible { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .form-title { color: #2d5a4c; font-size: 1rem; margin-bottom: 20px; font-weight: 700; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #555; font-size: 0.85rem; font-weight: 600; }
+        
+        .form-control {
+            width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 10px;
+            font-size: 0.95rem; outline: none; transition: 0.3s; background: #fff;
+        }
+        .form-control:focus { border-color: #2d5a4c; background: #fff; box-shadow: 0 0 0 3px rgba(45, 90, 76, 0.1); }
+
+        .row { display: flex; gap: 15px; }
+        .col { flex: 1; }
+
+        .modal-footer {
+            margin-top: 35px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-cancelar {
+            flex: 1; padding: 15px; border: 1px solid #ddd; background: white;
+            color: #666; border-radius: 12px; cursor: pointer; font-weight: 600;
+            text-decoration: none; text-align: center; transition: 0.3s;
+        }
+        .btn-cancelar:hover { background: #f5f5f5; color: #333; }
+
+        .btn-confirmar {
+            flex: 2; padding: 15px; border: none; background: #2d5a4c;
+            color: white; border-radius: 12px; cursor: pointer; font-weight: 700;
+            transition: 0.3s; font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(45, 90, 76, 0.2);
+        }
+        .btn-confirmar:hover { background: #1f4036; transform: translateY(-2px); }
+
+        .pix-qr-placeholder {
+            width: 120px; height: 120px; background: #e8f5e9; margin: 0 auto 15px;
+            display: flex; align-items: center; justify-content: center;
+            color: #2d5a4c; font-size: 2.5rem; border-radius: 12px; border: 2px dashed #a5d6a7;
+        }
+        
+        .boleto-alert {
+            background: #fff8e1; color: #f57c00; padding: 15px; 
+            border-radius: 10px; font-size: 0.85rem; border: 1px solid #ffe0b2;
+            display: flex; align-items: center; gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="checkout-container">
+    <a href="{{ url_for('planos.lista_planos') }}" class="btn-close">&times;</a>
+    
+    <h2>Finalizar Assinatura</h2>
+    <p class="subtitulo">Você escolheu o plano <strong>{{ plano.nome }}</strong> por <span class="destaque-preco">R$ {{ "%.2f"|format(plano.preco)|replace('.', ',') }}/mês</span></p>
+
+    <form method="POST" id="paymentForm" novalidate>
+        {{ form_cartao.hidden_tag() }}
+
+        <p style="font-weight: 700; color: #444; margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">Escolha como pagar:</p>
+
+        <label class="metodo-pagamento-label active" id="lbl-cartao">
+            <div class="metodo-info">
+                <div class="metodo-icon">💳</div>
+                <div class="metodo-texto">
+                    <h4>Cartão de Crédito</h4>
+                    <p>Aprovação imediata</p>
                 </div>
             </div>
+            <input type="radio" name="metodo_pagamento" value="cartao" checked onclick="toggleMetodo('cartao')">
+        </label>
 
-            <!-- Payment Methods -->
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="text-center text-primary fw-bold mb-4">
-                        <i data-feather="credit-card" class="me-2"></i>
-                        Escolha a forma de pagamento
-                    </h5>
-
-                    <div class="row">
-                        <!-- PIX Payment -->
-                        <div class="col-md-6 mb-3">
-                            <a href="{{ url_for('planos.pagar_pix', plano_id=plano.id) }}" class="payment-method d-block text-decoration-none">
-                                <div class="payment-icon">
-                                    💳
-                                </div>
-                                <h5 class="fw-bold">PIX</h5>
-                                <p class="mb-0">Pagamento instantâneo</p>
-                                <small class="text-success">✓ Aprovação imediata</small>
-                            </a>
-                        </div>
-
-                        <!-- Credit Card Payment -->
-                        <div class="col-md-6 mb-3">
-                            <a href="{{ url_for('planos.pagar_cartao', plano_id=plano.id) }}" class="payment-method d-block text-decoration-none">
-                                <div class="payment-icon">
-                                    💳
-                                </div>
-                                <h5 class="fw-bold">Cartão de Crédito</h5>
-                                <p class="mb-0">Parcele em até 12x</p>
-                                <small class="text-info">✓ Todas as bandeiras</small>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+        <div id="form-cartao" class="form-section visible">
+            <div class="form-title">Dados do Cartão</div>
+            
+            <div class="form-group">
+                <label>Número do Cartão</label>
+                {{ form_cartao.numero(class="form-control", placeholder="0000 0000 0000 0000", maxlength="19") }}
+            </div>
+            
+            <div class="form-group">
+                <label>Nome no Cartão</label>
+                {{ form_cartao.nome_titular(class="form-control", placeholder="Igual ao impresso no cartão") }}
             </div>
 
-            <!-- Security Info -->
-            <div class="card mt-4">
-                <div class="card-body text-center">
-                    <h6 class="text-primary fw-bold mb-3">
-                        <i data-feather="shield" class="me-2"></i>
-                        Pagamento 100% Seguro
-                    </h6>
-                    <div class="row text-muted small">
-                        <div class="col-md-4 mb-2">
-                            <i data-feather="lock" class="me-1"></i>
-                            SSL Criptografado
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <i data-feather="shield-check" class="me-1"></i>
-                            Dados Protegidos
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <i data-feather="check-circle" class="me-1"></i>
-                            PCI Compliance
-                        </div>
-                    </div>
+            <div class="row">
+                <div class="col form-group">
+                    <label>Validade</label>
+                    {{ form_cartao.validade(class="form-control", placeholder="MM/AA", maxlength="5") }}
+                </div>
+                <div class="col form-group">
+                    <label>CVV</label>
+                    {{ form_cartao.cvv(class="form-control", placeholder="123", maxlength="4") }}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>CPF do Titular</label>
+                <input type="text" name="cpf_titular" class="form-control" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)">
+            </div>
+        </div>
+
+        <label class="metodo-pagamento-label" id="lbl-pix">
+            <div class="metodo-info">
+                <div class="metodo-icon">💠</div>
+                <div class="metodo-texto">
+                    <h4>PIX</h4>
+                    <p>Rápido e seguro</p>
+                </div>
+            </div>
+            <input type="radio" name="metodo_pagamento" value="pix" onclick="toggleMetodo('pix')">
+        </label>
+
+        <div id="form-pix" class="form-section">
+            <div class="form-title">Pagamento via PIX</div>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div class="pix-qr-placeholder">
+                    <span style="font-size: 3rem;">▚</span>
+                </div>
+                <p style="font-size: 0.9rem; color: #555;">O QR Code será gerado na próxima tela para você escanear.</p>
+            </div>
+            
+            <div class="form-group">
+                <label>Confirme seu CPF para a nota fiscal</label>
+                <input type="text" name="cpf_pix" class="form-control" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)">
+            </div>
+        </div>
+
+        <label class="metodo-pagamento-label" id="lbl-boleto">
+            <div class="metodo-info">
+                <div class="metodo-icon">📄</div>
+                <div class="metodo-texto">
+                    <h4>Boleto Bancário</h4>
+                    <p>Vencimento em 3 dias</p>
+                </div>
+            </div>
+            <input type="radio" name="metodo_pagamento" value="boleto" onclick="toggleMetodo('boleto')">
+        </label>
+
+        <div id="form-boleto" class="form-section">
+            <div class="form-title">Emissão de Boleto</div>
+            
+            <div class="form-group">
+                <label>CPF/CNPJ</label>
+                <input type="text" name="cpf_boleto" class="form-control" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)">
+            </div>
+            
+            <div class="form-group">
+                <label>Nome Completo</label>
+                <input type="text" name="nome_boleto" class="form-control" value="{{ current_user.nome }}">
+            </div>
+
+            <div class="boleto-alert">
+                <span style="font-size: 1.2rem;">⚠️</span>
+                <div>
+                    <strong>Atenção:</strong> O boleto será enviado para <u>{{ current_user.email }}</u>.
                 </div>
             </div>
         </div>
-    </div>
+
+        <div class="modal-footer">
+            <a href="{{ url_for('planos.lista_planos') }}" class="btn-cancelar">Voltar</a>
+            <button type="submit" class="btn-confirmar">Confirmar e Assinar</button>
+        </div>
+    </form>
 </div>
-{% endblock %}
+
+<script>
+    function toggleMetodo(metodo) {
+        // 1. Remove classe ativa de todos os labels
+        document.querySelectorAll('.metodo-pagamento-label').forEach(el => el.classList.remove('active'));
+        
+        // 2. Esconde todas as seções de form e DESATIVA seus inputs
+        document.querySelectorAll('.form-section').forEach(el => {
+            el.classList.remove('visible');
+            // Desativa inputs para não serem validados/enviados
+            const inputs = el.querySelectorAll('input, select');
+            inputs.forEach(input => input.disabled = true);
+        });
+
+        // 3. Ativa o label clicado
+        document.getElementById('lbl-' + metodo).classList.add('active');
+        
+        // 4. Mostra o form correspondente e ATIVA seus inputs
+        const activeSection = document.getElementById('form-' + metodo);
+        activeSection.classList.add('visible');
+        const activeInputs = activeSection.querySelectorAll('input, select');
+        activeInputs.forEach(input => input.disabled = false);
+    }
+
+    // Inicialização: Garante que o estado inicial (Cartão) esteja correto ao carregar
+    window.addEventListener('DOMContentLoaded', (event) => {
+        toggleMetodo('cartao');
+    });
+
+    function mascaraCPF(i) {
+        var v = i.value;
+        if(isNaN(v[v.length-1])){ 
+           i.value = v.substring(0, v.length-1);
+           return;
+        }
+        i.setAttribute("maxlength", "14");
+        if (v.length == 3 || v.length == 7) i.value += ".";
+        if (v.length == 11) i.value += "-";
+    }
+</script>
+
+</body>
+</html>

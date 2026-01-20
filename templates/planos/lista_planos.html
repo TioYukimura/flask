@@ -1,148 +1,421 @@
-{% extends "base_new.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planos - Vale & Feira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Variáveis globais --- */
+        :root {
+            --verde-fundo: #edf7ed;
+            --verde-escuro: #2d5a4c;
+            --verde-primario: #3a6351;
+            --branco: #ffffff;
+            --texto-cor: #4a4a4a;
+            --cinza-texto: #7a7a7a;
+            --vermelho-notificacao: #ff6b6b;
+        }
 
-{% block title %}Planos Premium - Vale & Feira{% endblock %}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <!-- Header -->
-            <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold text-white mb-3">
-                    <i data-feather="star" class="me-2"></i>
-                    Planos Premium
-                </h2>
-                <p class="text-white fs-5 mb-4">
-                    Destaque seus produtos e aumente suas vendas com nossos planos premium!
-                </p>
-                {% if assinatura_usuario %}
-                    <div class="alert alert-info d-inline-block">
-                        <i data-feather="check-circle" class="me-2"></i>
-                        Você já tem um plano ativo: <strong>{{ assinatura_usuario.plano.nome }}</strong>
-                        <br>
-                        <small>Válido até {{ assinatura_usuario.data_fim.strftime('%d/%m/%Y') }}</small>
-                    </div>
-                {% endif %}
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--verde-fundo);
+            color: var(--texto-cor);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER --- */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background: #eef7ee;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 8px;
+        }
+
+        .logo-img { height: 35px; }
+        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--verde-escuro); }
+        
+        .nav-links { display: flex; align-items: center; gap: 25px; }
+        .nav-links a { text-decoration: none; color: var(--cinza-texto); font-weight: 500; transition: 0.3s; font-size: 0.9rem; }
+        .nav-links a:hover { color: var(--verde-escuro); }
+        
+        .nav-planoslink a { text-decoration: none; color:rgb(0, 76, 9); font-size: 0.9rem; font-weight: 900; }
+
+        /* --- ÁREA PRINCIPAL --- */
+        .hero-planos {
+            text-align: center;
+            padding: 60px 20px 40px;
+        }
+
+        .hero-planos h1 {
+            color: var(--verde-escuro);
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .hero-planos p {
+            color: var(--cinza-texto);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* --- CONTAINER HORIZONTAL DOS PLANOS --- */
+        .container-planos {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 80px;
+            
+            /* LÓGICA HORIZONTAL */
+            display: flex;
+            flex-direction: row; /* Força linha */
+            justify-content: center; /* Centraliza os itens */
+            align-items: stretch; /* Faz todos terem a mesma altura */
+            gap: 30px; /* Espaço entre os cards */
+            flex-wrap: wrap; /* Permite quebrar linha em celular */
+        }
+
+        .card-plano {
+            background: var(--branco);
+            border-radius: 20px;
+            padding: 40px 30px;
+            
+            /* Tamanho dos cards */
+            flex: 1; /* Cresce igualmente */
+            min-width: 280px; /* Largura mínima */
+            max-width: 360px; /* Largura máxima */
+            
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+            border: 1px solid transparent;
+            position: relative;
+        }
+
+        .card-plano:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(45, 90, 76, 0.1);
+            border-color: var(--verde-escuro);
+        }
+
+        /* Título do Plano */
+        .plano-nome {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+            margin-bottom: 15px;
+            text-transform: capitalize;
+        }
+
+        /* Preço */
+        .plano-preco-box {
+            display: flex;
+            align-items: baseline;
+            color: var(--verde-escuro);
+            margin-bottom: 30px;
+        }
+
+        .moeda { font-size: 1.2rem; font-weight: 700; margin-right: 5px; }
+        .valor { font-size: 3.2rem; font-weight: 700; line-height: 1; }
+        .periodo { font-size: 0.9rem; color: var(--cinza-texto); margin-left: 5px; }
+
+        /* Lista de Benefícios */
+        .lista-beneficios {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 30px 0;
+            width: 100%;
+            text-align: left;
+            flex-grow: 1; /* Empurra o botão para baixo */
+        }
+
+        .lista-beneficios li {
+            margin-bottom: 15px;
+            color: var(--texto-cor);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .check-icon {
+            color: var(--verde-escuro);
+            font-weight: bold;
+            margin-right: 12px;
+            min-width: 20px;
+        }
+
+        /* Botão */
+        .btn-assinar {
+            background-color: var(--verde-escuro);
+            color: white;
+            text-decoration: none;
+            padding: 16px 0;
+            width: 100%;
+            text-align: center;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
+            margin-top: auto; /* Garante que fique no fundo */
+        }
+
+        .btn-assinar:hover {
+            background-color: var(--verde-primario);
+            box-shadow: 0 5px 15px rgba(45, 90, 76, 0.2);
+        }
+
+        .btn-ativo {
+            background-color: #ddd;
+            color: #777;
+            cursor: default;
+        }
+        .btn-ativo:hover { background-color: #ddd; box-shadow: none; }
+
+        /* Footer */
+         .footer {
+            background: #2d5a4c;
+            color: #c2d6cf;
+            padding: 60px 10% 20px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 40px;
+        }
+
+        .footer-col h4 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-col a {
+            display: block;
+            color: #c2d6cf;
+            text-decoration: none;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            font-size: 0.75rem;
+        }
+
+        /* Responsividade para Celular */
+        @media (max-width: 900px) {
+            .topbar { padding: 20px; flex-direction: column; gap: 15px; }
+            /* No celular, volta a empilhar um embaixo do outro */.topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background: transparent;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .logo-img { height: 35px; }
+        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--verde-escuro); }
+        
+        
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color:#adaaa6;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--verde-escuro);
+        }
+
+        .nav-planoslink a {
+            text-decoration: none;
+            color:rgb(0, 76, 9);
+            font-size: 0.9rem;
+            font-weight: 900;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .bolinha-notificacao {
+            background-color: var(--vermelho-notificacao);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 50%;
+            margin-left: 5px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .btn-login {
+            border: 2px solid var(--verde-escuro);
+            color: var(--verde-escuro) !important;
+            padding: 8px 20px !important;
+            border-radius: 20px;
+            font-weight: 700 !important;
+        }
+            .container-planos { flex-direction: column; align-items: center; }
+            .card-plano { width: 100%; max-width: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="{{ url_for('main.home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                 alt="Vale&Feira" 
+                 class="logo-img"
+                 style="height: 55px; width: auto; object-fit: contain;">
+            
+            <span class="logo-text">Vale&Feira</span>
+        </a>
+
+       
+
+        <nav class="nav-links">
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('chat.meus_chats') }}">
+                    Conversas
+                    {% if mensagens_nao_lidas is defined and mensagens_nao_lidas > 0 %}
+                        <span class="bolinha-notificacao">{{ mensagens_nao_lidas }}</span>
+                    {% endif %}
+                </a>
+                <nav class="nav-planoslink">
+                    <a href="{{ url_for('planos.lista_planos') }}">🌟Planos🌟</a>
+                </nav>
+                <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+                <a href="{{ url_for('auth.logout') }}" style="color: #ff6b6b;">Sair</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-login">Login</a>
+                <a href="{{ url_for('auth.registrar') }}" class="btn-cadastro">Cadastrar</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <section class="hero-planos">
+        <h1>Escolha o Plano Ideal para o Seu Negócio</h1>
+        <p>Transparência e flexibilidade para produtores que querem crescer</p>
+        
+        {% if assinatura_usuario %}
+            <div style="margin-top: 20px; background: #e8f5e9; display: inline-block; padding: 10px 25px; border-radius: 30px; color: var(--verde-escuro); font-size: 0.9rem; border: 1px solid #c8e6c9;">
+                <strong>Seu plano atual:</strong> {{ assinatura_usuario.plano.nome }} (Ativo)
             </div>
-        </div>
-    </div>
+        {% endif %}
+    </section>
 
-    <div class="row justify-content-center">
-        <!-- Basic Plan -->
-        <div class="col-12 col-md-6 col-lg-4 mb-4">
-            <div class="plano-card">
-                <div class="mb-4">
-                    <i data-feather="package" style="width: 48px; height: 48px; color: #14635f;"></i>
-                </div>
-                <h3 class="fw-bold text-primary">Básico</h3>
-                <div class="plano-preco">
-                    R$ 19,90
-                    <small>/mês</small>
-                </div>
-                <ul class="list-unstyled text-start mb-4">
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Destaque para 5 produtos
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Aparecer no topo das buscas
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Badge "Premium" no perfil
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Suporte prioritário
-                    </li>
-                </ul>
-                {% if not assinatura_usuario %}
-                    <a href="{{ url_for('planos.escolher_pagamento', id_plano=1) }}" class="btn btn-outline-primary w-100">
-                        Escolher Plano
-                    </a>
+    <main class="container-planos">
+        
+        {% for plano in planos %}
+        <div class="card-plano">
+            <div class="plano-nome">{{ plano.nome }}</div>
+            
+            <div class="plano-preco-box">
+                <span class="moeda">R$</span>
+                <span class="valor">{{ "%.2f"|format(plano.preco)|replace('.', ',') }}</span>
+                <span class="periodo">/mês</span>
+            </div>
+
+            <ul class="lista-beneficios">
+                {% if plano.descricao %}
+                    {% for beneficio in plano.descricao.split(',') %}
+                        <li><span class="check-icon">✔</span> {{ beneficio.strip() }}</li>
+                    {% endfor %}
                 {% else %}
-                    <button class="btn btn-secondary w-100" disabled>Plano Ativo</button>
+                    <li><span class="check-icon">✔</span> Benefícios do plano</li>
                 {% endif %}
-            </div>
+            </ul>
+
+            {% if assinatura_usuario and assinatura_usuario.plano_id == plano.id %}
+                <button class="btn-assinar btn-ativo">Plano Atual</button>
+            {% else %}
+                <a href="{{ url_for('planos.escolher_pagamento', id_plano=plano.id) }}" class="btn-assinar">Assinar Agora</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+    </main>
+
+    <footer class="footer">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Vale&Feira</h4>
+            <p>Conectando produtores e consumidores através da tecnologia e sustentabilidade.</p>
         </div>
 
-        <!-- Premium Plan -->
-        <div class="col-12 col-md-6 col-lg-4 mb-4">
-            <div class="plano-card plano-destaque">
-                <div class="mb-4">
-                    <i data-feather="award" style="width: 48px; height: 48px; color: #14635f;"></i>
-                </div>
-                <h3 class="fw-bold text-primary">Premium</h3>
-                <div class="plano-preco">
-                    R$ 39,90
-                    <small>/mês</small>
-                </div>
-                <ul class="list-unstyled text-start mb-4">
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Destaque para produtos ilimitados
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Aparecer sempre no topo
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Badge "Premium Gold"
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Suporte 24/7
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Relatórios de vendas
-                    </li>
-                </ul>
-                {% if not assinatura_usuario %}
-                    <a href="{{ url_for('planos.escolher_pagamento', id_plano=2) }}" class="btn btn-primary w-100">
-                        Escolher Plano
-                    </a>
-                {% else %}
-                    <button class="btn btn-secondary w-100" disabled>Plano Ativo</button>
-                {% endif %}
-            </div>
+        <div class="footer-col">
+            <h4>Links Rápidos</h4>
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            <a href="{{ url_for('produto.adicionar_produtos') }}">Adicionar Produto</a> <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+            {% endif %}
+        </div>
+
+        <div class="footer-col">
+            <h4>Suporte</h4>
+            <a href="#">Central de Ajuda</a>
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Termos de Uso</a>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contato & Suporte</h4>
+            <a>📧contato@valefeira.com.br </a>
+            <a>📧suportevaleefeira@gmail.com</a>
+            <a href="#">📱 (38) 3333-4444</a>
+            <p>📍 Vale do Jequitinhonha, MG</p>
         </div>
     </div>
 
-    <!-- Benefits Section -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body text-center py-5">
-                    <h3 class="fw-bold text-primary mb-4">Por que escolher um plano premium?</h3>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="text-primary mb-3">
-                                <i data-feather="trending-up" style="width: 48px; height: 48px;"></i>
-                            </div>
-                            <h5>Mais Visibilidade</h5>
-                            <p class="text-muted">Seus produtos aparecem primeiro nos resultados de busca</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-primary mb-3">
-                                <i data-feather="message-circle" style="width: 48px; height: 48px;"></i>
-                            </div>
-                            <h5>Mais Contatos</h5>
-                            <p class="text-muted">Receba mais mensagens de interessados em seus produtos</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-primary mb-3">
-                                <i data-feather="dollar-sign" style="width: 48px; height: 48px;"></i>
-                            </div>
-                            <h5>Mais Vendas</h5>
-                            <p class="text-muted">Aumente significativamente suas chances de venda</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="footer-bottom">
+        &copy; 2026 Vale&Feira. Todos os direitos reservados.
     </div>
-</div>
-{% endblock %}
+</footer>
+
+</body>
+</html>

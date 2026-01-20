@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Perfil - Vale & Feira</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CONFIGURAÇÕES GERAIS --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background: #eef6ee; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* --- HEADER (Padrão) --- */
+        .topbar {
+            background: #eef7ee; padding: 18px 50px; display: flex; justify-content: space-between; 
+            align-items: center; border-bottom: 1px solid #ddd;
+        }
+        .logo-area { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: bold; color: #1f5c4d; text-decoration: none; }
+        .logo-area img { width: 35px; height: 35px; }
+        .link-voltar { 
+            color: #666; text-decoration: none; font-weight: 600; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 5px; transition: 0.3s;
+        }
+        .link-voltar:hover { color: #d32f2f; }
+
+        /* --- CONTAINER PRINCIPAL --- */
+        .container { flex: 1; display: flex; justify-content: center; padding: 40px 20px; }
+        
+        .form-box {
+            background: white; padding: 45px; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); width: 100%; max-width: 650px;
+        }
+        
+        .header-box { text-align: center; margin-bottom: 35px; }
+        .header-box h2 { color: #1f5c4d; font-size: 1.8rem; margin-bottom: 5px; }
+        .header-box p { color: #888; font-size: 0.95rem; }
+
+        /* --- BOTÕES DE SELEÇÃO (TOGGLES ESTILO PILL) --- */
+        .selecao-wrapper {
+            display: flex; gap: 15px; margin-bottom: 30px; justify-content: center; flex-wrap: wrap;
+        }
+        
+        /* O label age como o botão */
+        .toggle-btn {
+            background: #f8f9fa; border: 2px solid #e0e0e0; padding: 12px 25px;
+            border-radius: 30px; cursor: pointer; color: #555; font-weight: 600; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 8px; transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .toggle-btn:hover { background: #e8f5e9; border-color: #c8e6c9; color: #2d5a4c; }
+        
+        /* Classe ativada via JS quando o checkbox dentro estiver marcado */
+        .toggle-btn.active {
+            background: #2d5a4c; border-color: #2d5a4c; color: white;
+            box-shadow: 0 4px 10px rgba(45, 90, 76, 0.3); transform: translateY(-2px);
+        }
+        
+        /* Esconde o checkbox real, mas mantém funcionalidade */
+        .toggle-btn input { display: none; } 
+
+        /* --- SEÇÕES DO FORMULÁRIO --- */
+        .form-section { 
+            display: none; /* Oculto por padrão */
+            background: #fff; border: 1px solid #eee; border-left: 4px solid #2d5a4c;
+            padding: 25px; border-radius: 8px; margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            animation: slideDown 0.4s ease forwards;
+        }
+        .form-section.visible { display: block; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1rem; color: #2d5a4c; font-weight: 700; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        /* --- CAMPOS --- */
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #444; font-weight: 600; font-size: 0.9rem; }
+        
+        .form-control {
+            width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 10px;
+            font-size: 1rem; outline: none; background: #fdfdfd; transition: 0.3s;
+        }
+        .form-control:focus { border-color: #2d5a4c; background: white; box-shadow: 0 0 0 3px rgba(45, 90, 76, 0.1); }
+
+        .info-atual {
+            background: #e3f2fd; color: #0d47a1; padding: 10px 15px; border-radius: 8px;
+            font-size: 0.85rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;
+        }
+
+        /* --- ÁREA DE SEGURANÇA (CONFIRMAÇÃO) --- */
+        .confirmacao-box {
+            background: #fff8e1; border: 1px dashed #ffb74d; padding: 25px;
+            border-radius: 12px; margin-top: 30px; text-align: center;
+        }
+        .confirmacao-title {
+            color: #f57c00; font-weight: bold; margin-bottom: 15px; font-size: 0.95rem;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        .btn-submit {
+            width: 100%; padding: 15px; background: #2d5a4c; color: white; border: none;
+            border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer;
+            transition: 0.3s; margin-top: 15px;
+        }
+        .btn-submit:hover { background: #1f4036; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+        /* Mensagens de Erro/Flash */
+        .flash-msg { padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-size: 0.9rem; }
+        .error-msg { color: #d32f2f; font-size: 0.8rem; margin-top: 5px; display: block; }
+
+        .footer {
+            background: #2d5a4c;
+            color: #c2d6cf;
+            padding: 60px 10% 20px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 40px;
+        }
+
+        .footer-col h4 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-col a {
+            display: block;
+            color: #c2d6cf;
+            text-decoration: none;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            font-size: 0.75rem;
+        }
+        
+        @media (max-width: 600px) {
+            .topo { padding: 30px 20px; }
+            .form-box { padding: 25px; }
+            .selecao-wrapper { flex-direction: column; }
+            .toggle-btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topo">
+        <a href="{{ url_for('main.home') }}" class="logo-area">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Vale&Feira">
+            <span>Vale&Feira</span>
+        </a>
+        <a href="{{ url_for('perfil.perfil') }}" class="link-voltar">
+            <span>✖</span> Cancelar
+        </a>
+    </header>
+
+    <main class="container">
+        <div class="form-box">
+            <div class="header-box">
+                <h2>Editar Perfil</h2>
+                <p>Selecione abaixo o que você deseja alterar:</p>
+            </div>
+
+            <div class="selecao-wrapper">
+                <label class="toggle-btn" id="lbl-dados">
+                    <input type="checkbox" onchange="toggleSection(this, 'sec-dados', 'lbl-dados')"> 
+                    👤 Dados Pessoais
+                </label>
+                <label class="toggle-btn" id="lbl-email">
+                    <input type="checkbox" onchange="toggleSection(this, 'sec-email', 'lbl-email')"> 
+                    📧 E-mail
+                </label>
+                <label class="toggle-btn" id="lbl-senha">
+                    <input type="checkbox" onchange="toggleSection(this, 'sec-senha', 'lbl-senha')"> 
+                    🔒 Senha
+                </label>
+            </div>
+
+            <form method="POST">
+                {{ form.hidden_tag() }}
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash-msg" style="background: #ffebee; color: #c62828; border: 1px solid #ef9a9a;">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <div id="sec-dados" class="form-section">
+                    <div class="section-title">✏️ Informações Básicas</div>
+                    <div class="form-group">
+                        <label>Nome Completo</label>
+                        {{ form.nomeForm(class="form-control") }}
+                        {% if form.nomeForm.errors %} <span class="error-msg">{{ form.nomeForm.errors[0] }}</span> {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>Cidade</label>
+                        {{ form.cidadeForm(class="form-control") }}
+                        {% if form.cidadeForm.errors %} <span class="error-msg">{{ form.cidadeForm.errors[0] }}</span> {% endif %}
+                    </div>
+                </div>
+
+                <div id="sec-email" class="form-section">
+                    <div class="section-title">📧 Alterar E-mail</div>
+                    <div class="info-atual">
+                        <span>ℹ️</span> E-mail atual: <strong>{{ current_user.email }}</strong>
+                    </div>
+                    <div class="form-group">
+                        <label>Novo E-mail</label>
+                        {{ form.emailForm(class="form-control", placeholder="Digite o novo e-mail") }}
+                        {% if form.emailForm.errors %} <span class="error-msg">{{ form.emailForm.errors[0] }}</span> {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar Novo E-mail</label>
+                        {{ form.confirmaEmailForm(class="form-control", placeholder="Repita o novo e-mail") }}
+                        {% if form.confirmaEmailForm.errors %} <span class="error-msg">{{ form.confirmaEmailForm.errors[0] }}</span> {% endif %}
+                    </div>
+                </div>
+
+                <div id="sec-senha" class="form-section">
+                    <div class="section-title">🔒 Alterar Senha</div>
+                    <div class="form-group">
+                        <label>Nova Senha</label>
+                        {{ form.novaSenhaForm(class="form-control", placeholder="Crie uma nova senha forte") }}
+                        {% if form.novaSenhaForm.errors %} <span class="error-msg">{{ form.novaSenhaForm.errors[0] }}</span> {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar Nova Senha</label>
+                        {{ form.confirmaSenhaForm(class="form-control", placeholder="Repita a nova senha") }}
+                        {% if form.confirmaSenhaForm.errors %} <span class="error-msg">{{ form.confirmaSenhaForm.errors[0] }}</span> {% endif %}
+                    </div>
+                </div>
+
+                <div class="confirmacao-box">
+                    <span class="confirmacao-title">🔒</span>
+                    <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">Para salvar a alteração, digite sua senha atual.</p>
+                    
+                    <div class="form-group">
+                        {{ form.senha_atual(class="form-control", placeholder="Digite sua senha atual aqui...", style="text-align: center;") }}
+                        {% if form.senha_atual.errors %} <span class="error-msg">{{ form.senha_atual.errors[0] }}</span> {% endif %}
+                    </div>
+                    
+                    {{ form.submit(class="btn-submit") }}
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+   <footer class="footer">
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Vale&Feira</h4>
+            <p>Conectando produtores e consumidores através da tecnologia e sustentabilidade.</p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Links Rápidos</h4>
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            <a href="{{ url_for('produto.adicionar_produtos') }}">Adicionar Produto</a> <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+            {% endif %}
+        </div>
+
+        <div class="footer-col">
+            <h4>Suporte</h4>
+            <a href="#">Central de Ajuda</a>
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Termos de Uso</a>
+        </div>
+
+        <div class="footer-col">
+            <h4>Contato & Suporte</h4>
+            <a>📧contato@valefeira.com.br </a>
+            <a>📧suportevaleefeira@gmail.com</a>
+            <a href="#">📱 (38) 3333-4444</a>
+            <p>📍 Vale do Jequitinhonha, MG</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        &copy; 2026 Vale&Feira. Todos os direitos reservados.
+    </div>
+</footer>
+
+    <script>
+        function toggleSection(checkbox, sectionId, labelId) {
+            var section = document.getElementById(sectionId);
+            var label = document.getElementById(labelId);
+            
+            // Verifica se o checkbox está marcado (true) ou desmarcado (false)
+            if (checkbox.checked) {
+                section.classList.add('visible');
+                label.classList.add('active');
+            } else {
+                section.classList.remove('visible');
+                label.classList.remove('active');
+            }
+        }
+    </script>
+
+</body>
+</html>
