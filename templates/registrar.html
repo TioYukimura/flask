@@ -1,216 +1,323 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cadastro</title>
-  <style>
-    /* Reset básico */
-    * {
-      box-sizing: border-box;
-    }
+<!doctype html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Criar Conta - Vale & Feira</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+            rel="stylesheet"
+        />
 
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: rgb(20, 99, 95);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      align-items: center;
-    }
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/registrar.css') }}"
+        />
+    </head>
+    <body>
+        <header class="topo-registro">
+            <a href="{{ url_for('main.home') }}" class="area-logo-registro">
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Vale&Feira"
+                    class="logo-imagem-registro"
+                />
+                <span class="logo-texto-registro">Vale&Feira</span>
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="link-login-registro"
+                >Já tenho conta &rarr;</a
+            >
+        </header>
 
-    /* Faixa topo */
-    .faixa-topo {
-      width: 100%;
-      background: white;
-      height: 80px;
-      display: flex;
-      align-items: center;
-      padding-left: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
+        <main class="container-registro">
+            <div class="caixa-form-registro">
+                <h2 class="titulo-registro">Crie sua conta</h2>
 
-    .faixa-topo img {
-      height: 60px;
-    }
+                <form method="POST" class="formulario-registro">
+                    {{ form.hidden_tag() }}
 
-    /* Caixa de registro */
-    .register-box {
-      background: white;
-      max-width: 400px;
-      width: 90%;
-      margin: 40px 0;
-      padding: 30px 25px;
-      border-radius: 10px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
-      color: #333;
-      text-align: center;
-    }
+                    <div class="grupo-campo-registro">
+                        <label class="rotulo-campo-registro"
+                            >Nome Completo</label
+                        >
+                        {{ form.nomeForm(class="campo-registro",
+                        placeholder="Ex: Maria Silva") }} {% if
+                        form.nomeForm.errors %}
+                        <span class="mensagem-erro-registro"
+                            >{{ form.nomeForm.errors[0] }}</span
+                        >
+                        {% endif %}
+                    </div>
 
-    .register-box h1 {
-      margin-bottom: 25px;
-      font-weight: 700;
-      color: rgb(20, 99, 95);
-    }
+                    <div class="grupo-campo-registro">
+                        <label class="rotulo-campo-registro">E-mail</label>
+                        {{ form.emailForm(class="campo-registro",
+                        placeholder="seu@email.com") }} {% if
+                        form.emailForm.errors %}
+                        <span class="mensagem-erro-registro"
+                            >{{ form.emailForm.errors[0] }}</span
+                        >
+                        {% endif %}
+                    </div>
 
-    /* Labels e inputs */
-    label {
-      display: block;
-      text-align: left;
-      margin-bottom: 6px;
-      font-weight: 600;
-      color: rgb(20, 99, 95);
-    }
+                    <div class="grupo-campo-registro">
+                        <label class="rotulo-campo-registro">Cidade</label>
+                        {{ form.cidadeForm(class="campo-registro",
+                        placeholder="Ex: Araçuaí") }} {% if
+                        form.cidadeForm.errors %}
+                        <span class="mensagem-erro-registro"
+                            >{{ form.cidadeForm.errors[0] }}</span
+                        >
+                        {% endif %}
+                    </div>
 
-    input[type="text"],
-    input[type="password"],
-    input[type="email"] {
-      width: 100%;
-      padding: 10px 12px;
-      margin-bottom: 18px;
-      border: 2px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-      transition: border-color 0.3s ease;
-    }
+                    <div class="grupo-campo-registro">
+                        <label class="rotulo-campo-registro">Senha</label>
+                        {{ form.senhaForm(class="campo-registro",
+                        placeholder="Crie uma senha segura") }} {% if
+                        form.senhaForm.errors %}
+                        <span class="mensagem-erro-registro"
+                            >{{ form.senhaForm.errors[0] }}</span
+                        >
+                        {% endif %}
+                    </div>
 
-    input[type="text"]:focus,
-    input[type="password"]:focus,
-    input[type="email"]:focus {
-      outline: none;
-      border-color: rgb(20, 99, 95);
-      box-shadow: 0 0 5px rgb(20, 99, 95, 0.5);
-    }
+                    <div class="grupo-campo-registro">
+                        <label class="rotulo-campo-registro"
+                            >Confirmar Senha</label
+                        >
+                        {{ form.confirmaSenhaForm(class="campo-registro",
+                        placeholder="Digite a senha novamente") }} {% if
+                        form.confirmaSenhaForm.errors %}
+                        <span class="mensagem-erro-registro"
+                            >{{ form.confirmaSenhaForm.errors[0] }}</span
+                        >
+                        {% endif %}
+                    </div>
 
-    /* Botão submit */
-    button, input[type="submit"] {
-      width: 100%;
-      padding: 12px 0;
-      background-color: rgb(20, 99, 95);
-      border: none;
-      border-radius: 6px;
-      color: white;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin-top: 10px;
-    }
+                    <div class="grupo-termos-registro">
+                        <input
+                            type="checkbox"
+                            id="termos"
+                            name="termos"
+                            required
+                            class="checkbox-termos-registro"
+                        />
+                        <label for="termos" class="texto-termos-registro">
+                            Li e concordo com os
+                            <span
+                                class="link-termos-registro"
+                                onclick="abrirModalTermos()"
+                                >Termos e Condições de Uso</span
+                            >
+                            da plataforma.
+                        </label>
+                    </div>
 
-    button:hover, input[type="submit"]:hover {
-      background-color: rgb(15, 80, 76);
-    }
+                    {{ form.submit(class="botao-registro") }}
 
-    /* Links */
-    p {
-      margin-top: 20px;
-      font-size: 14px;
-      color: #555;
-    }
+                    <div class="rodape-form-registro">
+                        Já tem uma conta?
+                        <a
+                            href="{{ url_for('auth.login') }}"
+                            class="link-form-registro"
+                            >Fazer Login</a
+                        >
+                    </div>
+                </form>
+            </div>
+        </main>
 
-    a {
-      color: rgb(20, 99, 95);
-      text-decoration: none;
-      font-weight: 600;
-    }
+        <footer class="rodape-registro">
+            <div class="rodape-texto-registro">
+                &copy; 2026 Vale&Feira. Todos os direitos reservados.
+            </div>
+        </footer>
 
-    a:hover {
-      text-decoration: underline;
-    }
+        <div id="modalTermos" class="modal-termos-registro">
+            <div class="modal-conteudo-registro">
+                <span
+                    class="botao-fechar-modal-registro"
+                    onclick="fecharModalTermos()"
+                    >&times;</span
+                >
+                <div class="modal-corpo-registro">
+                    <h3 class="modal-titulo-registro">
+                        Termos e Condições de Uso: Plataforma Vale & Feira
+                    </h3>
 
-    /* Mensagens flash */
-    ul.messages {
-      list-style: none;
-      padding: 0;
-      margin: 20px 0 0;
-      text-align: left;
-    }
+                    <p><strong>1. Objeto e Definição</strong></p>
+                    <p>
+                        A plataforma Vale & Feira é um ambiente digital
+                        destinado à divulgação, promoção e facilitação da
+                        comercialização de produtos cultivados e produzidos no
+                        Vale do Jequitinhonha. O site atua como uma "feira
+                        virtual", conectando produtores locais (agricultores
+                        familiares e artesãos) a potenciais compradores.
+                    </p>
 
-    ul.messages li {
-      padding: 12px 15px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 14px;
-    }
+                    <p>
+                        <strong
+                            >2. Natureza do Serviço (Intermediação de
+                            Contato)</strong
+                        >
+                    </p>
+                    <ul>
+                        <li>
+                            <strong>Divulgação:</strong> A plataforma oferece
+                            espaço para que o produtor cadastre produtos com
+                            fotos, descrição e preço.
+                        </li>
+                        <li>
+                            <strong>Ausência de Intermediários:</strong> O Vale
+                            & Feira não realiza a venda direta nem processa
+                            pagamentos (nesta versão MVP). A plataforma facilita
+                            o contato via WhatsApp ou e-mail, sendo a transação
+                            comercial de inteira responsabilidade das partes
+                            envolvidas.
+                        </li>
+                    </ul>
 
-    ul.messages li.success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
+                    <p>
+                        <strong
+                            >3. Responsabilidades do Produtor (Vendedor)</strong
+                        >
+                    </p>
+                    <p>
+                        Ao cadastrar um produto, o usuário produtor garante que:
+                    </p>
+                    <ul>
+                        <li>
+                            As informações sobre o produto (origem, peso, tipo
+                            de cultivo) são verdadeiras.
+                        </li>
+                        <li>
+                            As imagens postadas correspondem fielmente ao
+                            produto ofertado.
+                        </li>
+                        <li>
+                            Possui autorização legal para comercializar os itens
+                            listados.
+                        </li>
+                        <li>
+                            Compromete-se a manter seus dados de contato
+                            atualizados para viabilizar a negociação.
+                        </li>
+                    </ul>
 
-    ul.messages li.error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
+                    <p>
+                        <strong
+                            >4. Responsabilidades do Consumidor
+                            (Comprador)</strong
+                        >
+                    </p>
+                    <p>
+                        O usuário interessado em adquirir produtos reconhece
+                        que:
+                    </p>
+                    <ul>
+                        <li>
+                            A plataforma não garante a logística de entrega, que
+                            deve ser combinada diretamente com o produtor.
+                        </li>
+                        <li>
+                            A verificação da qualidade e procedência do produto
+                            no ato da entrega é de sua responsabilidade.
+                        </li>
+                    </ul>
 
-    /* Mensagem de erro simples */
-    .erro {
-      margin-top: 15px;
-      color: #721c24;
-      background-color: #f8d7da;
-      border: 1px solid #f5c6cb;
-      padding: 12px 15px;
-      border-radius: 6px;
-      font-weight: 600;
-      text-align: left;
-    }
+                    <p>
+                        <strong
+                            >5. Propriedade Intelectual e Identidade
+                            Regional</strong
+                        >
+                    </p>
+                    <p>
+                        Todo o conteúdo institucional, logotipos e a estrutura
+                        do site são de propriedade da Equipe de Desenvolvimento
+                        Vale & Feira. A plataforma visa valorizar as tradições e
+                        a identidade do Vale do Jequitinhonha; portanto, o uso
+                        indevido da marca para fins que não o apoio ao produtor
+                        local é proibido.
+                    </p>
 
-    /* Responsividade */
-    @media (max-width: 420px) {
-      .register-box {
-        padding: 20px 15px;
-        width: 95%;
-      }
-    }
-  </style>
-</head>
-<body>
+                    <p><strong>6. Limitação de Responsabilidade</strong></p>
+                    <p>A equipe Vale & Feira não se responsabiliza por:</p>
+                    <ul>
+                        <li>
+                            Negociações frustradas ou não concretizadas entre
+                            usuários.
+                        </li>
+                        <li>
+                            Divergências de preços ou qualidade de produtos.
+                        </li>
+                        <li>
+                            Eventuais problemas no transporte ou perecibilidade
+                            de alimentos após a saída da propriedade rural.
+                        </li>
+                    </ul>
 
-  <!-- Faixa superior com logo -->
-  <div class="faixa-topo">
-      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" />
-  </div>
+                    <p><strong>7. Proteção de Dados (LGPD)</strong></p>
+                    <p>
+                        Em conformidade com a Lei Geral de Proteção de Dados, os
+                        dados coletados (nome, e-mail, telefone e localização)
+                        serão utilizados exclusivamente para:
+                    </p>
+                    <ul>
+                        <li>
+                            Criação do perfil de usuário e autenticação
+                            (Flask-Login).
+                        </li>
+                        <li>
+                            Exibição pública (no caso de produtores) para
+                            viabilizar o contato comercial.
+                        </li>
+                        <li>
+                            Segurança da plataforma contra acessos indevidos.
+                        </li>
+                    </ul>
 
-  <!-- Caixa de cadastro -->
-  <div class="register-box">
-      <h1>Cadastro</h1>
+                    <p><strong>8. Canal de Ética e Denúncias</strong></p>
+                    <p>
+                        Reservamo-nos o direito de remover anúncios ou suspender
+                        contas que apresentem comportamentos abusivos,
+                        informações falsas ou que desrespeitem os princípios da
+                        agricultura familiar e economia solidária da região.
+                    </p>
 
-      <form method="POST">
-    {{ form.hidden_tag() }}
-    <label for="nomeForm">Nome</label>
-    {{ form.nomeForm() }}
+                    <div class="modal-acoes-registro">
+                        <button
+                            type="button"
+                            class="botao-registro botao-concordo-registro"
+                            onclick="aceitarEFecharTermos()"
+                        >
+                            Li e Concordo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <script>
+            function abrirModalTermos() {
+                document.getElementById("modalTermos").style.display = "flex";
+            }
 
-    <label for="senhaForm">Senha</label>
-    {{ form.senhaForm() }}
+            function fecharModalTermos() {
+                document.getElementById("modalTermos").style.display = "none";
+            }
 
-    <label for="cidadeForm">Cidade</label>
-    {{ form.cidadeForm() }}  <!-- NOVO CAMPO -->
+            function aceitarEFecharTermos() {
+                document.getElementById("termos").checked = true;
+                fecharModalTermos();
+            }
 
-    {{ form.submit() }}
-</form>
-
-
-      <p>Já tem conta? <a href="{{ url_for('auth.login') }}">Entrar</a></p>
-
-      {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-              <ul class="messages">
-                  {% for category, message in messages %}
-                      <li class="{{ category }}">{{ message }}</li>
-                  {% endfor %}
-              </ul>
-          {% endif %}
-      {% endwith %}
-
-      {% if erro %}
-          <div class="erro">{{ erro }}</div>
-      {% endif %}
-  </div>
-
-</body>
+            window.onclick = function (event) {
+                var modal = document.getElementById("modalTermos");
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            };
+        </script>
+    </body>
 </html>

@@ -1,148 +1,554 @@
-{% extends "base_new.html" %}
+<!doctype html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Planos - Vale & Feira</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --verde-fundo: #edf7ed;
+                --verde-escuro: #2d5a4c;
+                --verde-primario: #3a6351;
+                --branco: #ffffff;
+                --texto-cor: #4a4a4a;
+                --cinza-texto: #7a7a7a;
+                --vermelho-notificacao: #ff6b6b;
+            }
 
-{% block title %}Planos Premium - Vale & Feira{% endblock %}
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <!-- Header -->
-            <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold text-white mb-3">
-                    <i data-feather="star" class="me-2"></i>
-                    Planos Premium
-                </h2>
-                <p class="text-white fs-5 mb-4">
-                    Destaque seus produtos e aumente suas vendas com nossos planos premium!
-                </p>
-                {% if assinatura_usuario %}
-                    <div class="alert alert-info d-inline-block">
-                        <i data-feather="check-circle" class="me-2"></i>
-                        Você já tem um plano ativo: <strong>{{ assinatura_usuario.plano.nome }}</strong>
-                        <br>
-                        <small>Válido até {{ assinatura_usuario.data_fim.strftime('%d/%m/%Y') }}</small>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+            body {
+                font-family: "Montserrat", sans-serif;
+                background-color: var(--verde-fundo);
+                color: var(--texto-cor);
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+            }
 
-    <div class="row justify-content-center">
-        <!-- Basic Plan -->
-        <div class="col-12 col-md-6 col-lg-4 mb-4">
-            <div class="plano-card">
-                <div class="mb-4">
-                    <i data-feather="package" style="width: 48px; height: 48px; color: #14635f;"></i>
-                </div>
-                <h3 class="fw-bold text-primary">Básico</h3>
-                <div class="plano-preco">
-                    R$ 19,90
-                    <small>/mês</small>
-                </div>
-                <ul class="list-unstyled text-start mb-4">
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Destaque para 5 produtos
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Aparecer no topo das buscas
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Badge "Premium" no perfil
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Suporte prioritário
-                    </li>
-                </ul>
-                {% if not assinatura_usuario %}
-                    <a href="{{ url_for('planos.escolher_pagamento', id_plano=1) }}" class="btn btn-outline-primary w-100">
-                        Escolher Plano
-                    </a>
+            .topbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px 10%;
+                background: #eef7ee;
+            }
+
+            .logo-container {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+                gap: 10px;
+                flex-shrink: 0;
+            }
+
+            .logo-img {
+                width: auto;
+                height: 100px;
+                object-fit: contain;
+                display: block;
+            }
+
+            .logo-text {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--verde-escuro);
+                line-height: 1;
+                white-space: nowrap;
+            }
+
+            .nav-links {
+                display: flex;
+                align-items: center;
+                gap: 25px;
+            }
+            .nav-links a {
+                text-decoration: none;
+                color: var(--cinza-texto);
+                font-weight: 500;
+                transition: 0.3s;
+                font-size: 0.9rem;
+            }
+            .nav-links a:hover {
+                color: var(--verde-escuro);
+            }
+
+            .nav-planoslink a {
+                text-decoration: none;
+                color: rgb(0, 76, 9);
+                font-size: 0.9rem;
+                font-weight: 900;
+            }
+
+            .hero-planos {
+                text-align: center;
+                padding: 60px 20px 40px;
+            }
+
+            .hero-planos h1 {
+                color: var(--verde-escuro);
+                font-size: 2.5rem;
+                margin-bottom: 15px;
+                font-weight: 700;
+            }
+
+            .hero-planos p {
+                color: var(--cinza-texto);
+                font-size: 1.1rem;
+                max-width: 700px;
+                margin: 0 auto;
+            }
+
+            .container-planos {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 20px 80px;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: stretch;
+                gap: 30px;
+                flex-wrap: wrap;
+            }
+
+            .card-plano {
+                background: var(--branco);
+                border-radius: 20px;
+                padding: 40px 30px;
+                flex: 1;
+                min-width: 280px;
+                max-width: 360px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                transition: transform 0.3s ease;
+                border: 1px solid transparent;
+                position: relative;
+            }
+
+            .card-plano:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 15px 40px rgba(45, 90, 76, 0.1);
+                border-color: var(--verde-escuro);
+            }
+
+            .plano-nome {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--verde-escuro);
+                margin-bottom: 15px;
+                text-transform: capitalize;
+            }
+
+            .plano-preco-box {
+                display: flex;
+                align-items: baseline;
+                color: var(--verde-escuro);
+                margin-bottom: 30px;
+            }
+
+            .moeda {
+                font-size: 1.2rem;
+                font-weight: 700;
+                margin-right: 5px;
+            }
+            .valor {
+                font-size: 3.2rem;
+                font-weight: 700;
+                line-height: 1;
+            }
+            .periodo {
+                font-size: 0.9rem;
+                color: var(--cinza-texto);
+                margin-left: 5px;
+            }
+
+            .lista-beneficios {
+                list-style: none;
+                padding: 0;
+                margin: 0 0 30px 0;
+                width: 100%;
+                text-align: left;
+                flex-grow: 1;
+            }
+
+            .lista-beneficios li {
+                margin-bottom: 15px;
+                color: var(--texto-cor);
+                font-size: 0.95rem;
+                display: flex;
+                align-items: flex-start;
+            }
+
+            .check-icon {
+                color: var(--verde-escuro);
+                font-weight: bold;
+                margin-right: 12px;
+                min-width: 20px;
+            }
+
+            .btn-assinar {
+                background-color: var(--verde-escuro);
+                color: white;
+                text-decoration: none;
+                padding: 16px 0;
+                width: 100%;
+                text-align: center;
+                border-radius: 10px;
+                font-weight: 700;
+                font-size: 1rem;
+                transition: 0.3s;
+                border: none;
+                cursor: pointer;
+                margin-top: auto;
+            }
+
+            .btn-assinar:hover {
+                background-color: var(--verde-primario);
+                box-shadow: 0 5px 15px rgba(45, 90, 76, 0.2);
+            }
+
+            .btn-ativo {
+                background-color: #ddd;
+                color: #777;
+                cursor: default;
+            }
+            .btn-ativo:hover {
+                background-color: #ddd;
+                box-shadow: none;
+            }
+
+            .footer {
+                background: #2d5a4c;
+                color: #c2d6cf;
+                padding: 60px 10% 20px;
+            }
+
+            .footer-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 40px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                padding-bottom: 40px;
+            }
+
+            .footer-col h4 {
+                color: white;
+                margin-bottom: 20px;
+            }
+
+            .footer-col a {
+                display: block;
+                color: #c2d6cf;
+                text-decoration: none;
+                margin-bottom: 12px;
+                font-size: 0.85rem;
+            }
+
+            .footer-bottom {
+                text-align: center;
+                padding-top: 20px;
+                font-size: 0.75rem;
+            }
+
+            @media (max-width: 900px) {
+                .topbar {
+                    padding: 20px;
+                    flex-direction: column;
+                    gap: 15px;
+                }
+                .container-planos {
+                    flex-direction: column;
+                    align-items: center;
+                }
+                .card-plano {
+                    width: 100%;
+                    max-width: 400px;
+                }
+            }
+
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 9999;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                background-color: rgba(0, 0, 0, 0.5);
+                align-items: center;
+                justify-content: center;
+            }
+            .modal-content {
+                background-color: #fefefe;
+                margin: auto;
+                padding: 30px;
+                border: 1px solid #888;
+                width: 90%;
+                max-width: 700px;
+                border-radius: 15px;
+                position: relative;
+                max-height: 85vh;
+                overflow-y: auto;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            }
+            .modal-content::-webkit-scrollbar {
+                width: 8px;
+            }
+            .modal-content::-webkit-scrollbar-thumb {
+                background: #ccc;
+                border-radius: 4px;
+            }
+            .close-btn {
+                color: #aaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+                line-height: 1;
+            }
+            .modal-body h3 {
+                color: #1f5c4d;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #eef7ee;
+                padding-bottom: 10px;
+            }
+            .modal-body p {
+                margin-bottom: 15px;
+                line-height: 1.6;
+                color: #444;
+                font-size: 0.95rem;
+                text-align: justify;
+            }
+
+            .modal-body h4 {
+                color: #2d5a4c;
+                margin: 20px 0 10px 0;
+                font-size: 1.1rem;
+            }
+            .modal-body ul {
+                margin-bottom: 15px;
+                padding-left: 20px;
+                color: #444;
+                font-size: 0.95rem;
+            }
+            .modal-body li {
+                margin-bottom: 5px;
+            }
+
+            .btn-modal-close {
+                background: #2d5a4c;
+                color: white;
+                border: none;
+                padding: 10px 25px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-weight: bold;
+                margin-top: 15px;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="topbar">
+            <a href="{{ url_for('main.home') }}" class="logo-container">
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Vale&Feira"
+                    class="logo-img"
+                />
+                <span class="logo-text">Vale&Feira</span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="{{ url_for('main.home') }}">Início</a>
+                <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('chat.meus_chats') }}">
+                    Conversas {% if mensagens_nao_lidas is defined and
+                    mensagens_nao_lidas > 0 %}
+                    <span class="bolinha-notificacao"
+                        >{{ mensagens_nao_lidas }}</span
+                    >
+                    {% endif %}
+                </a>
+                <nav class="nav-planoslink">
+                    <a href="{{ url_for('planos.lista_planos') }}"
+                        >🌟Planos🌟</a
+                    >
+                </nav>
+                <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+                <a href="{{ url_for('auth.logout') }}" style="color: #ff6b6b"
+                    >Sair</a
+                >
                 {% else %}
-                    <button class="btn btn-secondary w-100" disabled>Plano Ativo</button>
+                <a href="{{ url_for('auth.login') }}" class="btn-login"
+                    >Login</a
+                >
+                <a href="{{ url_for('auth.registrar') }}" class="btn-cadastro"
+                    >Cadastrar</a
+                >
                 {% endif %}
-            </div>
-        </div>
+            </nav>
+        </header>
 
-        <!-- Premium Plan -->
-        <div class="col-12 col-md-6 col-lg-4 mb-4">
-            <div class="plano-card plano-destaque">
-                <div class="mb-4">
-                    <i data-feather="award" style="width: 48px; height: 48px; color: #14635f;"></i>
+        <section class="hero-planos">
+            <h1>Escolha o Plano Ideal para o Seu Negócio</h1>
+            <p>
+                Transparência e flexibilidade para produtores que querem crescer
+            </p>
+
+            {% if assinatura_usuario %}
+            <div
+                style="
+                    margin-top: 20px;
+                    background: #e8f5e9;
+                    display: inline-block;
+                    padding: 10px 25px;
+                    border-radius: 30px;
+                    color: var(--verde-escuro);
+                    font-size: 0.9rem;
+                    border: 1px solid #c8e6c9;
+                "
+            >
+                <strong>Seu plano atual:</strong> {{
+                assinatura_usuario.plano.nome }} (Ativo)
+            </div>
+            {% endif %}
+        </section>
+
+        <main class="container-planos">
+            {% for plano in planos %}
+            <div class="card-plano">
+                <div class="plano-nome">{{ plano.nome }}</div>
+
+                <div class="plano-preco-box">
+                    <span class="moeda">R$</span>
+                    <span class="valor"
+                        >{{ "%.2f"|format(plano.preco)|replace('.', ',')
+                        }}</span
+                    >
+                    <span class="periodo">/mês</span>
                 </div>
-                <h3 class="fw-bold text-primary">Premium</h3>
-                <div class="plano-preco">
-                    R$ 39,90
-                    <small>/mês</small>
-                </div>
-                <ul class="list-unstyled text-start mb-4">
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Destaque para produtos ilimitados
+
+                <ul class="lista-beneficios">
+                    {% if plano.lista_beneficios %} {% for beneficio in
+                    plano.lista_beneficios %}
+                    <li><span class="check-icon">✔</span> {{ beneficio }}</li>
+                    {% endfor %} {% else %}
+                    <li>
+                        <span class="check-icon">✔</span> Consulte os
+                        benefícios
                     </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Aparecer sempre no topo
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Badge "Premium Gold"
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Suporte 24/7
-                    </li>
-                    <li class="mb-2">
-                        <i data-feather="check" class="me-2 text-success" style="width: 16px; height: 16px;"></i>
-                        Relatórios de vendas
-                    </li>
+                    {% endif %}
                 </ul>
-                {% if not assinatura_usuario %}
-                    <a href="{{ url_for('planos.escolher_pagamento', id_plano=2) }}" class="btn btn-primary w-100">
-                        Escolher Plano
-                    </a>
+                {% if assinatura_usuario and assinatura_usuario.plano_id ==
+                plano.id %}
+                <button class="btn-assinar btn-ativo">Plano Atual</button>
                 {% else %}
-                    <button class="btn btn-secondary w-100" disabled>Plano Ativo</button>
+                <form
+                    action="{{ url_for('planos.escolher_pagamento', id_plano=plano.id) }}"
+                    style="width: 100%"
+                >
+                    <button type="submit" class="btn-assinar">
+                        Assinar Agora
+                    </button>
+                </form>
                 {% endif %}
             </div>
-        </div>
-    </div>
+            {% endfor %}
+        </main>
 
-    <!-- Benefits Section -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body text-center py-5">
-                    <h3 class="fw-bold text-primary mb-4">Por que escolher um plano premium?</h3>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="text-primary mb-3">
-                                <i data-feather="trending-up" style="width: 48px; height: 48px;"></i>
-                            </div>
-                            <h5>Mais Visibilidade</h5>
-                            <p class="text-muted">Seus produtos aparecem primeiro nos resultados de busca</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-primary mb-3">
-                                <i data-feather="message-circle" style="width: 48px; height: 48px;"></i>
-                            </div>
-                            <h5>Mais Contatos</h5>
-                            <p class="text-muted">Receba mais mensagens de interessados em seus produtos</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-primary mb-3">
-                                <i data-feather="dollar-sign" style="width: 48px; height: 48px;"></i>
-                            </div>
-                            <h5>Mais Vendas</h5>
-                            <p class="text-muted">Aumente significativamente suas chances de venda</p>
-                        </div>
+        <footer class="footer">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Vale&Feira</h4>
+                    <p>
+                        Conectando produtores e consumidores através da
+                        tecnologia e sustentabilidade.
+                    </p>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Links Rápidos</h4>
+                    <a href="{{ url_for('main.home') }}">Início</a>
+                    <a href="{{ url_for('produto.buscar_produtos') }}"
+                        >Produtos</a
+                    >
+                    <a href="{{ url_for('produto.adicionar_produtos') }}"
+                        >Adicionar Produto</a
+                    >
+                    <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+                    {% endif %}
+                </div>
+
+                <div class="footer-col">
+                    <h4>Suporte/Ajuda</h4>
+                    <a href="{{ url_for('main.relatar_bug_page') }}"
+                        >Central de Ajuda</a
+                    >
+                    <a href="#" onclick="abrirModalTermos(); return false;"
+                        >Termos de Uso</a
+                    >
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contatos</h4>
+                    <a>📧contato@valefeira.com.br </a>
+                    <a>📧suportevaleefeira@gmail.com</a>
+                    <a href="#">📱 (38) 3333-4444</a>
+                    <p>📍 Vale do Jequitinhonha, MG</p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                &copy; 2026 Vale&Feira. Todos os direitos reservados.
+            </div>
+        </footer>
+
+        <div id="modalTermos" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="fecharModalTermos()"
+                    >&times;</span
+                >
+                <div class="modal-body">
+                    <h3>Termos e Condições de Uso</h3>
+                    <!-- (resto igual) -->
+                    <div style="text-align: center; margin-top: 20px">
+                        <button
+                            class="btn-modal-close"
+                            onclick="fecharModalTermos()"
+                        >
+                            Fechar
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-{% endblock %}
+
+        <script>
+            function abrirModalTermos() {
+                document.getElementById("modalTermos").style.display = "flex";
+            }
+            function fecharModalTermos() {
+                document.getElementById("modalTermos").style.display = "none";
+            }
+            window.onclick = function (event) {
+                if (event.target == document.getElementById("modalTermos")) {
+                    fecharModalTermos();
+                }
+            };
+        </script>
+    </body>
+</html>

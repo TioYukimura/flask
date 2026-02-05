@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperação de Senha - Vale & Feira</title>
+    <style>
+        /* Estilos inline para garantir compatibilidade com Gmail, Outlook, etc. */
+        body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Helvetica', Arial, sans-serif; }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e0eee0;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            background-color: #2d5a4c; /* Verde da marca */
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .content {
+            padding: 40px 30px;
+            color: #444444;
+            text-align: center;
+        }
+
+        .texto-destaque {
+            color: #2d5a4c;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .texto-corpo {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #555555;
+            margin-bottom: 30px;
+        }
+
+        /* --- MUDANÇAS AQUI --- */
+        .caixa-codigo {
+            background-color: #2d5a4c; /* Fundo verde escuro */
+            border-radius: 12px;
+            padding: 30px; /* Um pouco mais de espaço */
+            display: inline-block;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(45, 90, 76, 0.2); /* Sombra suave verde */
+        }
+
+        .label-codigo {
+            display: block;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #a5d6a7; /* Verde claro para o rótulo */
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .codigo-numero {
+            font-family: Arial, sans-serif; /* Fonte Arial mantida */
+            font-size: 42px; /* Um pouco maior */
+            font-weight: bold;
+            color: #ffffff; /* Código branco para contraste */
+            letter-spacing: 8px;
+            line-height: 1;
+        }
+        /* --------------------- */
+
+        .aviso-expiracao {
+            font-size: 13px;
+            color: #d32f2f; /* Vermelho alerta */
+            margin-top: 10px;
+        }
+
+        .divisor {
+            height: 1px;
+            background-color: #eeeeee;
+            margin: 30px 0;
+        }
+
+        .aviso-seguranca {
+            font-size: 12px;
+            color: #999999;
+            line-height: 1.4;
+        }
+
+        .footer {
+            background-color: #eef6ee;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666666;
+            border-top: 1px solid #e0eee0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="email-container">
+        <div class="header">
+            <h1>Vale & Feira</h1>
+        </div>
+
+        <div class="content">
+            <div class="texto-destaque">Olá, {{ usuario.nome }}!</div>
+            
+            <p class="texto-corpo">
+                Recebemos uma solicitação para redefinir a senha da sua conta.<br>
+                Use o código de verificação abaixo para continuar:
+            </p>
+
+            <div class="caixa-codigo">
+                <span class="label-codigo">Seu Código de Segurança</span>
+                <div class="codigo-numero">{{ codigo }}</div>
+            </div>
+
+            <div class="aviso-expiracao">
+                 Este código expira em 15 minutos.
+            </div>
+
+            <div class="divisor"></div>
+
+            <div class="aviso-seguranca">
+                <strong>Não solicitou essa alteração?</strong><br>
+                ⚠️Se você não solicitou a troca de senha, por favor entre em contato conosco⚠️.
+            </div>
+        </div>
+
+        <div class="footer">
+            &copy; 2026 Vale & Feira. Todos os direitos reservados.<br>
+            Vale do Jequitinhonha, MG
+        </div>
+    </div>
+
+</body>
+</html>

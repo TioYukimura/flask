@@ -1,76 +1,150 @@
-{% extends "base_new.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento PIX | Vale & Feira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .pagamento-container {
+            max-width: 550px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
 
-{% block title %}Pagamento PIX - Vale & Feira{% endblock %}
+        .pix-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            display: block;
+            text-align: center;
+            color: #32bcad;
+        }
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-center mb-4">
-                        <div class="text-primary mb-3">
-                            💳
-                        </div>
-                        <h4 class="fw-bold text-primary">Pagamento PIX</h4>
-                        <p class="text-muted">Preencha os dados para gerar o código PIX</p>
-                    </div>
+        .resumo-pagamento {
+            background-color: #f9fff9;
+            border: 2px dashed #2e7d32;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 25px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-                    <form method="POST">
-                        {{ formulario.hidden_tag() }}
-                        
-                        <div class="mb-3">
-                            {{ formulario.nome_completo.label(class="form-label fw-bold") }}
-                            {{ formulario.nome_completo(class="form-control" + (" is-invalid" if formulario.nome_completo.errors else "")) }}
-                            {% if formulario.nome_completo.errors %}
-                                {% for error in formulario.nome_completo.errors %}
-                                    <div class="invalid-feedback">{{ error }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
+        .total-valor {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2e7d32;
+        }
 
-                        <div class="mb-3">
-                            {{ formulario.email.label(class="form-label fw-bold") }}
-                            {{ formulario.email(class="form-control" + (" is-invalid" if formulario.email.errors else "")) }}
-                            {% if formulario.email.errors %}
-                                {% for error in formulario.email.errors %}
-                                    <div class="invalid-feedback">{{ error }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
+        .invalid-feedback {
+            color: #d32f2f;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: block;
+        }
 
-                        <div class="mb-4">
-                            {{ formulario.cpf.label(class="form-label fw-bold") }}
-                            {{ formulario.cpf(class="form-control" + (" is-invalid" if formulario.cpf.errors else ""), placeholder="000.000.000-00") }}
-                            {% if formulario.cpf.errors %}
-                                {% for error in formulario.cpf.errors %}
-                                    <div class="invalid-feedback">{{ error }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
+        .seguranca-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #888;
+            font-size: 0.85rem;
+        }
 
-                        <!-- Resumo do Pedido -->
-                        <div class="bg-light p-3 rounded mb-4">
-                            <div class="d-flex justify-content-between">
-                                <strong>Total a pagar:</strong>
-                                <strong class="text-primary">R$ {{ "%.2f"|format(plano.preco) }}</strong>
-                            </div>
-                        </div>
+        .instrucao-pix {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #e65100;
+            margin-bottom: 20px;
+            border-left: 5px solid #f57c00;
+        }
+    </style>
+</head>
+<body>
 
-                        <div class="d-grid">
-                            {{ formulario.enviar(class="btn btn-primary btn-lg") }}
-                        </div>
-                    </form>
+    <header class="topbar">
+        <a href="{{ url_for('main.home') }}">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Vale & Feira" class="logo">
+        </a>
+        <nav class="topbar-center">
+            <a href="{{ url_for('planos.lista_planos') }}">Voltar aos Planos</a>
+        </nav>
+    </header>
 
-                    <div class="text-center mt-4">
-                        <small class="text-muted">
-                            <i data-feather="shield" class="me-1" style="width: 14px; height: 14px;"></i>
-                            Pagamento seguro e criptografado
-                        </small>
-                    </div>
+    <main class="pagamento-container">
+        <div class="form-box">
+            <span class="pix-icon">📱</span>
+            <h2 style="text-align: center; color: #2e7d32; margin-bottom: 10px;">Pagamento via PIX</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">Confirme seus dados para gerar o código</p>
+
+            <div class="instrucao-pix">
+                O código PIX será gerado na próxima tela após a confirmação dos dados abaixo.
+            </div>
+
+            <form method="POST">
+                {{ formulario.hidden_tag() }}
+                
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    {{ formulario.nome_completo(placeholder="Digite seu nome completo") }}
+                    {% for error in formulario.nome_completo.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
                 </div>
+
+                <div class="form-group">
+                    <label>E-mail para confirmação</label>
+                    {{ formulario.email(placeholder="seu@email.com") }}
+                    {% for error in formulario.email.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label>CPF (apenas números)</label>
+                    {{ formulario.cpf(placeholder="000.000.000-00", id="cpf_input") }}
+                    {% for error in formulario.cpf.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="resumo-pagamento">
+                    <span style="font-weight: 600; color: #555;">Assinatura {{ plano.nome }}:</span>
+                    <span class="total-valor">R$ {{ "%.2f"|format(plano.preco) }}</span>
+                </div>
+
+                <button type="submit" class="btn-verde" style="width: 100%; font-size: 1.1rem; padding: 15px; border-radius: 30px;">
+                    Gerar Código PIX
+                </button>
+            </form>
+
+            <div class="seguranca-footer">
+                <p>🔒 Pagamento seguro via Vale & Feira</p>
+                <p style="font-size: 0.75rem; margin-top: 5px;">Seus dados estão protegidos de acordo com a LGPD.</p>
             </div>
         </div>
-    </div>
-</div>
-{% endblock %}
+    </main>
+
+    <footer style="text-align: center; padding: 40px 0; color: #aaa; font-size: 0.8rem;">
+        &copy; 2024 Vale & Feira
+    </footer>
+
+    <script>
+        const cpfInput = document.getElementById('cpf_input');
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            }
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

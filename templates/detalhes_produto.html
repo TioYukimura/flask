@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{{ produto.nome }} - Vale & Feira</title>
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/detalhes_produto.css') }}"
+        />
+    </head>
+
+    <body>
+        <header class="barra-topo">
+            <a href="{{ url_for('main.home') }}" class="container-logo">
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    class="imagem-logo"
+                    alt="Logo"
+                />
+                <span class="texto-logo">Vale&Feira</span>
+            </a>
+
+            <div class="barra-busca">
+                <form
+                    method="get"
+                    action="{{ url_for('produto.buscar_produtos') }}"
+                >
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="Buscar produto..."
+                        value="{{ busca|default('') }}"
+                    />
+                    <button type="submit">Buscar</button>
+                </form>
+            </div>
+
+            <nav class="links-navegacao">
+                <a href="{{ url_for('main.home') }}">Início</a>
+                <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('chat.meus_chats') }}">
+                    Conversas {% if mensagens_nao_lidas is defined and
+                    mensagens_nao_lidas > 0 %}
+                    <span class="bolinha-notificacao"
+                        >{{ mensagens_nao_lidas }}</span
+                    >
+                    {% endif %}
+                </a>
+
+                <nav class="link-planos">
+                    <a href="{{ url_for('planos.lista_planos') }}"
+                        >🌟Planos🌟</a
+                    >
+                </nav>
+
+                <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+                <a href="{{ url_for('auth.logout') }}" style="color: #ff6b6b"
+                    >Sair</a
+                >
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="botao-login"
+                    >Login</a
+                >
+                <a href="{{ url_for('auth.registrar') }}" class="botao-cadastro"
+                    >Cadastrar</a
+                >
+                {% endif %}
+            </nav>
+        </header>
+
+        <main class="container-principal">
+            <a href="{{ url_for('main.home') }}" class="botao-voltar"
+                >⬅ Voltar</a
+            >
+
+            <div class="grade-detalhes">
+                <div class="coluna-esquerda">
+                    <div class="container-imagem">
+                        <div class="area-carrossel">
+                            {% set imagens = [] %} {% if produto.imagens and
+                            produto.imagens|length > 0 %} {% set imagens =
+                            produto.imagens %} {% endif %} {% if imagens and
+                            imagens|length > 0 %} {% for img in imagens %} {%
+                            set caminho = img.caminho if img.caminho is defined
+                            else (img.imagem if img.imagem is defined else '')
+                            %} {% if caminho and caminho.startswith('http') %}
+                            {% set url_imagem = caminho %} {% elif caminho %} {%
+                            set url_imagem = url_for('static', filename=caminho)
+                            %} {% else %} {% set url_imagem = url_for('static',
+                            filename='img/sem_imagem.png') %} {% endif %}
+
+                            <img
+                                src="{{ url_imagem }}"
+                                class="imagem-carrossel {% if loop.first %}ativa{% endif %}"
+                                alt="{{ produto.nome }}"
+                                onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/sem_imagem.png') }}';"
+                            />
+                            {% endfor %} {% if imagens|length > 1 %}
+                            <button
+                                class="botao-carrossel anterior"
+                                type="button"
+                                onclick="mudarImagem(-1)"
+                            >
+                                ‹
+                            </button>
+                            <button
+                                class="botao-carrossel proximo"
+                                type="button"
+                                onclick="mudarImagem(1)"
+                            >
+                                ›
+                            </button>
+
+                            <div class="pontos-carrossel" id="pontos">
+                                {% for _ in imagens %}
+                                <button
+                                    class="ponto {% if loop.first %}ativo{% endif %}"
+                                    type="button"
+                                    onclick="irPara({{ loop.index0 }})"
+                                ></button>
+                                {% endfor %}
+                            </div>
+                            {% endif %} {% elif produto.imagem %} {% if
+                            produto.imagem.startswith('http') %} {% set
+                            url_imagem = produto.imagem %} {% else %} {% set
+                            url_imagem = url_for('static',
+                            filename=produto.imagem) %} {% endif %}
+
+                            <img
+                                src="{{ url_imagem }}"
+                                class="imagem-carrossel ativa"
+                                alt="{{ produto.nome }}"
+                                onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/sem_imagem.png') }}';"
+                            />
+                            {% else %}
+                            <img
+                                src="{{ url_for('static', filename='img/sem_imagem.png') }}"
+                                class="imagem-carrossel ativa"
+                                alt="Sem imagem"
+                            />
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="box-detalhes">
+                        <span class="titulo">Detalhes do Produto</span>
+
+                        <div class="area-descricao">
+                            <input
+                                type="checkbox"
+                                id="toggle-descricao"
+                                class="toggle-descricao"
+                            />
+
+                            <div
+                                class="descricao-produto descricao-cortada"
+                                id="descricao-produto"
+                            >
+                                {{ produto.descricao }}
+                            </div>
+
+                            <label
+                                for="toggle-descricao"
+                                class="botao-lermais"
+                                id="botao-lermais"
+                            >
+                                <span class="mais">Ler mais</span>
+                                <span class="menos">Ler menos</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="coluna-info">
+                    <div class="tags-topo">
+                        <div class="tag-categoria">
+                            {{ produto.categoria or 'Geral' }}
+                        </div>
+
+                        {% if produto.disponibilidade == 'sob_encomenda' %}
+                        <div class="tag-disponibilidade sob-encomenda">
+                            📦 Sob Encomenda
+                        </div>
+                        {% else %}
+                        <div class="tag-disponibilidade disponivel">
+                            ✅ Disponível
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <h1>{{ produto.nome }}</h1>
+
+                    <div class="area-produtor">
+                        <div class="nome-produtor">
+                            👤 Produzido por:
+                            <strong>
+                                {{ produto.nome_produtor if
+                                produto.nome_produtor else (produto.dono.nome if
+                                produto.dono else 'Produtor Local') }}
+                            </strong>
+                        </div>
+
+                        <div class="detalhes-produtor">
+                            <span>Cidade: {{ produto.cidade }}</span>
+
+                            {% if produto.link_mapa %}
+                            <a
+                                href="{{ produto.link_mapa }}"
+                                target="_blank"
+                                class="botao-mapa"
+                            >
+                                📍 Ver Rota no Mapa
+                            </a>
+                            {% endif %} {% if produto.tempo_experiencia %}
+                            <span>🏆 Exp: {{ produto.tempo_experiencia }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if produto.quantidade and produto.unidade %}
+                    <div class="area-estoque">
+                        <span class="badge-estoque">
+                            📦 Estoque: {{ produto.quantidade }} {{
+                            produto.unidade }}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    <div class="area-preco">
+                        {% if produto.desconto and produto.desconto > 0 %} {%
+                        set preco_antigo = produto.preco / (1 -
+                        (produto.desconto / 100)) %}
+                        <span class="preco-antigo"
+                            >R$ {{ "%.2f"|format(preco_antigo) }}</span
+                        >
+                        <span class="preco-atual"
+                            >R$ {{ "%.2f"|format(produto.preco) }}</span
+                        >
+                        <span class="badge-desconto"
+                            >-{{ produto.desconto }}% OFF</span
+                        >
+                        {% else %}
+                        <span class="preco-atual"
+                            >R$ {{ "%.2f"|format(produto.preco) }}</span
+                        >
+                        {% endif %}
+                    </div>
+
+                    {% if produto.caracteristicas %}
+                    <div class="lista-tags">
+                        {% for item in produto.caracteristicas.split(',') %}
+                        <span class="tag-caracteristica">✔ {{ item }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %} {% if produto.historia_produtor %}
+                    <div class="box-historia">
+                        <strong>📜 História do Produtor:</strong>
+                        <span>{{ produto.historia_produtor }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="area-acoes">
+                        {% if current_user.is_authenticated %} {% if
+                        current_user.id != produto.usuario_id %}
+                        <a
+                            href="{{ url_for('chat.chat', produto_id=produto.id, outro_usuario_id=produto.usuario_id) }}"
+                            class="botao-chat"
+                        >
+                            💬 Conversar com Produtor
+                        </a>
+
+                        {% if produto.whatsapp %}
+                        <a
+                            href="https://wa.me/55{{ produto.whatsapp|replace('(', '')|replace(')', '')|replace('-', '')|replace(' ', '') }}"
+                            target="_blank"
+                            class="botao-whatsapp"
+                        >
+                            WhatsApp
+                        </a>
+                        {% endif %} {% if produto.email_contato %}
+                        <a
+                            href="mailto:{{ produto.email_contato }}"
+                            class="botao-chat"
+                            style="background-color: #3a6351"
+                        >
+                            📧 Enviar E-mail
+                        </a>
+                        {% endif %} {% else %}
+                        <div class="botao-desabilitado">Este produto é seu</div>
+                        {% endif %} {% else %}
+                        <a
+                            href="{{ url_for('auth.login') }}"
+                            class="botao-chat"
+                        >
+                            🔒 Entre para Ver Contatos
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <div class="secao-avaliacoes">
+                        <h3 id="titulo-avaliacoes">
+                            Avaliações do Produto ({{ produto.media_notas }} ★)
+                        </h3>
+
+                        {% if current_user.is_authenticated %} {% if
+                        current_user.id != produto.usuario_id %}
+                        <form
+                            id="form-avaliacao-ajax"
+                            action="{{ url_for('produto.avaliar_produto', produto_id=produto.id) }}"
+                            method="POST"
+                        >
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="{{ csrf_token() }}"
+                            />
+
+                            <div style="margin-bottom: 15px">
+                                <label
+                                    style="
+                                        font-weight: bold;
+                                        display: block;
+                                        margin-bottom: 5px;
+                                    "
+                                >
+                                    Sua Nota:
+                                </label>
+
+                                <div class="avaliacao-estrelas">
+                                    <input
+                                        type="radio"
+                                        id="estrela5"
+                                        name="nota"
+                                        value="5"
+                                    />
+                                    <label for="estrela5" title="5 estrelas"
+                                        >5</label
+                                    >
+
+                                    <input
+                                        type="radio"
+                                        id="estrela4"
+                                        name="nota"
+                                        value="4"
+                                    />
+                                    <label for="estrela4" title="4 estrelas"
+                                        >4</label
+                                    >
+
+                                    <input
+                                        type="radio"
+                                        id="estrela3"
+                                        name="nota"
+                                        value="3"
+                                    />
+                                    <label for="estrela3" title="3 estrelas"
+                                        >3</label
+                                    >
+
+                                    <input
+                                        type="radio"
+                                        id="estrela2"
+                                        name="nota"
+                                        value="2"
+                                    />
+                                    <label for="estrela2" title="2 estrelas"
+                                        >2</label
+                                    >
+
+                                    <input
+                                        type="radio"
+                                        id="estrela1"
+                                        name="nota"
+                                        value="1"
+                                    />
+                                    <label for="estrela1" title="1 estrela"
+                                        >1</label
+                                    >
+                                </div>
+                            </div>
+
+                            <div
+                                style="
+                                    clear: both;
+                                    margin-top: 15px;
+                                    margin-bottom: 15px;
+                                "
+                            >
+                                {{ form_avaliacao.comentario(
+                                placeholder="Escreva o que achou do produto...",
+                                class="input-comentario", id="comentario-input"
+                                ) }}
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="botao-enviar-avaliacao"
+                                id="botao-enviar"
+                            >
+                                Enviar Avaliação
+                            </button>
+
+                            <span
+                                id="mensagem-carregando"
+                                style="
+                                    display: none;
+                                    color: #2d5a4c;
+                                    font-weight: bold;
+                                    margin-left: 10px;
+                                "
+                            >
+                                Enviando...
+                            </span>
+                        </form>
+                        {% endif %} {% else %}
+                        <div
+                            style="
+                                background-color: #f9f9f9;
+                                padding: 20px;
+                                border-radius: 15px;
+                                margin-bottom: 30px;
+                                text-align: center;
+                                border: 1px dashed #ccc;
+                            "
+                        >
+                            <p style="color: #666; margin-bottom: 10px">
+                                Já comprou este produto?
+                            </p>
+                            <a
+                                href="{{ url_for('auth.login') }}"
+                                style="
+                                    color: #2d5a4c;
+                                    font-weight: bold;
+                                    text-decoration: none;
+                                    border-bottom: 1px solid #2d5a4c;
+                                "
+                            >
+                                Faça login para avaliar
+                            </a>
+                        </div>
+                        {% endif %}
+
+                        <div
+                            id="lista-avaliacoes-container"
+                            style="
+                                border-top: 1px solid #eee;
+                                padding-top: 20px;
+                            "
+                        >
+                            {% set avaliacoes_ordenadas =
+                            produto.avaliacoes|sort(attribute='data_avaliacao',
+                            reverse=True) %} {% if avaliacoes_ordenadas %} {%
+                            for avaliacao in avaliacoes_ordenadas[:2] %}
+                            <div class="item-avaliacao">
+                                <div class="cabecalho-avaliacao">
+                                    <strong
+                                        >{{ avaliacao.usuario.nome }}</strong
+                                    >
+                                    <span class="estrelas-avaliacao">
+                                        {% for i in range(avaliacao.nota) %}★{%
+                                        endfor %}
+                                    </span>
+                                </div>
+                                <p class="texto-avaliacao">
+                                    {{ avaliacao.comentario }}
+                                </p>
+                                <small class="data-avaliacao">
+                                    {{
+                                    avaliacao.data_avaliacao.strftime('%d/%m/%Y')
+                                    }}
+                                </small>
+                            </div>
+                            {% endfor %} {% if avaliacoes_ordenadas|length > 2
+                            %}
+                            <div id="avaliacoes-ocultas" style="display: none">
+                                {% for avaliacao in avaliacoes_ordenadas[2:] %}
+                                <div
+                                    class="item-avaliacao"
+                                    style="
+                                        border-top: 1px dashed #eee;
+                                        margin-top: 10px;
+                                        padding-top: 10px;
+                                    "
+                                >
+                                    <div class="cabecalho-avaliacao">
+                                        <strong
+                                            >{{ avaliacao.usuario.nome
+                                            }}</strong
+                                        >
+                                        <span class="estrelas-avaliacao">
+                                            {% for i in range(avaliacao.nota)
+                                            %}★{% endfor %}
+                                        </span>
+                                    </div>
+                                    <p class="texto-avaliacao">
+                                        {{ avaliacao.comentario }}
+                                    </p>
+                                    <small class="data-avaliacao">
+                                        {{
+                                        avaliacao.data_avaliacao.strftime('%d/%m/%Y')
+                                        }}
+                                    </small>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <button
+                                id="botao-ver-todas"
+                                onclick="verTodasAvaliacoes()"
+                                style="
+                                    width: 100%;
+                                    padding: 10px;
+                                    background: #f0f0f0;
+                                    border: none;
+                                    border-radius: 10px;
+                                    color: #555;
+                                    cursor: pointer;
+                                    font-weight: bold;
+                                    margin-top: 10px;
+                                "
+                            >
+                                Ver todas as avaliações ⬇
+                            </button>
+                            {% endif %} {% else %}
+                            <p
+                                class="sem-avaliacoes"
+                                id="mensagem-sem-avaliacao"
+                            >
+                                Este produto ainda não tem avaliações.
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="rodape-pagina">
+            <div class="rodape-conteudo">
+                &copy; 2026 Vale&Feira. Todos os direitos reservados.
+            </div>
+        </footer>
+
+        <script>
+            let indiceAtual = 0;
+
+            function pegarImagens() {
+                return document.querySelectorAll(".imagem-carrossel");
+            }
+
+            function pegarPontos() {
+                return document.querySelectorAll(".ponto");
+            }
+
+            function atualizarPontos() {
+                const pontos = pegarPontos();
+                if (!pontos.length) return;
+
+                pontos.forEach((p) => p.classList.remove("ativo"));
+                if (pontos[indiceAtual])
+                    pontos[indiceAtual].classList.add("ativo");
+            }
+
+            function mostrarIndice(novoIndice) {
+                const imagens = pegarImagens();
+                if (!imagens.length) return;
+
+                imagens[indiceAtual].classList.remove("ativa");
+                indiceAtual = (novoIndice + imagens.length) % imagens.length;
+                imagens[indiceAtual].classList.add("ativa");
+
+                atualizarPontos();
+            }
+
+            function mudarImagem(direcao) {
+                mostrarIndice(indiceAtual + direcao);
+            }
+
+            function irPara(i) {
+                mostrarIndice(i);
+            }
+
+            (function ativarSwipe() {
+                const area = document.querySelector(".area-carrossel");
+                if (!area) return;
+
+                let x0 = null;
+
+                area.addEventListener(
+                    "touchstart",
+                    (e) => {
+                        x0 = e.touches[0].clientX;
+                    },
+                    { passive: true },
+                );
+
+                area.addEventListener("touchend", (e) => {
+                    if (x0 === null) return;
+
+                    const x1 = e.changedTouches[0].clientX;
+                    const dx = x1 - x0;
+                    x0 = null;
+
+                    if (Math.abs(dx) < 40) return;
+
+                    if (dx > 0) mudarImagem(-1);
+                    else mudarImagem(1);
+                });
+            })();
+
+            function verTodasAvaliacoes() {
+                var ocultas = document.getElementById("avaliacoes-ocultas");
+                var botao = document.getElementById("botao-ver-todas");
+
+                if (ocultas && botao && ocultas.style.display === "none") {
+                    ocultas.style.display = "block";
+                    botao.style.display = "none";
+                }
+            }
+
+            (function ativarLerMaisDescricao() {
+                const desc = document.getElementById("descricao-produto");
+                const botao = document.getElementById("botao-lermais");
+                const toggle = document.getElementById("toggle-descricao");
+
+                if (!desc || !botao || !toggle) return;
+
+                function checar() {
+                    toggle.checked = false;
+                    const precisa = desc.scrollHeight > desc.clientHeight + 5;
+                    botao.style.display = precisa ? "inline-flex" : "none";
+                }
+
+                window.addEventListener("load", checar);
+                window.addEventListener("resize", checar);
+                checar();
+            })();
+        </script>
+    </body>
+</html>

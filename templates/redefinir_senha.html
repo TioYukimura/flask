@@ -1,82 +1,116 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-br">
     <head>
         <meta charset="UTF-8" />
-        <title>Redefinir Senha</title>
-        <style>
-            body {
-                background-color: rgb(20, 99, 95);
-                font-family: Arial, sans-serif;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-            }
-            .reset-box {
-                background: white;
-                padding: 30px;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-                width: 350px;
-                text-align: center;
-            }
-            input[type="text"],
-            input[type="password"],
-            input[type="submit"] {
-                width: 100%;
-                padding: 10px;
-                margin-top: 15px;
-                border-radius: 4px;
-                border: 1px solid #ccc;
-                box-sizing: border-box;
-            }
-            input[type="submit"] {
-                background-color: rgb(20, 99, 95);
-                color: white;
-                border: none;
-                cursor: pointer;
-            }
-            input[type="submit"]:hover {
-                background-color: rgb(15, 80, 76);
-            }
-            a {
-                color: rgb(20, 99, 95);
-                text-decoration: none;
-                display: block;
-                margin-top: 20px;
-            }
-            a:hover {
-                text-decoration: underline;
-            }
-            .erro {
-                color: red;
-                margin-top: 10px;
-            }
-        </style>
+        <title>Recuperar Senha - Vale & Feira</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/redefinir_senha.css') }}"
+        />
     </head>
     <body>
-        <div class="reset-box">
-            <h2>Redefinir Senha</h2>
-            <form method="POST">
-                {{ form.hidden_tag() }}
-                <!-- Isso inclui o campo CSRF -->
+        <header class="topo-recuperacao">
+            <a href="{{ url_for('main.home') }}" class="area-logo-recuperacao">
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Vale&Feira"
+                    class="logo-imagem-recuperacao"
+                />
+                <span class="logo-texto-recuperacao">Vale&Feira</span>
+            </a>
+            <a
+                href="{{ url_for('auth.cancelar_recuperacao') }}"
+                class="link-cancelar-recuperacao"
+                >Cancelar</a
+            >
+        </header>
 
-                <label for="nome">Nome de usuário:</label>
-                {{ form.nomeForm(id="nome") }}
+        <main class="container-recuperacao">
+            <div class="caixa-form-recuperacao">
+                <div class="passos-recuperacao">
+                    <span
+                        class="passo-recuperacao {{ 'passo-ativo-recuperacao' if etapa == 1 }}"
+                        >1. E-mail</span
+                    >
+                    <span class="seta-passos-recuperacao">&rarr;</span>
+                    <span
+                        class="passo-recuperacao {{ 'passo-ativo-recuperacao' if etapa == 2 }}"
+                        >2. Código</span
+                    >
+                    <span class="seta-passos-recuperacao">&rarr;</span>
+                    <span
+                        class="passo-recuperacao {{ 'passo-ativo-recuperacao' if etapa == 3 }}"
+                        >3. Senha</span
+                    >
+                </div>
 
-                <label for="nova_senha">Nova senha:</label>
-                {{ form.novaSenhaForm(id="nova_senha") }}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %} {% for category, message in messages %}
+                <div class="mensagem-flash-recuperacao flash-{{ category }}">
+                    {{ message }}
+                </div>
+                {% endfor %} {% endif %} {% endwith %} {% if etapa == 1 %}
+                <h2 class="titulo-recuperacao">Recuperar Acesso</h2>
+                <form method="POST" class="formulario-recuperacao">
+                    {{ form_email.hidden_tag() }}
+                    <div class="grupo-campo-recuperacao">
+                        <label class="rotulo-campo-recuperacao"
+                            >Informe seu E-mail</label
+                        >
+                        {{ form_email.emailForm(class="campo-recuperacao",
+                        placeholder="seu@email.com") }}
+                    </div>
+                    {{ form_email.submit(class="botao-recuperacao") }}
+                </form>
 
-                <label for="confirma_senha">Confirme a nova senha:</label>
-                {{ form.confirmaSenhaForm(id="confirma_senha") }} {{
-                form.submit() }}
-            </form>
-            {% with messages = get_flashed_messages(with_categories=true) %} {%
-            if messages %} {% for category, message in messages %}
-            <div class="erro">{{ message }}</div>
-            {% endfor %} {% endif %} {% endwith %}
-            <a href="{{ url_for('auth.login') }}">Voltar para Login</a>
-        </div>
+                {% elif etapa == 2 %}
+                <h2 class="titulo-recuperacao">Código de Segurança</h2>
+                <p class="texto-ajuda-recuperacao">
+                    Verifique seu e-mail e digite o código abaixo.
+                </p>
+                <form method="POST" class="formulario-recuperacao">
+                    {{ form_codigo.hidden_tag() }}
+                    <div class="grupo-campo-recuperacao">
+                        <label class="rotulo-campo-recuperacao"
+                            >Código Recebido</label
+                        >
+                        {{ form_codigo.codigoForm(class="campo-recuperacao",
+                        placeholder="Ex: 123456") }}
+                    </div>
+                    {{ form_codigo.submit(class="botao-recuperacao") }}
+                </form>
+
+                {% elif etapa == 3 %}
+                <h2 class="titulo-recuperacao">Criar Nova Senha</h2>
+                <form method="POST" class="formulario-recuperacao">
+                    {{ form_senha.hidden_tag() }}
+                    <div class="grupo-campo-recuperacao">
+                        <label class="rotulo-campo-recuperacao"
+                            >Nova Senha</label
+                        >
+                        {{ form_senha.novaSenhaForm(class="campo-recuperacao",
+                        placeholder="Mínimo 6 caracteres") }}
+                    </div>
+                    <div class="grupo-campo-recuperacao">
+                        <label class="rotulo-campo-recuperacao"
+                            >Confirmar Nova Senha</label
+                        >
+                        {{
+                        form_senha.confirmaSenhaForm(class="campo-recuperacao",
+                        placeholder="Repita a senha") }}
+                    </div>
+                    {{ form_senha.submit(class="botao-recuperacao") }}
+                </form>
+                {% endif %}
+            </div>
+        </main>
+
+        <footer class="rodape-recuperacao">&copy; 2026 Vale&Feira.</footer>
     </body>
 </html>

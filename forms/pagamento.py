@@ -1,13 +1,8 @@
-"""
-Formulários de pagamento
-"""
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, SubmitField, HiddenField
+from wtforms import StringField, SelectField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, Regexp
 
-
 class FormularioPagamentoPix(FlaskForm):
-    """Formulário de pagamento PIX"""
     
     nome_completo = StringField('Nome Completo', validators=[
         DataRequired(message='Nome completo é obrigatório'),
@@ -21,14 +16,14 @@ class FormularioPagamentoPix(FlaskForm):
     
     cpf = StringField('CPF', validators=[
         DataRequired(message='CPF é obrigatório'),
-        Regexp(r'^\d{3}\.\d{3}\.\d{3}-\d{2}$', message='CPF deve estar no formato XXX.XXX.XXX-XX')
+        Regexp(r'^\d{3}\.\d{3}\.\d{3}-\d{2}$', message='CPF deve estar no formato 000.000.000-00')
     ])
     
     enviar = SubmitField('Gerar PIX')
 
 
 class FormularioPagamentoCartao(FlaskForm):
-    """Formulário de pagamento com cartão de crédito"""
+   
     
     nome_titular = StringField('Nome no Cartão', validators=[
         DataRequired(message='Nome do titular é obrigatório'),
@@ -37,25 +32,28 @@ class FormularioPagamentoCartao(FlaskForm):
     
     numero = StringField('Número do Cartão', validators=[
         DataRequired(message='Número do cartão é obrigatório'),
-        Regexp(r'^\d{4}\s?\d{4}\s?\d{4}\s?\d{4}$', message='Número do cartão inválido')
+        Regexp(r'^(\d{4}\s?){3}\d{1,4}$', message='Número do cartão inválido')
     ])
     
     validade = StringField('Validade (MM/AA)', validators=[
         DataRequired(message='Validade é obrigatória'),
-        Regexp(r'^(0[1-9]|1[0-2])\/\d{2}$', message='Validade deve estar no formato MM/AA')
+        Regexp(r'^(0[1-9]|1[0-2])\/\d{2}$', message='Use o formato MM/AA')
     ])
     
     cvv = StringField('CVV', validators=[
-        DataRequired(message='CVV é obrigatório'),
-        Length(min=3, max=4, message='CVV deve ter 3 ou 4 dígitos')
+        DataRequired(message='CVV obrigatório'),
+        Length(min=3, max=4, message='CVV inválido')
+    ])
+    
+    cpf = StringField('CPF do Titular', validators=[
+        DataRequired(message='CPF do titular é obrigatório'),
+        Regexp(r'^\d{3}\.\d{3}\.\d{3}-\d{2}$', message='CPF inválido')
     ])
     
     parcelas = SelectField('Parcelas', choices=[
         ('1', '1x sem juros'),
         ('2', '2x sem juros'),
-        ('3', '3x sem juros'),
-        ('6', '6x com juros'),
-        ('12', '12x com juros')
+        ('3', '3x sem juros')
     ], default='1')
     
     enviar = SubmitField('Finalizar Pagamento')

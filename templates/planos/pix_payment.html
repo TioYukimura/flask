@@ -1,106 +1,327 @@
-{% extends "base_new.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento PIX | Vale & Feira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+ font-family: 'Montserrat', sans-serif;
+ background-color: #eef6ee;
+ padding: 20px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ min-height: 100vh;
+ margin: 0;
+ }
+        
+        .main-card {
+ background: white;
+ padding: 40px;
+ border-radius: 20px;
+ box-shadow: 0 10px 40px rgba(45, 90, 76, 0.1);
+ text-align: center;
+ max-width: 450px;
+ width: 100%;
+ position: relative;
+ transition: all 0.5s ease;
+ min-height: 500px;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ }
 
-{% block title %}PIX Gerado - Vale & Feira{% endblock %}
+        #estado-qrcode {
+ display: block;
+ width: 100%;
+ }
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-6">
-            <div class="card">
-                <div class="card-body text-center">
-                    <div class="text-success mb-4">
-                        <i data-feather="check-circle" style="width: 64px; height: 64px;"></i>
-                    </div>
-                    <h4 class="fw-bold text-primary mb-3">PIX Gerado com Sucesso!</h4>
-                    <p class="text-muted mb-4">
-                        Escaneie o código QR ou copie o código PIX para realizar o pagamento
-                    </p>
+        .qr-code-img {
+ width: 220px;
+ height: 220px;
+ margin: 20px auto;
+ border: 2px dashed #2d5a4c;
+ padding: 10px;
+ border-radius: 10px;
+ display: block;
+ }
+        
+        .loader {
+ border: 3px solid #f3f3f3;
+ border-top: 3px solid #2d5a4c;
+ border-radius: 50%;
+ width: 20px;
+ height: 20px;
+ animation: spin 1s linear infinite;
+ display: inline-block;
+ vertical-align: middle;
+ margin-right: 8px;
+ }
+        @keyframes spin {
+ 0% {
+ transform: rotate(0deg);
+ }
+ 100% {
+ transform: rotate(360deg);
+ }
+ }
 
-                    <!-- Simulated QR Code -->
-                    <div class="qr-code-container mb-4">
-                        <div class="bg-light p-4 rounded">
-                            <div style="width: 200px; height: 200px; background: #f0f0f0; border: 2px dashed #ccc; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;">
-                                <div class="text-center">
-                                    <i data-feather="square" style="width: 48px; height: 48px; color: #ccc;"></i>
-                                    <br>
-                                    <small class="text-muted">QR Code PIX</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        .status-waiting {
+ background: #fff3e0;
+ color: #e65100;
+ padding: 12px;
+ border-radius: 10px;
+ margin-top: 20px;
+ font-weight: bold;
+ font-size: 0.9rem;
+ border: 1px solid #ffe0b2;
+ }
 
-                    <!-- PIX Code -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Código PIX (Copiar):</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" 
-                                   value="{{ pagamento.qr_code_data[:50] }}..." 
-                                   id="pixCode" readonly>
-                            <button class="btn btn-outline-primary" onclick="copyPixCode()">
-                                <i data-feather="copy" style="width: 16px; height: 16px;"></i>
-                            </button>
-                        </div>
-                    </div>
+        .input-copy {
+ width: 100%;
+ padding: 12px;
+ border: 1px solid #ddd;
+ border-radius: 8px;
+ margin-bottom: 10px;
+ background: #f9f9f9;
+ color: #555;
+ font-size: 0.85rem;
+ text-align: center;
+ }
 
-                    <!-- Payment Info -->
-                    <div class="bg-light p-3 rounded mb-4 text-start">
-                        <div class="row">
-                            <div class="col-6">
-                                <strong>Valor:</strong><br>
-                                <span class="text-primary">R$ {{ "%.2f"|format(pagamento.valor) }}</span>
-                            </div>
-                            <div class="col-6">
-                                <strong>Código:</strong><br>
-                                <span class="text-muted">{{ pagamento.codigo_transacao }}</span>
-                            </div>
-                        </div>
-                    </div>
+        .btn-copy {
+ background: #2d5a4c;
+ color: white;
+ border: none;
+ padding: 12px;
+ border-radius: 8px;
+ cursor: pointer;
+ font-weight: bold;
+ width: 100%;
+ transition: 0.3s;
+ }
+        .btn-copy:hover {
+ background: #1f4036;
+ }
 
-                    <!-- Action Buttons -->
-                    <div class="d-grid gap-2">
-                        <a href="{{ url_for('planos.confirmar_pix', payment_id=pagamento.id) }}" 
-                           class="btn btn-success btn-lg">
-                            <i data-feather="check-circle" class="me-2"></i>
-                            Já Paguei - Confirmar
-                        </a>
-                        <a href="{{ url_for('planos.lista_planos') }}" 
-                           class="btn btn-outline-secondary">
-                            Voltar aos Planos
-                        </a>
-                    </div>
+        #estado-sucesso {
+ display: none;
+ width: 100%;
+ animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+ }
 
-                    <!-- Instructions -->
-                    <div class="alert alert-info mt-4 text-start">
-                        <h6 class="fw-bold">Como pagar com PIX:</h6>
-                        <ol class="mb-0 small">
-                            <li>Abra o app do seu banco</li>
-                            <li>Escolha a opção PIX</li>
-                            <li>Escaneie o QR Code ou cole o código</li>
-                            <li>Confirme os dados e o valor</li>
-                            <li>Clique em "Já Paguei" acima</li>
-                        </ol>
-                    </div>
+        @keyframes popIn {
+ 0% {
+ transform: scale(0.8);
+ opacity: 0;
+ }
+ 100% {
+ transform: scale(1);
+ opacity: 1;
+ }
+ }
+
+        .check-container {
+ width: 80px;
+ height: 80px;
+ background: #e8f5e9;
+ border-radius: 50%;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ margin: 0 auto 20px;
+ }
+
+        .check-icon {
+ color: #2e7d32;
+ font-size: 3rem;
+ animation: checkGrow 0.5s ease-in-out 0.2s backwards;
+ }
+        @keyframes checkGrow {
+ 0% {
+ transform: scale(0);
+ }
+ 80% {
+ transform: scale(1.2);
+ }
+ 100% {
+ transform: scale(1);
+ }
+ }
+
+        .info-box {
+ background: #f9fbf9;
+ border: 1px dashed #c8e6c9;
+ padding: 15px;
+ border-radius: 10px;
+ margin: 20px 0;
+ }
+
+        .redirect-msg {
+ font-size: 0.8rem;
+ color: #888;
+ margin-top: 15px;
+ font-style: italic;
+ animation: blink 1.5s infinite;
+ }
+        @keyframes blink {
+ 0% {
+ opacity: 0.5;
+ }
+ 50% {
+ opacity: 1;
+ }
+ 100% {
+ opacity: 0.5;
+ }
+ }
+
+        .btn-dev {
+ margin-top: 20px;
+ font-size: 0.75rem;
+ color: #bbb;
+ text-decoration: underline;
+ background: none;
+ border: none;
+ cursor: pointer;
+ }
+        .btn-dev:hover {
+ color: #2d5a4c;
+ }
+    </style>
+</head>
+<body>
+
+    <div class="main-card">
+        
+        <div id="estado-qrcode">
+            <h2 style="color: #2d5a4c; margin-bottom: 5px;">Pagamento via PIX</h2>
+            <p style="color: #666; font-size: 0.9rem;">Escaneie o código para liberar seu plano.</p>
+
+            {% if pagamento.dados_qr_code %}
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ pagamento.dados_qr_code }}" class="qr-code-img" alt="QR Code">
+            {% endif %}
+
+            <div style="text-align: left;">
+                <label style="font-size: 0.75rem; font-weight: bold; color: #888; display: block; margin-bottom: 5px;">Copia e Cola:</label>
+                <input type="text" value="{{ pagamento.dados_qr_code }}" id="pixCode" class="input-copy" readonly>
+                <button onclick="copiarPix()" class="btn-copy">Copiar Código PIX</button>
+            </div>
+
+            <div class="status-waiting">
+                <div class="loader"></div>
+                Aguardando confirmação do banco...
+            </div>
+
+            <button onclick="simularPagamentoDev()" class="btn-dev">
+                 Simular
+            </button>
+        </div>
+
+
+        <div id="estado-sucesso">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="height: 50px; margin-bottom: 15px; opacity: 0.9;">
+            
+            <div class="check-container">
+                <span class="check-icon">✔</span>
+            </div>
+
+            <h1 style="color: #2d5a4c; font-size: 1.6rem; margin-bottom: 10px;">Pagamento Aprovado!</h1>
+            <p style="color: #666; font-size: 0.95rem;">Sua assinatura foi confirmada.</p>
+
+            <div class="info-box">
+                <div style="margin-bottom: 10px;">
+                    <span style="font-size: 0.75rem; color: #888; font-weight: bold; text-transform: uppercase;">Plano Liberado</span>
+                    <div style="font-size: 1.2rem; color: #2d5a4c; font-weight: 700;">{{ plano.nome }}</div>
+                </div>
+                <div>
+                    <span style="font-size: 0.75rem; color: #888; font-weight: bold; text-transform: uppercase;">Válido Até</span>
+                    <div id="data-vencimento-display" style="font-size: 1.1rem; color: #333; font-weight: 600;">--/--/----</div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-<script>
-function copyPixCode() {
-    const pixCode = document.getElementById('pixCode');
-    pixCode.select();
-    pixCode.setSelectionRange(0, 99999); // For mobile devices
-    navigator.clipboard.writeText(pixCode.value);
+            <p class="redirect-msg">Redirecionando para o perfil em 3 segundos...</p>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    // Show success message
-    const button = event.target.closest('button');
-    const originalText = button.innerHTML;
-    button.innerHTML = '<i data-feather="check" style="width: 16px; height: 16px;"></i>';
-    setTimeout(() => {
-        button.innerHTML = originalText;
-        feather.replace();
-    }, 2000);
-}
-</script>
-{% endblock %}
+    <script>
+        function copiarPix() {
+            var copyText = document.getElementById("pixCode");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+            alert("Código copiado!");
+        }
+
+        const pagamentoId = "{{ pagamento.id }}";
+        let checkInterval;
+        let jaAprovado = false;
+
+        function soltarConfetes() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        function mostrarSucesso(dataVencimento) {
+            if (jaAprovado) return;
+            jaAprovado = true;
+            clearInterval(checkInterval);
+
+            if (dataVencimento) {
+                document.getElementById('data-vencimento-display').innerText = dataVencimento;
+            }
+
+            document.getElementById('estado-qrcode').style.display = 'none';
+            document.getElementById('estado-sucesso').style.display = 'block';
+
+            soltarConfetes();
+
+            setTimeout(function() {
+                window.location.href = "{{ url_for('perfil.perfil') }}";
+            }, 3000);
+        }
+
+        function verificarStatus() {
+            if (jaAprovado) return; 
+
+            fetch(`/planos/api/verificar_status/${pagamentoId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.aprovado) {
+                        mostrarSucesso(data.data_vencimento);
+                    }
+                })
+                .catch(error => console.error('Erro:', error));
+        }
+
+        function simularPagamentoDev() {
+            const btn = document.querySelector('.btn-dev');
+            btn.innerHTML = "Processando simulação...";
+            btn.disabled = true;
+
+            fetch("{{ url_for('planos.simular_aprovacao_banco', id_pagamento=pagamento.id) }}")
+                .then(() => {
+                    console.log("Simulação enviada!");
+                });
+        }
+
+        checkInterval = setInterval(verificarStatus, 2000);
+    </script>
+
+</body>
+</html>

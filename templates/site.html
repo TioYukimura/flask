@@ -3,224 +3,503 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Produtos</title>
-        <style>
-            body {
-                margin: 0;
-                background-color: rgb(20, 99, 95);
-                font-family: Arial, Helvetica, sans-serif;
-                color: white;
-            }
+        <title>Vale & Feira</title>
 
-            .topo {
-                background-color: white;
-                height: 80px;
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0 20px;
-                box-sizing: border-box;
-            }
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+            rel="stylesheet"
+        />
 
-            .login-link {
-                background-color: black;
-                color: white;
-                padding: 8px 16px;
-                border-radius: 8px;
-                text-decoration: none;
-                font-weight: bold;
-                margin-left: 10px;
-            }
-
-            .login-link:hover {
-                background-color: gray;
-            }
-
-            .barra-busca {
-                display: flex;
-                justify-content: center;
-                margin: 20px 0;
-            }
-
-            .barra-busca form {
-                display: flex;
-                width: 100%;
-                max-width: 500px;
-            }
-
-            .barra-busca input[type="text"] {
-                flex: 1;
-                padding: 10px 15px;
-                border-radius: 8px 0 0 8px;
-                border: 1px solid #ccc;
-                font-size: 16px;
-                outline: none;
-            }
-
-            .barra-busca button {
-                padding: 10px 20px;
-                border: none;
-                background-color: rgb(20, 99, 95);
-                color: white;
-                font-weight: bold;
-                cursor: pointer;
-                border-radius: 0 8px 8px 0;
-                transition: background-color 0.3s;
-            }
-
-            .barra-busca button:hover {
-                background-color: rgb(15, 80, 76);
-            }
-
-            .produtos {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 20px;
-                margin: 20px 0;
-            }
-
-            .produto {
-                background-color: white;
-                color: black;
-                border-radius: 8px;
-                padding: 15px;
-                width: 220px;
-                box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-                text-align: center;
-            }
-
-            .produto img {
-                max-width: 100%;
-                border-radius: 8px;
-                margin-bottom: 10px;
-            }
-
-            .produto h3 {
-                margin: 10px 0 5px 0;
-                font-size: 18px;
-            }
-
-            .produto p {
-                font-size: 14px;
-                margin: 5px 0;
-            }
-
-            .produto strong {
-                display: block;
-                margin-top: 10px;
-                font-size: 16px;
-                color: green;
-            }
-
-            .produto a {
-                text-decoration: none;
-                color: inherit;
-            }
-
-            .produto a:hover {
-                text-decoration: underline;
-            }
-
-            .chat-btn {
-                display: inline-block;
-                margin-top: 10px;
-                background-color: rgb(20, 99, 95);
-                color: white;
-                padding: 8px 15px;
-                border-radius: 5px;
-                text-decoration: none;
-                font-weight: bold;
-            }
-
-            .chat-btn:hover {
-                background-color: rgb(15, 80, 76);
-            }
-        </style>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/site.css') }}"
+        />
     </head>
+
     <body>
-        <div class="topo">
-            <img
-                src="{{ url_for('static', filename='img/logo.png') }}"
-                alt="Logo"
-                style="height: 60px; margin-left: 10px"
-            />
-            <div style="display: flex; align-items: center">
+        <header class="barra-topo">
+            <a href="{{ url_for('main.home') }}" class="area-logo">
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Vale&Feira"
+                    class="logo-imagem"
+                />
+                <span class="logo-texto">Vale&Feira</span>
+            </a>
+
+            <div class="area-busca">
+                <form
+                    method="get"
+                    action="{{ url_for('produto.buscar_produtos') }}"
+                >
+                    <input
+                        type="text"
+                        name="q"
+                        class="input-busca"
+                        placeholder="Buscar produto..."
+                        value="{{ busca|default('') }}"
+                    />
+                    <button type="submit" class="botao-busca">Buscar</button>
+                </form>
+            </div>
+
+            <nav class="links-topo">
+                <a href="{{ url_for('main.home') }}">Início</a>
+                <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+
                 {% if current_user.is_authenticated %}
-                <a href="{{ url_for('chat.meus_chats') }}" class="login-link"
-                    >Meus Chats</a
+                <a
+                    href="{{ url_for('chat.meus_chats') }}"
+                    class="link-conversas"
                 >
-                <a href="{{ url_for('perfil.perfil') }}" class="login-link"
-                    >Meu Perfil</a
-                >
-                <a href="{{ url_for('auth.logout') }}" class="login-link"
+                    Conversas {% if mensagens_nao_lidas is defined and
+                    mensagens_nao_lidas > 0 %}
+                    <span class="bolinha-notificacao"
+                        >{{ mensagens_nao_lidas }}</span
+                    >
+                    {% endif %}
+                </a>
+
+                <nav class="link-planos">
+                    <a href="{{ url_for('planos.lista_planos') }}"
+                        >🌟Planos🌟</a
+                    >
+                </nav>
+
+                <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+                <a href="{{ url_for('auth.logout') }}" class="link-sair"
                     >Sair</a
                 >
                 {% else %}
-                <a href="{{ url_for('auth.login') }}" class="login-link"
+                <a href="{{ url_for('auth.login') }}" class="botao-login"
                     >Login</a
                 >
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="barra-busca">
-            <form
-                method="get"
-                action="{{ url_for('produto.buscar_produtos') }}"
-            >
-                <input
-                    type="text"
-                    name="q"
-                    placeholder="Buscar produto..."
-                    value="{{ busca|default('') }}"
-                />
-                <button type="submit">Buscar</button>
-            </form>
-        </div>
-
-        <div class="produtos">
-            {% if produtos %} {% for produto in produtos %}
-            <div class="produto">
-                <a
-                    href="{{ url_for('produto.pagina_produto', id=produto.id) }}"
+                <a href="{{ url_for('auth.registrar') }}" class="botao-cadastro"
+                    >Cadastrar</a
                 >
-                    <img
-                        src="{{ url_for('static', filename=produto.imagem) if produto.imagem else url_for('static', filename='img/sem_imagem.png') }}"
-                        alt="{{ produto.nome }}"
-                    />
-                </a>
-                <h3>
-                    <a
-                        href="{{ url_for('produto.pagina_produto', id=produto.id) }}"
-                        >{{ produto.nome }}</a
-                    >
-                </h3>
-                <p>{{ produto.descricao }}</p>
-                <strong>R$ {{ '%.2f'|format(produto.preco) }}</strong>
-                {% if current_user.is_authenticated and current_user.id !=
-                produto.usuario_id %}
-                <a
-                    href="{{ url_for('chat.chat', produto_id=produto.id, outro_usuario_id=produto.usuario_id) }}"
-                    class="chat-btn"
-                >
-                    Falar com vendedor
-                </a>
                 {% endif %}
-            </div>
-            {% endfor %} {% else %}
-            <p
-                style="
-                    color: white;
-                    font-size: 18px;
-                    text-align: center;
-                    width: 100%;
-                "
-            >
-                Nenhum produto encontrado.
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>Conectando o Vale do Jequitinhonha</h1>
+            <p>
+                Produtos sustentáveis direto do produtor para sua mesa, com
+                tecnologia e responsabilidade ambiental
             </p>
+
+            <div class="hero-botoes">
+                <a
+                    href="{{ url_for('produto.buscar_produtos') }}"
+                    class="botao-principal"
+                >
+                    🛒 Ver Produtos
+                </a>
+                <a
+                    href="{{ url_for('produto.adicionar_produtos') }}"
+                    class="botao-secundario"
+                >
+                    ➕ Adicionar Produto
+                </a>
+            </div>
+        </section>
+
+        <main class="container-principal">
+            {% set produtos_destaque = [] %} {% set produtos_normais = [] %} {%
+            if produtos %} {% for p in produtos %} {% if p.destaque %} {% set _
+            = produtos_destaque.append(p) %} {% else %} {% set _ =
+            produtos_normais.append(p) %} {% endif %} {% endfor %} {% endif %}
+            {% if produtos_destaque %}
+            <section class="secao-destaque">
+                <h2 class="titulo-destaque">⭐ Produtos em Destaque ⭐</h2>
+
+                <div class="grade-produtos">
+                    {% for produto in produtos_destaque %}
+                    <div class="card-produto card-produto-destaque">
+                        <div class="area-imagem-produto">
+                            {% if produto.imagem %} {% if
+                            produto.imagem.startswith('http') %} {% set
+                            url_final = produto.imagem %} {% else %} {% set
+                            url_final = url_for('static',
+                            filename=produto.imagem) %} {% endif %} {% else %}
+                            {% set url_final = url_for('static',
+                            filename='img/sem_imagem.png') %} {% endif %}
+
+                            <img
+                                src="{{ url_final }}"
+                                alt="{{ produto.nome }}"
+                                onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/sem_imagem.png') }}';"
+                            />
+                        </div>
+
+                        <div class="area-badges-produto">
+                            <span class="badge-categoria"
+                                >{{ produto.categoria or 'Geral' }}</span
+                            >
+
+                            {% if produto.disponibilidade == 'sob_encomenda' %}
+                            <span class="badge-disponibilidade badge-laranja"
+                                >📦 Sob Encomenda</span
+                            >
+                            {% else %}
+                            <span class="badge-disponibilidade badge-verde"
+                                >✅ Disponível</span
+                            >
+                            {% endif %}
+                        </div>
+
+                        <h3 class="nome-produto">{{ produto.nome }}</h3>
+
+                        <div class="info-produtor">
+                            👤 {{ produto.nome_produtor if produto.nome_produtor
+                            else (produto.dono.nome if produto.dono else
+                            'Produtor Local') }}
+                        </div>
+
+                        <div class="linha-preco">
+                            {% if produto.desconto and produto.desconto > 0 %}
+                            {% set preco_antigo = produto.preco / (1 -
+                            (produto.desconto / 100)) %}
+                            <span class="preco-antigo"
+                                >R$ {{ "%.2f"|format(preco_antigo) }}</span
+                            >
+
+                            <span class="preco-novo">
+                                R$ {{ "%.2f"|format(produto.preco) }}{% if
+                                produto.unidade %} / {{ produto.unidade }}{%
+                                endif %}
+                            </span>
+
+                            <span class="tag-desconto"
+                                >-{{ produto.desconto }}%</span
+                            >
+                            {% else %}
+                            <span class="preco-novo">
+                                R$ {{ "%.2f"|format(produto.preco) }}{% if
+                                produto.unidade %} / {{ produto.unidade }}{%
+                                endif %}
+                            </span>
+                            {% endif %} {% if produto.media_notas > 0 %}
+                            <span class="avaliacao-inline">
+                                <span class="estrela">★</span>
+                                <span class="nota"
+                                    >{{ produto.media_notas }}</span
+                                >
+                                <span class="quantidade"
+                                    >({{ produto.total_avaliacoes }})</span
+                                >
+                            </span>
+                            {% else %}
+                            <span class="tag-novo">Novo</span>
+                            {% endif %}
+                        </div>
+
+                        {% if current_user.is_authenticated %} {% if
+                        current_user.id != produto.usuario_id %}
+                        <a
+                            href="{{ url_for('chat.chat', produto_id=produto.id, outro_usuario_id=produto.usuario_id) }}"
+                            class="botao-conversar"
+                        >
+                            💬 Conversar com Produtor
+                        </a>
+                        {% else %}
+                        <span class="botao-conversar desativado"
+                            >Seu Produto</span
+                        >
+                        {% endif %} {% else %}
+                        <a
+                            href="{{ url_for('auth.login') }}"
+                            class="botao-conversar"
+                            >🔒 Login</a
+                        >
+                        {% endif %}
+
+                        <a
+                            href="{{ url_for('produto.pagina_produto', id=produto.id) }}"
+                            class="botao-detalhes"
+                        >
+                            Ver Detalhes
+                        </a>
+
+                        <a
+                            href="{{ url_for('main.denunciar_produto_page', produto_id=produto.id) }}"
+                            class="botao-denunciar"
+                        >
+                            ⚠️ Denunciar Anúncio
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
             {% endif %}
+
+            <section class="secao-produtos">
+                <div class="cabecalho-secao">
+                    <h2>Produtos que Você Pode Gostar</h2>
+                </div>
+
+                <div class="grade-produtos">
+                    {% if produtos_normais %} {% for produto in produtos_normais
+                    %}
+                    <div class="card-produto">
+                        <div class="area-imagem-produto">
+                            {% if produto.imagem %} {% if
+                            produto.imagem.startswith('http') %} {% set
+                            url_final = produto.imagem %} {% else %} {% set
+                            url_final = url_for('static',
+                            filename=produto.imagem) %} {% endif %} {% else %}
+                            {% set url_final = url_for('static',
+                            filename='img/sem_imagem.png') %} {% endif %}
+
+                            <img
+                                src="{{ url_final }}"
+                                alt="{{ produto.nome }}"
+                                onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/sem_imagem.png') }}';"
+                            />
+                        </div>
+
+                        <div class="area-badges-produto">
+                            <span class="badge-categoria"
+                                >{{ produto.categoria or 'Geral' }}</span
+                            >
+
+                            {% if produto.disponibilidade == 'sob_encomenda' %}
+                            <span class="badge-disponibilidade badge-laranja"
+                                >📦 Sob Encomenda</span
+                            >
+                            {% else %}
+                            <span class="badge-disponibilidade badge-verde"
+                                >✅ Disponível</span
+                            >
+                            {% endif %}
+                        </div>
+
+                        <h3 class="nome-produto">{{ produto.nome }}</h3>
+
+                        <div class="info-produtor">
+                            👤 {{ produto.nome_produtor if produto.nome_produtor
+                            else (produto.dono.nome if produto.dono else
+                            'Produtor Local') }} {% if produto.cidade %} •
+                            Cidade: {{ produto.cidade }}{% endif %}
+                        </div>
+
+                        <div class="linha-preco">
+                            {% if produto.desconto and produto.desconto > 0 %}
+                            {% set preco_antigo = produto.preco / (1 -
+                            (produto.desconto / 100)) %}
+                            <span class="preco-antigo"
+                                >R$ {{ "%.2f"|format(preco_antigo) }}</span
+                            >
+
+                            <span class="preco-novo">
+                                R$ {{ "%.2f"|format(produto.preco) }}{% if
+                                produto.unidade %} / {{ produto.unidade }}{%
+                                endif %}
+                            </span>
+
+                            <span class="tag-desconto"
+                                >-{{ produto.desconto }}%</span
+                            >
+                            {% else %}
+                            <span class="preco-novo">
+                                R$ {{ "%.2f"|format(produto.preco) }}{% if
+                                produto.unidade %} / {{ produto.unidade }}{%
+                                endif %}
+                            </span>
+                            {% endif %} {% if produto.media_notas > 0 %}
+                            <span class="avaliacao-inline">
+                                <span class="estrela">★</span>
+                                <span class="nota"
+                                    >{{ produto.media_notas }}</span
+                                >
+                                <span class="quantidade"
+                                    >({{ produto.total_avaliacoes }})</span
+                                >
+                            </span>
+                            {% else %}
+                            <span class="tag-novo">Novo</span>
+                            {% endif %}
+                        </div>
+
+                        {% if current_user.is_authenticated %} {% if
+                        current_user.id != produto.usuario_id %}
+                        <a
+                            href="{{ url_for('chat.chat', produto_id=produto.id, outro_usuario_id=produto.usuario_id) }}"
+                            class="botao-conversar"
+                        >
+                            💬 Conversar com o Produtor
+                        </a>
+                        {% else %}
+                        <span class="botao-conversar desativado"
+                            >Seu Produto</span
+                        >
+                        {% endif %} {% else %}
+                        <a
+                            href="{{ url_for('auth.login') }}"
+                            class="botao-conversar"
+                            >🔒 Login</a
+                        >
+                        {% endif %}
+
+                        <a
+                            href="{{ url_for('produto.pagina_produto', id=produto.id) }}"
+                            class="botao-detalhes"
+                        >
+                            Ver Detalhes
+                        </a>
+
+                        <a
+                            href="{{ url_for('main.denunciar_produto_page', produto_id=produto.id) }}"
+                            class="botao-denunciar"
+                        >
+                            ⚠️ Denunciar Anúncio
+                        </a>
+                    </div>
+                    {% endfor %} {% else %}
+                    <p class="texto-sem-produtos">
+                        Nenhum produto cadastrado no momento.
+                    </p>
+                    {% endif %}
+                </div>
+            </section>
+        </main>
+
+        <section class="secao-porque">
+            <h2>Por que escolher o Vale&Feira?</h2>
+
+            <div class="grade-porque">
+                <div class="card-porque">
+                    <div class="icone-porque">🌱</div>
+                    <h3>100% Sustentável</h3>
+                    <p>
+                        Produtos orgânicos e práticas ambientalmente
+                        responsáveis.
+                    </p>
+                </div>
+
+                <div class="card-porque">
+                    <div class="icone-porque">🤝</div>
+                    <h3>Direto do Produtor</h3>
+                    <p>Conectamos você diretamente aos produtores locais.</p>
+                </div>
+
+                <div class="card-porque">
+                    <div class="icone-porque">📱</div>
+                    <h3>Tecnologia Rural</h3>
+                    <p>Inovação a serviço da agricultura familiar.</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="rodape">
+            <div class="rodape-grade">
+                <div class="rodape-coluna">
+                    <h4>Vale&Feira</h4>
+                    <p>
+                        Conectando produtores e consumidores através da
+                        tecnologia e sustentabilidade.
+                    </p>
+                </div>
+
+                <div class="rodape-coluna">
+                    <h4>Links Rápidos</h4>
+                    <a href="{{ url_for('main.home') }}">Início</a>
+                    <a href="{{ url_for('produto.buscar_produtos') }}"
+                        >Produtos</a
+                    >
+                    <a href="{{ url_for('produto.adicionar_produtos') }}"
+                        >Adicionar Produto</a
+                    >
+                    <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+                    {% endif %}
+                </div>
+
+                <div class="rodape-coluna">
+                    <h4>Suporte/Ajuda</h4>
+                    <a href="{{ url_for('main.relatar_bug_page') }}"
+                        >Central de Ajuda</a
+                    >
+                    <a href="#" onclick="abrirModalTermos(); return false;"
+                        >Termos de Uso</a
+                    >
+                </div>
+
+                <div class="rodape-coluna">
+                    <h4>Contatos</h4>
+                    <a>📧contato@valefeira.com.br</a>
+                    <a>📧suportevaleefeira@gmail.com</a>
+                    <a href="#">📱 (38) 3333-4444</a>
+                    <p>📍 Vale do Jequitinhonha, MG</p>
+                </div>
+            </div>
+
+            <div class="rodape-final">
+                &copy; 2026 Vale&Feira. Todos os direitos reservados.
+            </div>
+        </footer>
+
+        <a
+            href="{{ url_for('main.relatar_bug_page') }}"
+            class="botao-flutuante-bug"
+            title="Relatar um problema"
+        >
+            🪲 Relatar Erro / Ajuda
+        </a>
+
+        <div id="modalTermos" class="modal-termos">
+            <div class="modal-conteudo">
+                <span class="botao-fechar-modal" onclick="fecharModalTermos()"
+                    >&times;</span
+                >
+
+                <div class="modal-corpo">
+                    <h3>Termos e Condições de Uso</h3>
+
+                    <h4>1. Objeto e Definição</h4>
+                    <p>
+                        A plataforma Vale & Feira é um ambiente digital
+                        destinado à divulgação, promoção e facilitação da
+                        comercialização de produtos cultivados e produzidos no
+                        Vale do Jequitinhonha. O site atua como uma "feira
+                        virtual", conectando produtores locais (agricultores
+                        familiares e artesãos) a potenciais compradores.
+                    </p>
+
+                    <h4>2. Natureza do Serviço</h4>
+                    <p>
+                        O Vale & Feira não realiza a venda direta nem processa
+                        pagamentos (nesta versão MVP). A plataforma facilita o
+                        contato via WhatsApp ou e-mail.
+                    </p>
+
+                    <div class="modal-acoes">
+                        <button
+                            class="botao-fechar-termos"
+                            onclick="fecharModalTermos()"
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <script>
+            function abrirModalTermos() {
+                document.getElementById("modalTermos").style.display = "flex";
+            }
+
+            function fecharModalTermos() {
+                document.getElementById("modalTermos").style.display = "none";
+            }
+
+            window.onclick = function (event) {
+                if (event.target == document.getElementById("modalTermos")) {
+                    fecharModalTermos();
+                }
+            };
+        </script>
     </body>
 </html>

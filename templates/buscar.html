@@ -1,113 +1,498 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-br">
     <head>
         <meta charset="UTF-8" />
-        <title>Produtos</title>
-        <style>
-            body {
-                background-color: rgb(20, 99, 95);
-                font-family: Arial, sans-serif;
-                color: white;
-                padding: 20px;
-            }
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Buscar Produtos - Vale & Feira</title>
 
-            h1 {
-                text-align: center;
-                margin-bottom: 30px;
-            }
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+            rel="stylesheet"
+        />
 
-            .produtos-container {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 20px;
-            }
-
-            .produto-box {
-                background: white;
-                color: black;
-                border-radius: 8px;
-                padding: 20px;
-                width: 220px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-                text-align: center;
-            }
-
-            .produto-box img {
-                max-width: 100%;
-                border-radius: 8px;
-                margin-bottom: 10px;
-            }
-
-            .produto-box h3 {
-                margin: 10px 0 5px 0;
-                font-size: 18px;
-            }
-            .produto-box p {
-                font-size: 14px;
-                margin: 5px 0;
-            }
-            .produto-box strong {
-                display: block;
-                margin-top: 10px;
-                font-size: 16px;
-                color: green;
-            }
-
-            .produto-box a {
-                text-decoration: none;
-                color: inherit;
-            }
-            .produto-box a:hover {
-                text-decoration: underline;
-            }
-
-            .chat-btn {
-                display: inline-block;
-                margin-top: 10px;
-                background-color: rgb(20, 99, 95);
-                color: white;
-                padding: 8px 15px;
-                border-radius: 5px;
-                text-decoration: none;
-                font-weight: bold;
-            }
-
-            .chat-btn:hover {
-                background-color: rgb(15, 80, 76);
-            }
-        </style>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/buscar_produtos.css') }}"
+        />
     </head>
-    <body>
-        <h1>Produtos disponíveis</h1>
 
-        <div class="produtos-container">
-            {% for p in produtos %}
-            <div class="produto-box">
-                <a href="{{ url_for('produto.pagina_produto', id=p.id) }}">
-                    <img
-                        src="{{ url_for('static', filename=p.imagem) if p.imagem else url_for('static', filename='img/sem_imagem.png') }}"
-                        alt="{{ p.nome }}"
+    <body>
+        <header class="barra-topo">
+            <a href="{{ url_for('main.home') }}" class="container-logo">
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    class="imagem-logo"
+                    alt="Logo"
+                />
+                <span class="texto-logo">Vale&Feira</span>
+            </a>
+
+            <div class="barra-busca">
+                <form method="get" action="{{ url_for('produto.buscar_produtos') }}">
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="Buscar produto..."
+                        value="{{ busca|default('') }}"
                     />
+                    <button type="submit">Buscar</button>
+                </form>
+            </div>
+
+            <nav class="links-navegacao">
+                <a href="{{ url_for('main.home') }}">Início</a>
+                <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('chat.meus_chats') }}">
+                    Conversas
+                    {% if mensagens_nao_lidas is defined and mensagens_nao_lidas > 0 %}
+                    <span class="bolinha-notificacao">{{ mensagens_nao_lidas }}</span>
+                    {% endif %}
                 </a>
-                <h3>
-                    <a href="{{ url_for('produto.pagina_produto', id=p.id) }}"
-                        >{{ p.nome }}</a
-                    >
-                </h3>
-                <p>{{ p.descricao }}</p>
-                <strong>R$ {{ "%.2f"|format(p.preco) }}</strong>
-                {% if current_user.is_authenticated and current_user.id !=
-                p.usuario_id %}
+
+                <nav class="link-planos">
+                    <a href="{{ url_for('planos.lista_planos') }}">🌟Planos🌟</a>
+                </nav>
+
+                <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+                <a href="{{ url_for('auth.logout') }}" class="link-sair">Sair</a>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="botao-login">Login</a>
+                <a href="{{ url_for('auth.registrar') }}" class="botao-cadastro">Cadastrar</a>
+                {% endif %}
+            </nav>
+        </header>
+
+        <main class="conteudo">
+            <div class="area-controle-filtros">
+                <button class="botao-abrir-filtros" onclick="toggleFiltros()">
+                    🔍 Filtrar
+                </button>
+
+                {% if request.args.get('categoria') or request.args.get('min_price') or request.args.get('max_price') or request.args.get('cidade') %}
                 <a
-                    href="{{ url_for('chat.chat', produto_id=p.id, outro_usuario_id=p.usuario_id) }}"
-                    class="chat-btn"
+                    href="{{ url_for('produto.buscar_produtos', q=busca) }}"
+                    class="link-limpar-filtros"
                 >
-                    Falar com vendedor
+                    Limpar filtros ✕
                 </a>
                 {% endif %}
             </div>
-            {% endfor %}
+
+            <div
+                id="painelFiltros"
+                class="painel-filtros {% if request.args.get('categoria') or request.args.get('min_price') or request.args.get('max_price') or request.args.get('cidade') %}aberto{% endif %}"
+            >
+                <form action="{{ url_for('produto.buscar_produtos') }}" method="GET">
+                    <input type="hidden" name="q" value="{{ busca }}" />
+
+                    <div class="grade-filtros">
+                        <div>
+                            <label class="rotulo-filtro">Preço (R$)</label>
+                            <div class="linha-campos-preco">
+                                <input
+                                    type="number"
+                                    name="min_price"
+                                    class="campo-filtro"
+                                    placeholder="Mín"
+                                    value="{{ request.args.get('min_price', '') }}"
+                                />
+                                <input
+                                    type="number"
+                                    name="max_price"
+                                    class="campo-filtro"
+                                    placeholder="Máx"
+                                    value="{{ request.args.get('max_price', '') }}"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="rotulo-filtro">Categoria</label>
+                            <select name="categoria" class="campo-filtro">
+                                <option value="">Todas</option>
+                                <option value="Vegetais e Verduras" {% if request.args.get('categoria') == 'Vegetais e Verduras' %}selected{% endif %}>Vegetais e Verduras</option>
+                                <option value="Frutas Frescas" {% if request.args.get('categoria') == 'Frutas Frescas' %}selected{% endif %}>Frutas Frescas</option>
+                                <option value="Mel e Derivados" {% if request.args.get('categoria') == 'Mel e Derivados' %}selected{% endif %}>Mel e Derivados</option>
+                                <option value="Grãos e Cereais" {% if request.args.get('categoria') == 'Grãos e Cereais' %}selected{% endif %}>Grãos e Cereais</option>
+                                <option value="Queijos e Laticínios" {% if request.args.get('categoria') == 'Queijos e Laticínios' %}selected{% endif %}>Queijos e Laticínios</option>
+                                <option value="Conservas e Doces" {% if request.args.get('categoria') == 'Conservas e Doces' %}selected{% endif %}>Conservas e Doces</option>
+                                <option value="Artesanato Local" {% if request.args.get('categoria') == 'Artesanato Local' %}selected{% endif %}>Artesanato Local</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="rotulo-filtro">Cidade</label>
+                            <input
+                                type="text"
+                                name="cidade"
+                                class="campo-filtro"
+                                placeholder="Ex: Diamantina"
+                                value="{{ request.args.get('cidade', '') }}"
+                            />
+                        </div>
+
+                        <button type="submit" class="botao-aplicar">Aplicar</button>
+                    </div>
+                </form>
+            </div>
+
+            {% if produtos %}
+                {% set premium = [] %}
+                {% set produtor = [] %}
+                {% set basico = [] %}
+
+                {% for p in produtos %}
+                    {% set plano_id = 0 %}
+                    {% if p.dono %}
+                        {% set assinatura = p.dono.assinatura_atual() %}
+                        {% if assinatura %}
+                            {% set plano_id = assinatura.plano_id %}
+                        {% endif %}
+                    {% endif %}
+
+                    {% if p.destaque %}
+                        {% if plano_id == 3 %}
+                            {% set _ = premium.append(p) %}
+                        {% elif plano_id == 2 %}
+                            {% set _ = produtor.append(p) %}
+                        {% elif plano_id == 1 %}
+                            {% set _ = basico.append(p) %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+                {% set produtos_destaque = premium + produtor + basico %}
+
+                {% if produtos_destaque %}
+                <section class="secao-destaque">
+                    <h2 class="titulo-destaque">⭐ Produtos em Destaque ⭐</h2>
+
+                    <div class="grade-produtos">
+                        {% for produto in produtos_destaque %}
+                        <div class="card-produto card-destaque">
+                            <div class="area-imagem-card">
+                                {% if produto.imagem %}
+                                    {% if produto.imagem.startswith('http') %}
+                                        {% set final_url = produto.imagem %}
+                                    {% else %}
+                                        {% set final_url = url_for('static', filename=produto.imagem) %}
+                                    {% endif %}
+                                {% else %}
+                                    {% set final_url = url_for('static', filename='img/sem_imagem.png') %}
+                                {% endif %}
+
+                                <img
+                                    src="{{ final_url }}"
+                                    alt="{{ produto.nome }}"
+                                    onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/sem_imagem.png') }}';"
+                                />
+                            </div>
+
+                            <div class="badges-abaixo-imagem">
+                                <span class="badge-categoria">{{ produto.categoria or 'Geral' }}</span>
+                                {% if produto.disponibilidade == 'sob_encomenda' %}
+                                    <span class="badge-disponibilidade laranja">📦 Sob Encomenda</span>
+                                {% else %}
+                                    <span class="badge-disponibilidade verde">✅ Disponível</span>
+                                {% endif %}
+                            </div>
+
+                            <h3>{{ produto.nome }}</h3>
+
+                            <div class="info-produtor">
+                                👤 {{ produto.nome_produtor if produto.nome_produtor else (produto.dono.nome if produto.dono else 'Produtor Local') }}
+                                {% if produto.cidade %} • Cidade: {{ produto.cidade }}{% endif %}
+                            </div>
+
+                            <div class="container-preco">
+                                <span class="preco-novo">
+                                    R$ {{ "%.2f"|format(produto.preco) }}{% if produto.unidade %} / {{ produto.unidade }}{% endif %}
+                                </span>
+
+                                {% if produto.media_notas > 0 %}
+                                <span class="avaliacao-inline">
+                                    <span class="estrela">★</span>
+                                    <span class="nota">{{ produto.media_notas }}</span>
+                                    <span class="qtd">({{ produto.total_avaliacoes }})</span>
+                                </span>
+                                {% else %}
+                                <span class="tag-novo">Novo</span>
+                                {% endif %}
+                            </div>
+
+                            {% if current_user.is_authenticated %}
+                                {% if current_user.id != produto.usuario_id %}
+                                <a
+                                    href="{{ url_for('chat.chat', produto_id=produto.id, outro_usuario_id=produto.usuario_id) }}"
+                                    class="botao-conversa"
+                                >
+                                    💬 Conversar com o Produtor
+                                </a>
+                                {% else %}
+                                <span class="botao-conversa desabilitado">Seu Produto</span>
+                                {% endif %}
+                            {% else %}
+                            <a href="{{ url_for('auth.login') }}" class="botao-conversa">🔒 Login</a>
+                            {% endif %}
+
+                            <a
+                                href="{{ url_for('produto.pagina_produto', id=produto.id) }}"
+                                class="botao-detalhes"
+                            >
+                                Ver Detalhes
+                            </a>
+
+                            <a
+                                href="{{ url_for('main.denunciar_produto_page', produto_id=produto.id) }}"
+                                class="botao-denunciar"
+                            >
+                                ⚠️ Denunciar Anúncio
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+            {% endif %}
+
+            <h2 class="titulo-resultados">Todos os Resultados</h2>
+
+            <div class="grade-produtos">
+                {% if produtos %}
+                    {% for produto in produtos %}
+                    <div class="card-produto">
+                        <div class="area-imagem-card">
+                            {% if produto.imagem %}
+                                {% if produto.imagem.startswith('http') %}
+                                    {% set final_url = produto.imagem %}
+                                {% else %}
+                                    {% set final_url = url_for('static', filename=produto.imagem) %}
+                                {% endif %}
+                            {% else %}
+                                {% set final_url = url_for('static', filename='img/sem_imagem.png') %}
+                            {% endif %}
+
+                            <img
+                                src="{{ final_url }}"
+                                alt="{{ produto.nome }}"
+                                onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/sem_imagem.png') }}';"
+                            />
+                        </div>
+
+                        <div class="badges-abaixo-imagem">
+                            <span class="badge-categoria">{{ produto.categoria or 'Geral' }}</span>
+                            {% if produto.disponibilidade == 'sob_encomenda' %}
+                                <span class="badge-disponibilidade laranja">📦 Sob Encomenda</span>
+                            {% else %}
+                                <span class="badge-disponibilidade verde">✅ Disponível</span>
+                            {% endif %}
+                        </div>
+
+                        <h3>{{ produto.nome }}</h3>
+
+                        <div class="info-produtor">
+                            👤 {{ produto.nome_produtor if produto.nome_produtor else (produto.dono.nome if produto.dono else 'Produtor Local') }}
+                            {% if produto.cidade %} • Cidade: {{ produto.cidade }}{% endif %}
+                        </div>
+
+                        <div class="container-preco">
+                            <div class="linha-preco">
+                                {% if produto.desconto and produto.desconto > 0 %}
+                                    {% set preco_antigo = produto.preco / (1 - (produto.desconto / 100)) %}
+                                    <span class="preco-antigo">R$ {{ "%.2f"|format(preco_antigo) }}</span>
+                                    <span class="preco-novo">
+                                        R$ {{ "%.2f"|format(produto.preco) }}{% if produto.unidade %} / {{ produto.unidade }}{% endif %}
+                                    </span>
+                                    <span class="tag-desconto">-{{ produto.desconto }}%</span>
+                                {% else %}
+                                    <span class="preco-novo">
+                                        R$ {{ "%.2f"|format(produto.preco) }}{% if produto.unidade %} / {{ produto.unidade }}{% endif %}
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            {% if produto.media_notas > 0 %}
+                            <span class="avaliacao-inline">
+                                <span class="estrela">★</span>
+                                <span class="nota">{{ produto.media_notas }}</span>
+                                <span class="qtd">({{ produto.total_avaliacoes }})</span>
+                            </span>
+                            {% else %}
+                            <span class="tag-novo">Novo</span>
+                            {% endif %}
+                        </div>
+
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.id != produto.usuario_id %}
+                            <a
+                                href="{{ url_for('chat.chat', produto_id=produto.id, outro_usuario_id=produto.usuario_id) }}"
+                                class="botao-conversa"
+                            >
+                                💬 Conversar com o Produtor
+                            </a>
+                            {% else %}
+                            <span class="botao-conversa desabilitado">Seu Produto</span>
+                            {% endif %}
+                        {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="botao-conversa">🔒 Login</a>
+                        {% endif %}
+
+                        <a
+                            href="{{ url_for('produto.pagina_produto', id=produto.id) }}"
+                            class="botao-detalhes"
+                        >
+                            Ver Detalhes
+                        </a>
+
+                        <a
+                            href="{{ url_for('main.denunciar_produto_page', produto_id=produto.id) }}"
+                            class="botao-denunciar"
+                        >
+                            ⚠️ Denunciar Anúncio
+                        </a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="estado-vazio">
+                    <p>Nenhum produto encontrado para sua busca.</p>
+                    <a href="{{ url_for('main.home') }}">Ver todos os produtos →</a>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+
+        <footer class="rodape">
+            <div class="grade-rodape">
+                <div class="coluna-rodape">
+                    <h4>Vale&Feira</h4>
+                    <p>
+                        Conectando produtores e consumidores através da
+                        tecnologia e sustentabilidade.
+                    </p>
+                </div>
+
+                <div class="coluna-rodape">
+                    <h4>Links Rápidos</h4>
+                    <a href="{{ url_for('main.home') }}">Início</a>
+                    <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+                    <a href="{{ url_for('produto.adicionar_produtos') }}">Adicionar Produto</a>
+                    <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+                    {% endif %}
+                </div>
+
+                <div class="coluna-rodape">
+                    <h4>Suporte/Ajuda</h4>
+                    <a href="{{ url_for('main.relatar_bug_page') }}">Central de Ajuda</a>
+                    <a href="#" onclick="abrirModalTermos(); return false;">Termos de Uso</a>
+                </div>
+
+                <div class="coluna-rodape">
+                    <h4>Contatos</h4>
+                    <a>📧contato@valefeira.com.br</a>
+                    <a>📧suportevaleefeira@gmail.com</a>
+                    <a href="#">📱 (38) 3333-4444</a>
+                    <p>📍 Vale do Jequitinhonha, MG</p>
+                </div>
+            </div>
+
+            <div class="rodape-inferior">
+                &copy; 2026 Vale&Feira. Todos os direitos reservados.
+            </div>
+        </footer>
+
+        <div id="modalTermos" class="modal">
+            <div class="conteudo-modal">
+                <span class="btn-fechar" onclick="fecharModalTermos()">&times;</span>
+                <div class="corpo-modal">
+                    <h3>Termos e Condições de Uso</h3>
+                    <h4>1. Objeto e Definição</h4>
+                    <p>
+                        A plataforma Vale & Feira é um ambiente digital destinado à divulgação,
+                        promoção e facilitação da comercialização de produtos cultivados e
+                        produzidos no Vale do Jequitinhonha. O site atua como uma "feira virtual",
+                        conectando produtores locais (agricultores familiares e artesãos) a potenciais compradores.
+                    </p>
+
+                    <h4>2. Natureza do Serviço (Intermediação de Contato)</h4>
+                    <ul>
+                        <li><strong>Divulgação:</strong> A plataforma oferece espaço para que o produtor cadastre produtos com fotos, descrição e preço.</li>
+                        <li><strong>Ausência de Intermediários:</strong> O Vale & Feira não realiza a venda direta nem processa pagamentos (nesta versão MVP). A plataforma facilita o contato via WhatsApp ou e-mail, sendo a transação comercial de inteira responsabilidade das partes envolvidas.</li>
+                    </ul>
+
+                    <h4>3. Responsabilidades do Produtor (Vendedor)</h4>
+                    <p>Ao cadastrar um produto, o usuário produtor garante que:</p>
+                    <ul>
+                        <li>As informações sobre o produto (origem, peso, tipo de cultivo) são verdadeiras.</li>
+                        <li>As imagens postadas correspondem fielmente ao produto ofertado.</li>
+                        <li>Possui autorização legal para comercializar os itens listados.</li>
+                        <li>Compromete-se a manter seus dados de contato atualizados para viabilizar a negociação.</li>
+                    </ul>
+
+                    <h4>4. Responsabilidades do Consumidor (Comprador)</h4>
+                    <p>O usuário interessado em adquirir produtos reconhece que:</p>
+                    <ul>
+                        <li>A plataforma não garante a logística de entrega, que deve ser combinada diretamente com o produtor.</li>
+                        <li>A verificação da qualidade e procedência do produto no ato da entrega é de sua responsabilidade.</li>
+                    </ul>
+
+                    <h4>5. Propriedade Intelectual e Identidade Regional</h4>
+                    <p>
+                        Todo o conteúdo institucional, logotipos e a estrutura do site são de propriedade da
+                        Equipe de Desenvolvimento Vale & Feira. A plataforma visa valorizar as tradições e a
+                        identidade do Vale do Jequitinhonha.
+                    </p>
+
+                    <h4>6. Limitação de Responsabilidade</h4>
+                    <p>A equipe Vale & Feira não se responsabiliza por:</p>
+                    <ul>
+                        <li>Negociações frustradas ou não concretizadas entre usuários.</li>
+                        <li>Divergências de preços ou qualidade de produtos.</li>
+                        <li>Eventuais problemas no transporte ou perecibilidade de alimentos após a saída da propriedade rural.</li>
+                    </ul>
+
+                    <h4>7. Proteção de Dados (LGPD)</h4>
+                    <p>
+                        Em conformidade com a Lei Geral de Proteção de Dados, os dados coletados (nome, e-mail,
+                        telefone e localização) serão utilizados exclusivamente para autenticação, exibição pública
+                        (no caso de produtores) e segurança da plataforma.
+                    </p>
+
+                    <h4>8. Canal de Ética e Denúncias</h4>
+                    <p>
+                        Reservamo-nos o direito de remover anúncios ou suspender contas que apresentem comportamentos abusivos,
+                        informações falsas ou que desrespeitem os princípios da agricultura familiar e economia solidária.
+                    </p>
+
+                    <div class="centralizado-mt20">
+                        <button class="botao-fechar-modal" onclick="fecharModalTermos()">
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <script>
+            function toggleFiltros() {
+                var painel = document.getElementById("painelFiltros");
+                painel.classList.toggle("aberto");
+            }
+
+            function abrirModalTermos() {
+                document.getElementById("modalTermos").style.display = "flex";
+            }
+            function fecharModalTermos() {
+                document.getElementById("modalTermos").style.display = "none";
+            }
+            window.onclick = function (event) {
+                if (event.target == document.getElementById("modalTermos")) {
+                    fecharModalTermos();
+                }
+            };
+        </script>
     </body>
 </html>

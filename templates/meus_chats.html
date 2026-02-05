@@ -1,223 +1,413 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-br">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Meus Chats</title>
-        <style>
-            body {
-                margin: 0;
-                background-color: rgb(20, 99, 95);
-                font-family: Arial, Helvetica, sans-serif;
-                color: white;
-            }
+        <title>Minhas Conversas - Vale & Feira</title>
 
-            .topo {
-                background-color: white;
-                height: 80px;
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0 20px;
-                box-sizing: border-box;
-            }
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+            rel="stylesheet"
+        />
 
-            .login-link {
-                background-color: black;
-                color: white;
-                padding: 8px 16px;
-                border-radius: 8px;
-                text-decoration: none;
-                font-weight: bold;
-                margin-left: 10px;
-            }
-
-            .login-link:hover {
-                background-color: gray;
-            }
-
-            .container {
-                max-width: 800px;
-                margin: 30px auto;
-                padding: 20px;
-            }
-
-            h1 {
-                text-align: center;
-                margin-bottom: 30px;
-            }
-
-            .chat-list {
-                background-color: white;
-                border-radius: 10px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-                overflow: hidden;
-                color: #333;
-            }
-
-            .chat-item {
-                padding: 15px;
-                border-bottom: 1px solid #eee;
-                display: flex;
-                align-items: center;
-                text-decoration: none;
-                color: inherit;
-            }
-
-            .chat-item:last-child {
-                border-bottom: none;
-            }
-
-            .chat-item:hover {
-                background-color: #f9f9f9;
-            }
-
-            .chat-avatar {
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                background-color: rgb(20, 99, 95);
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: bold;
-                margin-right: 15px;
-                flex-shrink: 0;
-            }
-
-            .chat-content {
-                flex-grow: 1;
-            }
-
-            .chat-header {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 5px;
-            }
-
-            .chat-user {
-                font-weight: bold;
-                color: rgb(20, 99, 95);
-            }
-
-            .chat-product {
-                font-weight: bold;
-            }
-
-            .chat-preview {
-                font-size: 14px;
-                color: #666;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            .chat-time {
-                font-size: 12px;
-                color: #999;
-            }
-
-            .unread-count {
-                background-color: red;
-                color: white;
-                border-radius: 50%;
-                width: 20px;
-                height: 20px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 12px;
-                margin-left: 10px;
-            }
-
-            .no-chats {
-                text-align: center;
-                padding: 30px;
-                color: #666;
-            }
-
-            .back-link {
-                display: block;
-                text-align: center;
-                margin-top: 20px;
-                color: white;
-                text-decoration: none;
-            }
-
-            .back-link:hover {
-                text-decoration: underline;
-            }
-        </style>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/meus_chats.css') }}"
+        />
     </head>
+
     <body>
-        <!-- Topo -->
-        <div class="topo">
-            <img
-                src="{{ url_for('static', filename='img/logo.png') }}"
-                alt="Logo"
-                style="height: 60px; margin-left: 10px"
-            />
-            <div style="display: flex; align-items: center">
-                {% if current_user.is_authenticated %}
-                <a href="{{ url_for('perfil.perfil') }}" class="login-link"
-                    >Meu Perfil</a
-                >
-                <a href="{{ url_for('auth.logout') }}" class="login-link"
-                    >Sair</a
-                >
-                {% else %}
-                <a href="{{ url_for('auth.login') }}" class="login-link"
-                    >Login</a
-                >
-                {% endif %}
-            </div>
-        </div>
+        <header class="topbar">
+            <a href="{{ url_for('main.home') }}" class="logo-container">
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    class="logo-img"
+                    alt="Logo"
+                />
+                <span class="logo-text">Vale&Feira</span>
+            </a>
 
-        <!-- Lista de chats -->
-        <div class="container">
-            <h1>Minhas Conversas</h1>
+            <nav class="nav-links">
+                <a href="{{ url_for('main.home') }}">Início</a>
+                <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
 
-            <div class="chat-list">
-                {% if grupos_chat %} {% for grupo in grupos_chat %}
-                <a
-                    href="{{ url_for('chat.chat', produto_id=grupo['produto'].id, outro_usuario_id=grupo['outro_usuario'].id) }}"
-                    class="chat-item"
-                >
-                    <div class="chat-avatar">
-                        {{ grupo['outro_usuario'].nome[0]|upper }}
-                    </div>
-                    <div class="chat-content">
-                        <div class="chat-header">
-                            <span class="chat-user"
-                                >{{ grupo['outro_usuario'].nome }}</span
-                            >
-                            <span class="chat-time"
-                                >{{
-                                grupo['ultimo_chat'].data_criacao.strftime('%d/%m/%Y
-                                %H:%M') }}</span
-                            >
-                        </div>
-                        <div class="chat-product">
-                            {{ grupo['produto'].nome }}
-                        </div>
-                        <div class="chat-preview">
-                            {{ grupo['ultimo_chat'].obter_preview() }}
-                        </div>
-                    </div>
-                    {% if grupo['nao_lidas'] > 0 %}
-                    <div class="unread-count">{{ grupo['nao_lidas'] }}</div>
+                <a href="{{ url_for('chat.meus_chats') }}">
+                    Conversas {% if mensagens_nao_lidas is defined and
+                    mensagens_nao_lidas > 0 %}
+                    <span class="bolinha-notificacao"
+                        >{{ mensagens_nao_lidas }}</span
+                    >
                     {% endif %}
                 </a>
+
+                <nav class="nav-planoslink">
+                    <a href="{{ url_for('planos.lista_planos') }}"
+                        >🌟Planos🌟</a
+                    >
+                </nav>
+
+                <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+                <a href="{{ url_for('auth.logout') }}" class="link-sair"
+                    >Sair</a
+                >
+            </nav>
+        </header>
+
+        <main class="container">
+            <div class="header-section">
+                <h2>💬 Minhas Conversas</h2>
+                <a href="{{ url_for('main.home') }}" class="btn-voltar-home"
+                    >🏠 Voltar ao Início</a
+                >
+            </div>
+
+            <div class="lista-conversas">
+                {% if chats %} {% for chat in chats %}
+                <div class="card-wrapper">
+                    <a
+                        href="{{ url_for('chat.chat', produto_id=chat.produto.id, outro_usuario_id=chat.outro_usuario.id) }}"
+                        class="card-conversa"
+                    >
+                        <div class="user-avatar-list">
+                            {% if chat.outro_usuario.foto_perfil and
+                            chat.outro_usuario.foto_perfil !=
+                            'default_profile.png' %}
+                            <img
+                                src="{{ url_for('static', filename='uploads/' + chat.outro_usuario.foto_perfil) }}"
+                                alt="Foto de {{ chat.outro_usuario.nome }}"
+                                loading="lazy"
+                            />
+                            {% else %}
+                            <span class="avatar-fallback" aria-hidden="true"
+                                >👤</span
+                            >
+                            {% endif %}
+                        </div>
+
+                        <div class="info-conversa">
+                            <span class="nome-produto"
+                                >{{ chat.produto.nome }}</span
+                            >
+                            <span class="nome-usuario"
+                                >Vendedor: {{ chat.outro_usuario.nome }}</span
+                            >
+
+                            <span class="ultima-msg">
+                                {% if chat.ultima_mensagem %} {{
+                                chat.ultima_mensagem.mensagem|truncate(50) }} {%
+                                else %} Nenhuma mensagem ainda. {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="meta-conversa">
+                            <span class="data-msg">
+                                {% if chat.ultima_mensagem %} {{
+                                chat.ultima_mensagem.data_criacao.strftime('%d/%m
+                                %H:%M') }} {% endif %}
+                            </span>
+
+                            {% if chat.nao_lidas > 0 %}
+                            <span class="badge-notificacao"
+                                >{{ chat.nao_lidas }} nova(s)</span
+                            >
+                            {% endif %}
+                        </div>
+                    </a>
+
+                    <div class="menu-wrapper">
+                        <button
+                            type="button"
+                            class="btn-menu"
+                            aria-label="Opções do chat"
+                            aria-expanded="false"
+                            data-menu-id="menu-{{ chat.produto.id }}-{{ chat.outro_usuario.id }}"
+                        >
+                            ⋮
+                        </button>
+
+                        <div
+                            class="menu-dropdown"
+                            id="menu-{{ chat.produto.id }}-{{ chat.outro_usuario.id }}"
+                        >
+                            <form
+                                method="POST"
+                                action="{{ url_for('chat.excluir_chat', produto_id=chat.produto.id, outro_usuario_id=chat.outro_usuario.id) }}"
+                                onsubmit="return confirm('Tem certeza que deseja excluir esta conversa?');"
+                            >
+                                {% if csrf_token is defined %}
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    value="{{ csrf_token() }}"
+                                />
+                                {% endif %}
+
+                                <button type="submit" class="menu-item danger">
+                                    🗑 Excluir chat
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
                 {% endfor %} {% else %}
-                <div class="no-chats">Você não tem nenhuma conversa ativa.</div>
+                <div class="estado-vazio">
+                    <p class="estado-vazio-texto">
+                        Você ainda não possui conversas ativas.
+                    </p>
+                    <a
+                        href="{{ url_for('produto.buscar_produtos') }}"
+                        class="btn-explorar"
+                    >
+                        Explorar Produtos
+                    </a>
+                </div>
                 {% endif %}
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Vale&Feira</h4>
+                    <p>
+                        Conectando produtores e consumidores através da
+                        tecnologia e sustentabilidade.
+                    </p>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Links Rápidos</h4>
+                    <a href="{{ url_for('main.home') }}">Início</a>
+                    <a href="{{ url_for('produto.buscar_produtos') }}"
+                        >Produtos</a
+                    >
+                    <a href="{{ url_for('produto.adicionar_produtos') }}"
+                        >Adicionar Produto</a
+                    >
+                    <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+                    {% endif %}
+                </div>
+
+                <div class="footer-col">
+                    <h4>Suporte/Ajuda</h4>
+                    <a href="{{ url_for('main.relatar_bug_page') }}"
+                        >Central de Ajuda</a
+                    >
+                    <a href="#" onclick="abrirModalTermos(); return false;"
+                        >Termos de Uso</a
+                    >
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contatos</h4>
+                    <a>📧contato@valefeira.com.br </a>
+                    <a>📧suportevaleefeira@gmail.com</a>
+                    <a href="#">📱 (38) 3333-4444</a>
+                    <p>📍 Vale do Jequitinhonha, MG</p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                &copy; 2026 Vale&Feira. Todos os direitos reservados.
+            </div>
+        </footer>
+
+        <div id="modalTermos" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="fecharModalTermos()"
+                    >&times;</span
+                >
+                <div class="modal-body">
+                    <h3>Termos e Condições de Uso</h3>
+
+                    <h4>1. Objeto e Definição</h4>
+                    <p>
+                        A plataforma Vale & Feira é um ambiente digital
+                        destinado à divulgação, promoção e facilitação da
+                        comercialização de produtos cultivados e produzidos no
+                        Vale do Jequitinhonha. O site atua como uma "feira
+                        virtual", conectando produtores locais (agricultores
+                        familiares e artesãos) a potenciais compradores.
+                    </p>
+
+                    <h4>2. Natureza do Serviço (Intermediação de Contato)</h4>
+                    <ul>
+                        <li>
+                            <strong>Divulgação:</strong> A plataforma oferece
+                            espaço para que o produtor cadastre produtos com
+                            fotos, descrição e preço.
+                        </li>
+                        <li>
+                            <strong>Ausência de Intermediários:</strong> O Vale
+                            & Feira não realiza a venda direta nem processa
+                            pagamentos (nesta versão MVP). A plataforma facilita
+                            o contato via WhatsApp ou e-mail, sendo a transação
+                            comercial de inteira responsabilidade das partes
+                            envolvidas.
+                        </li>
+                    </ul>
+
+                    <h4>3. Responsabilidades do Produtor (Vendedor)</h4>
+                    <p>
+                        Ao cadastrar um produto, o usuário produtor garante que:
+                    </p>
+                    <ul>
+                        <li>
+                            As informações sobre o produto (origem, peso, tipo
+                            de cultivo) são verdadeiras.
+                        </li>
+                        <li>
+                            As imagens postadas correspondem fielmente ao
+                            produto ofertado.
+                        </li>
+                        <li>
+                            Possui autorização legal para comercializar os itens
+                            listados.
+                        </li>
+                        <li>
+                            Compromete-se a manter seus dados de contato
+                            atualizados para viabilizar a negociação.
+                        </li>
+                    </ul>
+
+                    <h4>4. Responsabilidades do Consumidor (Comprador)</h4>
+                    <p>
+                        O usuário interessado em adquirir produtos reconhece
+                        que:
+                    </p>
+                    <ul>
+                        <li>
+                            A plataforma não garante a logística de entrega, que
+                            deve ser combinada diretamente com o produtor.
+                        </li>
+                        <li>
+                            A verificação da qualidade e procedência do produto
+                            no ato da entrega é de sua responsabilidade.
+                        </li>
+                    </ul>
+
+                    <h4>5. Propriedade Intelectual e Identidade Regional</h4>
+                    <p>
+                        Todo o conteúdo institucional, logotipos e a estrutura
+                        do site são de propriedade da Equipe de Desenvolvimento
+                        Vale & Feira. A plataforma visa valorizar as tradições e
+                        a identidade do Vale do Jequitinhonha; portanto, o uso
+                        indevido da marca para fins que não o apoio ao produtor
+                        local é proibido.
+                    </p>
+
+                    <h4>6. Limitação de Responsabilidade</h4>
+                    <p>A equipe Vale & Feira não se responsabiliza por:</p>
+                    <ul>
+                        <li>
+                            Negociações frustradas ou não concretizadas entre
+                            usuários.
+                        </li>
+                        <li>
+                            Divergências de preços ou qualidade de produtos.
+                        </li>
+                        <li>
+                            Eventuais problemas no transporte ou perecibilidade
+                            de alimentos após a saída da propriedade rural.
+                        </li>
+                    </ul>
+
+                    <h4>7. Proteção de Dados (LGPD)</h4>
+                    <p>
+                        Em conformidade com a Lei Geral de Proteção de Dados, os
+                        dados coletados (nome, e-mail, telefone e localização)
+                        serão utilizados exclusivamente para:
+                    </p>
+                    <ul>
+                        <li>
+                            Criação do perfil de usuário e autenticação
+                            (Flask-Login).
+                        </li>
+                        <li>
+                            Exibição pública (no caso de produtores) para
+                            viabilizar o contato comercial.
+                        </li>
+                        <li>
+                            Segurança da plataforma contra acessos indevidos.
+                        </li>
+                    </ul>
+
+                    <h4>8. Canal de Ética e Denúncias</h4>
+                    <p>
+                        Reservamo-nos o direito de remover anúncios ou suspender
+                        contas que apresentem comportamentos abusivos,
+                        informações falsas ou que desrespeitem os princípios da
+                        agricultura familiar e economia solidária da região.
+                    </p>
+
+                    <div class="modal-actions">
+                        <button
+                            class="btn-modal-close"
+                            onclick="fecharModalTermos()"
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <a href="{{ url_for('main.home') }}" class="back-link"
-            >Voltar para a página inicial</a
-        >
+        <script>
+            function abrirModalTermos() {
+                document.getElementById("modalTermos").style.display = "flex";
+            }
+            function fecharModalTermos() {
+                document.getElementById("modalTermos").style.display = "none";
+            }
+            window.onclick = function (event) {
+                if (event.target == document.getElementById("modalTermos"))
+                    fecharModalTermos();
+            };
+
+            function closeAllMenus() {
+                document.querySelectorAll(".menu-dropdown").forEach((m) => {
+                    m.classList.remove("open");
+                });
+                document.querySelectorAll(".btn-menu").forEach((b) => {
+                    b.setAttribute("aria-expanded", "false");
+                });
+            }
+
+            document.addEventListener("click", function (e) {
+                const btn = e.target.closest(".btn-menu");
+                const menu = e.target.closest(".menu-dropdown");
+
+                if (btn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const id = btn.getAttribute("data-menu-id");
+                    const dropdown = document.getElementById(id);
+
+                    document.querySelectorAll(".menu-dropdown").forEach((m) => {
+                        if (m !== dropdown) m.classList.remove("open");
+                    });
+                    document.querySelectorAll(".btn-menu").forEach((b) => {
+                        if (b !== btn) b.setAttribute("aria-expanded", "false");
+                    });
+
+                    if (dropdown) {
+                        const willOpen = !dropdown.classList.contains("open");
+                        dropdown.classList.toggle("open", willOpen);
+                        btn.setAttribute(
+                            "aria-expanded",
+                            willOpen ? "true" : "false",
+                        );
+                    }
+                    return;
+                }
+
+                if (menu) return;
+
+                closeAllMenus();
+            });
+        </script>
     </body>
 </html>

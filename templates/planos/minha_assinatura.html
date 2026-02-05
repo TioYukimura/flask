@@ -1,158 +1,838 @@
-{% extends "base_new.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Minha Assinatura - Vale & Feira</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --verde-fundo: #edf7ed;
+            --verde-escuro: #2d5a4c;
+            --verde-primario: #3a6351;
+            --branco: #ffffff;
+            --texto-cor: #4a4a4a;
+            --cinza-texto: #7a7a7a;
+            --vermelho-notificacao: #ff6b6b;
+            --dourado-destaque: #ffc107;
+        }
 
-{% block title %}Minha Assinatura - Vale & Feira{% endblock %}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="text-white fw-bold mb-4">
-                <i data-feather="star" class="me-2"></i>
-                Minha Assinatura
-            </h2>
-        </div>
-    </div>
+        body {
+            background-color: var(--verde-fundo);
+            color: var(--texto-cor);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-    {% if assinatura %}
-    <!-- Active Subscription -->
-    <div class="row mb-4">
-        <div class="col-12 col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <div>
-                            <h4 class="text-primary fw-bold mb-1">
-                                Plano {{ assinatura.plano.nome }}
-                                {% if assinatura.esta_ativo %}
-                                    <span class="badge bg-success ms-2">ATIVO</span>
-                                {% else %}
-                                    <span class="badge bg-danger ms-2">EXPIRADO</span>
-                                {% endif %}
-                            </h4>
-                            <p class="text-muted mb-0">{{ assinatura.plano.descricao or 'Seus produtos em destaque' }}</p>
-                        </div>
-                        <div class="text-end">
-                            <div class="h5 text-primary mb-0">R$ {{ "%.2f"|format(assinatura.valor_pago) }}</div>
-                            <small class="text-muted">{{ assinatura.metodo_pagamento.upper() }}</small>
-                        </div>
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background: transparent;
+            border-bottom: 1px solid #e0eee0;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .logo-img {
+            height: 35px;
+        }
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--verde-escuro);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #adaaa6;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .nav-links a:hover {
+            color: var(--verde-escuro);
+        }
+        .nav-planoslink a {
+            color: rgb(0, 76, 9);
+            font-weight: 900;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            flex: 1;
+            width: 100%;
+        }
+
+        .btn-voltar {
+            text-decoration: none;
+            color: var(--verde-escuro);
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .btn-voltar:hover {
+            opacity: 0.8;
+        }
+
+        .subscription-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(45, 90, 76, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 20px;
+        }
+        .plano-titulo {
+            font-size: 2rem;
+            color: var(--verde-escuro);
+            margin: 0;
+        }
+        .plano-preco {
+            font-size: 1.1rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        .status-badge {
+            background: #e8f5e9;
+            color: var(--verde-escuro);
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            border: 1px solid #c8e6c9;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .detail-item label {
+            display: block;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .detail-item strong {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .beneficios-section {
+            background: #f9fbf9;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #eef6ee;
+        }
+        .beneficios-title {
+            font-size: 1.1rem;
+            color: var(--verde-escuro);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        .lista-beneficios {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        .lista-beneficios li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #555;
+            font-size: 0.95rem;
+        }
+        .lista-beneficios li::before {
+            content: "✅";
+            font-size: 0.9rem;
+        }
+
+        .progress-section {
+            margin-bottom: 40px;
+        }
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .progress-bg {
+            width: 100%;
+            height: 12px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--verde-escuro), #66bb6a);
+            border-radius: 10px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .btn-mudar {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: var(--verde-escuro);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-mudar:hover {
+            background: var(--verde-primario);
+        }
+
+        .btn-cancelar {
+            padding: 15px 25px;
+            background: transparent;
+            color: #d32f2f;
+            border: 1px solid #ffcdd2;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-cancelar:hover {
+            background: #ffebee;
+        }
+
+        .no-plan {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .no-plan h2 {
+            color: #555;
+            margin-top: 15px;
+        }
+        .btn-assinar-agora {
+            display: inline-block;
+            margin-top: 20px;
+            background: var(--dourado-destaque);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px; 
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        .flash-msg {
+            background: #e3f2fd;
+            color: #0d47a1;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid #bbdefb;
+        }
+
+        .footer {
+            background: var(--verde-escuro);
+            color: #c2d6cf;
+            padding: 60px 10% 20px;
+            margin-top: auto;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 40px;
+        }
+        .footer-col h4 {
+            color: white;
+            margin-bottom: 20px;
+        }
+        .footer-col a {
+            display: block;
+            color: #c2d6cf;
+            text-decoration: none;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 0.75rem;
+        }
+.modal {
+                display: none;
+                position: fixed;
+                z-index: 9999;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                background-color: rgba(0, 0, 0, 0.5);
+                align-items: center;
+                justify-content: center;
+            }
+            .modal-content {
+                background-color: #fefefe;
+                margin: auto;
+                padding: 30px;
+                border: 1px solid #888;
+                width: 90%;
+                max-width: 700px;
+                border-radius: 15px;
+                position: relative;
+                max-height: 85vh;
+                overflow-y: auto;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            }
+            .modal-content::-webkit-scrollbar {
+                width: 8px;
+            }
+            .modal-content::-webkit-scrollbar-thumb {
+                background: #ccc;
+                border-radius: 4px;
+            }
+            .close-btn {
+                color: #aaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+                line-height: 1;
+            }
+            .modal-body h3 {
+                color: #1f5c4d;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #eef7ee;
+                padding-bottom: 10px;
+            }
+            .modal-body p {
+                margin-bottom: 15px;
+                line-height: 1.6;
+                color: #444;
+                font-size: 0.95rem;
+                text-align: justify;
+            }
+
+            .modal-body h4 {
+                color: #2d5a4c;
+                margin: 20px 0 10px 0;
+                font-size: 1.1rem;
+            }
+            .modal-body ul {
+                margin-bottom: 15px;
+                padding-left: 20px;
+                color: #444;
+                font-size: 0.95rem;
+            }
+            .modal-body li {
+                margin-bottom: 5px;
+            }
+
+            .btn-modal-close {
+                background: #2d5a4c;
+                color: white;
+                border: none;
+                padding: 10px 25px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-weight: bold;
+                margin-top: 15px;
+            }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(45, 90, 76, 0.6); 
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-box {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-overlay.active .modal-box {
+            transform: translateY(0);
+        }
+        .modal-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .modal-title {
+            color: var(--verde-escuro);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        .modal-text {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .btn-modal-cancel {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            background: #e0e0e0;
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+            transition: 0.2s;
+        }
+        .btn-modal-cancel:hover {
+            background: #d0d0d0;
+        }
+        .btn-modal-confirm {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            background: #d32f2f;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+            transition: 0.2s;
+            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.3);
+        }
+        .btn-modal-confirm:hover {
+            background: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="{{ url_for('main.home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Vale&Feira" class="logo-img">
+            <span class="logo-text">Vale&Feira</span>
+        </a>
+       <nav class="nav-links">
+                <a href="{{ url_for('main.home') }}">Início</a>
+                <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('chat.meus_chats') }}">
+                    Conversas {% if mensagens_nao_lidas is defined and
+                    mensagens_nao_lidas > 0 %}<span class="bolinha-notificacao"
+                        >{{ mensagens_nao_lidas }}</span
+                    >{% endif %}
+                </a>
+                <nav class="nav-planoslink">
+                    <a href="{{ url_for('planos.lista_planos') }}"
+                        >🌟Planos🌟</a
+                    >
+                </nav>
+                <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+                <a href="{{ url_for('auth.logout') }}" style="color: #ff6b6b"
+                    >Sair</a
+                >
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-login"
+                    >Login</a
+                >
+                <a href="{{ url_for('auth.registrar') }}" class="btn-cadastro"
+                    >Cadastrar</a
+                >
+                {% endif %}
+            </nav>
+    </header>
+
+    <main class="container">
+        
+        <a href="{{ url_for('perfil.perfil') }}" class="btn-voltar">← Voltar ao Perfil</a>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-msg">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if assinatura_usuario and assinatura_usuario.esta_ativo %}
+            <div class="subscription-card">
+                
+                <div class="header-card">
+                    <div>
+                        <h1 class="plano-titulo">Plano {{ assinatura_usuario.plano.nome }}</h1>
+                        <p class="plano-preco">R$ {{ "%.2f"|format(assinatura_usuario.valor_pago) }} / mês</p>
                     </div>
+                    <div class="status-badge">● Ativo</div>
+                </div>
 
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <strong class="text-muted small">DATA DE INÍCIO</strong>
-                            <div>{{ assinatura.data_inicio.strftime('%d/%m/%Y') }}</div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong class="text-muted small">VÁLIDO ATÉ</strong>
-                            <div>{{ assinatura.data_fim.strftime('%d/%m/%Y') }}</div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <strong class="text-muted small">DIAS RESTANTES</strong>
-                            <div class="{% if assinatura.dias_restantes <= 7 %}text-warning{% else %}text-success{% endif %}">
-                                {{ assinatura.dias_restantes }} dias
-                            </div>
-                        </div>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <label>Data de Início</label>
+                        <strong>{{ assinatura_usuario.data_inicio.strftime('%d/%m/%Y') }}</strong>
                     </div>
+                    <div class="detail-item">
+                        <label>Próxima Renovação</label>
+                        <strong style="color: var(--verde-escuro);">{{ assinatura_usuario.data_fim.strftime('%d/%m/%Y') }}</strong>
+                    </div>
+                    <div class="detail-item">
+                        <label>Forma de Pagamento</label>
+                        <strong style="text-transform: capitalize;">
+                            {% if assinatura_usuario.metodo_pagamento == 'pix' %} 💠 PIX {% else %} 💳 Cartão {% endif %}
+                        </strong>
+                    </div>
+                </div>
 
-                    {% if assinatura.dias_restantes <= 7 and assinatura.esta_ativo %}
-                    <div class="alert alert-warning mt-3">
-                        <i data-feather="alert-triangle" class="me-2"></i>
-                        <strong>Seu plano expira em breve!</strong>
-                        <a href="{{ url_for('planos.lista_planos') }}" class="alert-link">Renovar agora</a>
+                <div class="beneficios-section">
+                    <h3 class="beneficios-title">Seus Benefícios:</h3>
+                    <ul class="lista-beneficios">
+                        {% if assinatura_usuario.plano.beneficios %}
+                            {% for beneficio in assinatura_usuario.plano.beneficios.split('\n') %}
+                                <li>{{ beneficio }}</li>
+                            {% endfor %}
+                        {% else %}
+                            <li>Destaque de Produtos</li>
+                            <li>Prioridade nas Buscas</li>
+                            <li>Suporte Especializado</li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <div class="progress-section">
+                    {% set dias_totais = 30 %}
+                    {% set dias_restantes = assinatura_usuario.dias_restantes %}
+                    {% set porcentagem = ((dias_totais - dias_restantes) / dias_totais) * 100 %}
+                    
+                    <div class="progress-labels">
+                        <span>Ciclo Mensal</span>
+                        <span>{{ dias_restantes }} dias restantes</span>
                     </div>
+                    <div class="progress-bg">
+                        <div class="progress-fill" style="width: {{ porcentagem }}%;"></div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <a href="{{ url_for('planos.lista_planos') }}" class="btn-mudar">Alterar Plano (Upgrade)</a>
+                    
+                    <form id="form-cancelamento" action="{{ url_for('planos.cancelar_assinatura') }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        
+                        <button type="button" class="btn-cancelar" onclick="abrirModal('{{ assinatura_usuario.data_fim.strftime('%d/%m/%Y') }}')">
+                            Cancelar Assinatura
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        {% else %}
+            <div class="subscription-card no-plan">
+                <div style="font-size: 4rem; margin-bottom: 15px;">🍃</div>
+                <h2>Você está no Plano Gratuito</h2>
+                <p style="color: #666; margin-bottom: 30px;">Assine um plano Premium para destacar seus produtos e vender mais.</p>
+                <a href="{{ url_for('planos.lista_planos') }}" class="btn-assinar-agora">Ver Planos Disponíveis</a>
+            </div>
+        {% endif %}
+    </main>
+
+    <footer class="footer">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Vale&Feira</h4>
+                    <p>
+                        Conectando produtores e consumidores através da
+                        tecnologia e sustentabilidade.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h4>Links Rápidos</h4>
+                    <a href="{{ url_for('main.home') }}">Início</a>
+                    <a href="{{ url_for('produto.buscar_produtos') }}"
+                        >Produtos</a
+                    >
+                    <a href="{{ url_for('produto.adicionar_produtos') }}"
+                        >Adicionar Produto</a
+                    >
+                    <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
                     {% endif %}
                 </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-md-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <div class="text-primary mb-3">
-                        <i data-feather="award" style="width: 48px; height: 48px;"></i>
-                    </div>
-                    <h5 class="fw-bold">Status Premium</h5>
-                    <p class="text-muted mb-3">Seus produtos estão sendo destacados na plataforma!</p>
-                    <a href="{{ url_for('main.meus_produtos') }}" class="btn btn-outline-primary btn-sm">
-                        Ver Meus Produtos
-                    </a>
+                <div class="footer-col">
+                    <h4>Suporte/Ajuda</h4>
+                    <a href="{{ url_for('main.relatar_bug_page') }}"
+                        >Central de Ajuda</a
+                    >
+                    <a href="#" onclick="abrirModalTermos(); return false;"
+                        >Termos de Uso</a
+                    >
+                </div>
+                <div class="footer-col">
+                    <h4>Contatos</h4>
+                    <a>📧contato@valefeira.com.br </a>
+                    <a>📧suportevaleefeira@gmail.com</a>
+                    <a href="#">📱 (38) 3333-4444</a>
+                    <p>📍 Vale do Jequitinhonha, MG</p>
                 </div>
             </div>
-        </div>
-    </div>
-    {% else %}
-    <!-- No Active Subscription -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body text-center py-5">
-                    <div class="text-muted mb-4">
-                        <i data-feather="star" style="width: 64px; height: 64px;"></i>
-                    </div>
-                    <h4 class="fw-bold mb-3">Nenhum plano ativo</h4>
-                    <p class="text-muted mb-4">
-                        Assine um plano premium para destacar seus produtos e aumentar suas vendas!
+
+            <div class="footer-bottom">
+                &copy; 2026 Vale&Feira. Todos os direitos reservados.
+            </div>
+        </footer>
+        <div id="modalTermos" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="fecharModalTermos()"
+                    >&times;</span
+                >
+                <div class="modal-body">
+                    <h3>Termos e Condições de Uso</h3>
+
+                    <h4>1. Objeto e Definição</h4>
+                    <p>
+                        A plataforma Vale & Feira é um ambiente digital
+                        destinado à divulgação, promoção e facilitação da
+                        comercialização de produtos cultivados e produzidos no
+                        Vale do Jequitinhonha. O site atua como uma "feira
+                        virtual", conectando produtores locais (agricultores
+                        familiares e artesãos) a potenciais compradores.
                     </p>
-                    <a href="{{ url_for('planos.lista_planos') }}" class="btn btn-primary">
-                        Ver Planos Disponíveis
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
-    <!-- Subscription History -->
-    {% if historico %}
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="fw-bold text-primary mb-4">
-                        <i data-feather="clock" class="me-2"></i>
-                        Histórico de Assinaturas
-                    </h5>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Plano</th>
-                                    <th>Período</th>
-                                    <th>Valor</th>
-                                    <th>Pagamento</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for sub in historico %}
-                                <tr>
-                                    <td class="fw-bold">{{ sub.plano.nome }}</td>
-                                    <td>
-                                        {{ sub.data_inicio.strftime('%d/%m/%Y') }}
-                                        -
-                                        {{ sub.data_fim.strftime('%d/%m/%Y') }}
-                                    </td>
-                                    <td class="text-primary fw-bold">R$ {{ "%.2f"|format(sub.valor_pago) }}</td>
-                                    <td>
-                                        <span class="badge bg-secondary">{{ sub.metodo_pagamento.upper() }}</span>
-                                    </td>
-                                    <td>
-                                        {% if sub.esta_ativo %}
-                                            <span class="badge bg-success">Ativo</span>
-                                        {% else %}
-                                            <span class="badge bg-secondary">Expirado</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <h4>2. Natureza do Serviço (Intermediação de Contato)</h4>
+                    <ul>
+                        <li>
+                            <strong>Divulgação:</strong> A plataforma oferece
+                            espaço para que o produtor cadastre produtos com
+                            fotos, descrição e preço.
+                        </li>
+                        <li>
+                            <strong>Ausência de Intermediários:</strong> O Vale
+                            & Feira não realiza a venda direta nem processa
+                            pagamentos (nesta versão MVP). A plataforma facilita
+                            o contato via WhatsApp ou e-mail, sendo a transação
+                            comercial de inteira responsabilidade das partes
+                            envolvidas.
+                        </li>
+                    </ul>
+
+                    <h4>3. Responsabilidades do Produtor (Vendedor)</h4>
+                    <p>
+                        Ao cadastrar um produto, o usuário produtor garante que:
+                    </p>
+                    <ul>
+                        <li>
+                            As informações sobre o produto (origem, peso, tipo
+                            de cultivo) são verdadeiras.
+                        </li>
+                        <li>
+                            As imagens postadas correspondem fielmente ao
+                            produto ofertado.
+                        </li>
+                        <li>
+                            Possui autorização legal para comercializar os itens
+                            listados.
+                        </li>
+                        <li>
+                            Compromete-se a manter seus dados de contato
+                            atualizados para viabilizar a negociação.
+                        </li>
+                    </ul>
+
+                    <h4>4. Responsabilidades do Consumidor (Comprador)</h4>
+                    <p>
+                        O usuário interessado em adquirir produtos reconhece
+                        que:
+                    </p>
+                    <ul>
+                        <li>
+                            A plataforma não garante a logística de entrega, que
+                            deve ser combinada diretamente com o produtor.
+                        </li>
+                        <li>
+                            A verificação da qualidade e procedência do produto
+                            no ato da entrega é de sua responsabilidade.
+                        </li>
+                    </ul>
+
+                    <h4>5. Propriedade Intelectual e Identidade Regional</h4>
+                    <p>
+                        Todo o conteúdo institucional, logotipos e a estrutura
+                        do site são de propriedade da Equipe de Desenvolvimento
+                        Vale & Feira. A plataforma visa valorizar as tradições e
+                        a identidade do Vale do Jequitinhonha; portanto, o uso
+                        indevido da marca para fins que não o apoio ao produtor
+                        local é proibido.
+                    </p>
+
+                    <h4>6. Limitação de Responsabilidade</h4>
+                    <p>A equipe Vale & Feira não se responsabiliza por:</p>
+                    <ul>
+                        <li>
+                            Negociações frustradas ou não concretizadas entre
+                            usuários.
+                        </li>
+                        <li>
+                            Divergências de preços ou qualidade de produtos.
+                        </li>
+                        <li>
+                            Eventuais problemas no transporte ou perecibilidade
+                            de alimentos após a saída da propriedade rural.
+                        </li>
+                    </ul>
+
+                    <h4>7. Proteção de Dados (LGPD)</h4>
+                    <p>
+                        Em conformidade com a Lei Geral de Proteção de Dados, os
+                        dados coletados (nome, e-mail, telefone e localização)
+                        serão utilizados exclusivamente para:
+                    </p>
+                    <ul>
+                        <li>
+                            Criação do perfil de usuário e autenticação
+                            (Flask-Login).
+                        </li>
+                        <li>
+                            Exibição pública (no caso de produtores) para
+                            viabilizar o contato comercial.
+                        </li>
+                        <li>
+                            Segurança da plataforma contra acessos indevidos.
+                        </li>
+                    </ul>
+
+                    <h4>8. Canal de Ética e Denúncias</h4>
+                    <p>
+                        Reservamo-nos o direito de remover anúncios ou suspender
+                        contas que apresentem comportamentos abusivos,
+                        informações falsas ou que desrespeitem os princípios da
+                        agricultura familiar e economia solidária da região.
+                    </p>
+
+                    <div style="text-align: center; margin-top: 20px">
+                        <button
+                            class="btn-modal-close"
+                            onclick="fecharModalTermos()"
+                        >
+                            Fechar
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <script>
+            function abrirModalTermos() {
+                document.getElementById("modalTermos").style.display = "flex";
+            }
+            function fecharModalTermos() {
+                document.getElementById("modalTermos").style.display = "none";
+            }
+            window.onclick = function (event) {
+                if (event.target == document.getElementById("modalTermos")) {
+                    fecharModalTermos();
+                }
+            };
+        </script>
+
+    <div id="modalCancelamento" class="modal-overlay">
+        <div class="modal-box">
+            <span class="modal-icon">⚠️</span>
+            <h3 class="modal-title">Tem certeza?</h3>
+            <p class="modal-text">
+                Ao cancelar, sua assinatura não será renovada.<br>
+                Mas não se preocupe: você continua com acesso total aos benefícios até o dia <strong id="dataFimModal" style="color: var(--verde-escuro);"></strong>.
+            </p>
+            <div class="modal-buttons">
+                <button class="btn-modal-cancel" onclick="fecharModal()">Manter Plano</button>
+                <button class="btn-modal-confirm" onclick="confirmarRealmente()">Sim, Cancelar</button>
+            </div>
+        </div>
     </div>
-    {% endif %}
-</div>
-{% endblock %}
+
+    <script>
+        function abrirModal(dataFim) {
+            document.getElementById('dataFimModal').innerText = dataFim;
+            document.getElementById('modalCancelamento').classList.add('active');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalCancelamento').classList.remove('active');
+        }
+
+        function confirmarRealmente() {
+            document.getElementById('form-cancelamento').submit();
+        }
+
+        document.getElementById('modalCancelamento').addEventListener('click', function(e) {
+            if (e.target === this) {
+                fecharModal();
+            }
+        });
+    </script>
+
+</body>
+</html>

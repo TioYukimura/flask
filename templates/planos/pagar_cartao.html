@@ -1,131 +1,199 @@
-{% extends "base_new.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Cartão | Vale & Feira</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .pagamento-container {
+            max-width: 550px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
 
-{% block title %}Pagamento Cartão - Vale & Feira{% endblock %}
+        .cartao-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+            text-align: center;
+        }
 
-{% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-center mb-4">
-                        <div class="text-primary mb-3">
-                            💳
-                        </div>
-                        <h4 class="fw-bold text-primary">Pagamento com Cartão</h4>
-                        <p class="text-muted">Preencha os dados do seu cartão de crédito</p>
+        .resumo-pagamento {
+            background-color: #f9fff9;
+            border: 2px dashed #2e7d32;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 25px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-valor {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2e7d32;
+        }
+
+        .selos-seguranca {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .badge-cartao {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #666;
+            margin: 0 5px;
+            border: 1px solid #ddd;
+        }
+
+        .row-flex {
+            display: flex;
+            gap: 15px;
+        }
+        .col-flex {
+            flex: 1;
+        }
+
+        .invalid-feedback {
+            color: #d32f2f;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: block;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 18px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 1rem;
+            background-color: #f8fafc;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="{{ url_for('main.home') }}">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Vale & Feira" class="logo">
+        </a>
+        <nav class="topbar-center">
+            <a href="{{ url_for('planos.lista_planos') }}">Voltar aos Planos</a>
+        </nav>
+    </header>
+
+    <main class="pagamento-container">
+        <div class="form-box">
+            <span class="cartao-icon">💳</span>
+            <h2 style="text-align: center; color: #2e7d32; margin-bottom: 10px;">Pagamento com Cartão</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">Insira os dados para ativar seu plano <strong>{{ plano.nome }}</strong></p>
+
+            <form method="POST">
+                {{ formulario.hidden_tag() }}
+                
+                <div class="form-group">
+                    <label>Nome do Titular (como no cartão)</label>
+                    {{ formulario.nome_titular(placeholder="JOAO M SILVA") }}
+                    {% for error in formulario.nome_titular.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label>Número do Cartão</label>
+                    {{ formulario.numero(placeholder="0000 0000 0000 0000") }}
+                    {% for error in formulario.numero.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="row-flex">
+                    <div class="form-group col-flex">
+                        <label>Validade</label>
+                        {{ formulario.validade(placeholder="MM/AA") }}
+                        {% for error in formulario.validade.errors %}
+                            <span class="invalid-feedback">{{ error }}</span>
+                        {% endfor %}
                     </div>
-
-                    <form method="POST">
-                        {{ formulario.hidden_tag() }}
-                        
-                        <div class="mb-3">
-                            {{ formulario.nome_titular.label(class="form-label fw-bold") }}
-                            {{ formulario.nome_titular(class="form-control" + (" is-invalid" if formulario.nome_titular.errors else "")) }}
-                            {% if formulario.nome_titular.errors %}
-                                {% for error in formulario.nome_titular.errors %}
-                                    <div class="invalid-feedback">{{ error }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-
-                        <div class="mb-3">
-                            {{ formulario.numero.label(class="form-label fw-bold") }}
-                            {{ formulario.numero(class="form-control" + (" is-invalid" if formulario.numero.errors else ""), placeholder="0000 0000 0000 0000") }}
-                            {% if formulario.numero.errors %}
-                                {% for error in formulario.numero.errors %}
-                                    <div class="invalid-feedback">{{ error }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="mb-3">
-                                    {{ formulario.validade.label(class="form-label fw-bold") }}
-                                    {{ formulario.validade(class="form-control" + (" is-invalid" if formulario.validade.errors else ""), placeholder="12/28") }}
-                                    {% if formulario.validade.errors %}
-                                        {% for error in formulario.validade.errors %}
-                                            <div class="invalid-feedback">{{ error }}</div>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="mb-3">
-                                    {{ formulario.cvv.label(class="form-label fw-bold") }}
-                                    {{ formulario.cvv(class="form-control" + (" is-invalid" if formulario.cvv.errors else ""), placeholder="123") }}
-                                    {% if formulario.cvv.errors %}
-                                        {% for error in formulario.cvv.errors %}
-                                            <div class="invalid-feedback">{{ error }}</div>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            {{ formulario.parcelas.label(class="form-label fw-bold") }}
-                            {{ formulario.parcelas(class="form-select" + (" is-invalid" if formulario.parcelas.errors else "")) }}
-                            {% if formulario.parcelas.errors %}
-                                {% for error in formulario.parcelas.errors %}
-                                    <div class="invalid-feedback">{{ error }}</div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-
-                        <!-- Resumo do Pedido -->
-                        <div class="bg-light p-3 rounded mb-4">
-                            <div class="d-flex justify-content-between">
-                                <strong>Total a pagar:</strong>
-                                <strong class="text-primary">R$ {{ "%.2f"|format(plano.preco) }}</strong>
-                            </div>
-                        </div>
-
-                        <div class="d-grid">
-                            {{ formulario.enviar(class="btn btn-primary btn-lg") }}
-                        </div>
-                    </form>
-
-                    <!-- Security badges -->
-                    <div class="text-center mt-4">
-                        <small class="text-muted">
-                            <i data-feather="shield" class="me-1" style="width: 14px; height: 14px;"></i>
-                            Dados protegidos com criptografia SSL
-                        </small>
-                        <br>
-                        <div class="mt-2">
-                            <span class="badge bg-secondary me-2">VISA</span>
-                            <span class="badge bg-secondary me-2">MASTERCARD</span>
-                            <span class="badge bg-secondary">ELO</span>
-                        </div>
+                    <div class="form-group col-flex">
+                        <label>CVV</label>
+                        {{ formulario.cvv(placeholder="123") }}
+                        {% for error in formulario.cvv.errors %}
+                            <span class="invalid-feedback">{{ error }}</span>
+                        {% endfor %}
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Parcelas</label>
+                    {{ formulario.parcelas() }}
+                    {% for error in formulario.parcelas.errors %}
+                        <span class="invalid-feedback">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="resumo-pagamento">
+                    <span style="font-weight: 600; color: #555;">Total a pagar:</span>
+                    <span class="total-valor">R$ {{ "%.2f"|format(plano.preco) }}</span>
+                </div>
+
+                <button type="submit" class="btn-verde" style="width: 100%; font-size: 1.1rem; padding: 15px;">
+                    Confirmar Pagamento
+                </button>
+            </form>
+
+            <div class="selos-seguranca">
+                <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">
+                    🔒 Pagamento 100% Seguro via Criptografia SSL
+                </p>
+                <div>
+                    <span class="badge-cartao">VISA</span>
+                    <span class="badge-cartao">MASTERCARD</span>
+                    <span class="badge-cartao">ELO</span>
+                    <span class="badge-cartao">AMEX</span>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+    </main>
 
-<script>
-// Format card number input
-document.querySelector('input[name="numero"]').addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\D/g, '');
-    value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
-    e.target.value = value;
-});
+    <footer style="text-align: center; padding: 40px 0; color: #aaa; font-size: 0.8rem;">
+        &copy; 2024 Vale & Feira
+    </footer>
 
-// Format expiry date input
-document.querySelector('input[name="validade"]').addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length >= 2) {
-        value = value.substring(0, 2) + '/' + value.substring(2, 4);
-    }
-    e.target.value = value;
-});
+    <script>
+        document.querySelector('input[name="numero"]').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+            e.target.value = value.substring(0, 19);
+        });
 
-// Format CVV input
-document.querySelector('input[name="cvv"]').addEventListener('input', function(e) {
-    e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
-});
-</script>
-{% endblock %}
+        document.querySelector('input[name="validade"]').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value.substring(0, 5);
+        });
+
+        document.querySelector('input[name="cvv"]').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+        });
+    </script>
+</body>
+</html>

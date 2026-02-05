@@ -1,189 +1,525 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8" />
-    <title>Perfil do Usuário</title>
-    <style>
-        body {
-            margin: 0;
-            background-color: rgb(20, 99, 95);
-            font-family: Arial, Helvetica, sans-serif;
-        }
+<!doctype html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Perfil - Vale & Feira</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+            rel="stylesheet"
+        />
 
-        .topo {
-            background-color: white;
-            height: 80px;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px 0 0;
-            box-sizing: border-box;
-        }
-
-        .login-link {
-            background-color: black;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
-        .login-link:hover {
-            background-color: gray;
-        }
-
-        .conteudo {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-        }
-
-        h1, h2 {
-            color: #143f3d;
-        }
-
-        .produtos {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: flex-start;
-            margin-top: 20px;
-        }
-
-        .produto {
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            padding: 15px;
-            width: 200px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .botao-excluir {
-            background-color: #c00;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 6px 12px;
-            cursor: pointer;
-            font-weight: bold;
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-        }
-
-        .botao-excluir:hover {
-            background-color: #a00;
-        }
-
-        .chat-btn {
-            display: inline-block;
-            margin-top: 10px;
-            background-color: rgb(20, 99, 95);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-        }
-
-        .chat-btn:hover {
-            background-color: rgb(15, 80, 76);
-        }
-
-        .mensagens {
-            margin-top: 20px;
-        }
-
-        .mensagens li {
-            list-style: none;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-
-        .success { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: #721c24; }
-        .info { background-color: #d1ecf1; color: #0c5460; }
-
-        .botao-add {
-            display: inline-block;
-            margin-top: 20px;
-            background-color: rgb(20, 99, 95);
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-
-        .botao-add:hover {
-            background-color: rgb(15, 80, 76);
-        }
-    </style>
-<body>
-
-<div class="topo">
-    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" style="height: 175px; margin-left: -10px;">
-    <div> <a href="{{ url_for('chat.meus_chats') }}" class="login-link">Meus Chats</a>
-        
-        <a href="{{ url_for('planos.minha_assinatura') }}" class="login-link">Minha Assinatura</a>
-        <a href="{{ url_for('planos.lista_planos') }}" class="login-link">Ver Planos</a>
-        
-        <a href="{{ url_for('auth.logout') }}" class="login-link">Sair</a>
-    </div>
-</div>
-
-<div class="conteudo">
-    <h1>Olá, {{ current_user.nome }}</h1>
-    <p><strong>Email:</strong> {{ current_user.email or 'Não informado' }}</p>
-    <p><strong>Cidade:</strong> {{ current_user.cidade or 'Não informado' }}</p>
-
-    <div class="mensagens">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-          {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    </div>
-
-    <h2>Seus Produtos</h2>
-    {% if produtos %}
-    <div class="produtos">
-        {% for produto in produtos %}
-        <div class="produto">
-            <strong>{{ produto.nome }}</strong><br>
-            {{ produto.descricao or "Sem descrição" }}<br>
-            <span>R$ {{ "%.2f"|format(produto.preco) }}</span>
-            <form action="{{ url_for('produto.excluir_produto', id=produto.id) }}" method="post" style="display:inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="botao-excluir">Excluir</button>
-            </form>
-            <a href="{{ url_for('chat.chat', produto_id=produto.id, outro_usuario_id=produto.usuario_id) }}" class="chat-btn">
-                Ver conversas
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/perfil.css') }}"
+        />
+    </head>
+    <body>
+        <header class="barra-topo">
+            <a href="{{ url_for('main.home') }}" class="area-logo">
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Vale&Feira"
+                    class="imagem-logo"
+                />
+                <span class="texto-logo">Vale&Feira</span>
             </a>
+
+            <nav class="links-navegacao">
+                <a href="{{ url_for('main.home') }}">Início</a>
+                <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('chat.meus_chats') }}">
+                    Conversas {% if mensagens_nao_lidas is defined and
+                    mensagens_nao_lidas > 0 %}
+                    <span class="bolinha-notificacao"
+                        >{{ mensagens_nao_lidas }}</span
+                    >
+                    {% endif %}
+                </a>
+
+                <a
+                    href="{{ url_for('planos.lista_planos') }}"
+                    class="link-planos"
+                    >🌟Planos🌟</a
+                >
+                <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+                <a href="{{ url_for('auth.logout') }}" class="link-sair"
+                    >Sair</a
+                >
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="link-login"
+                    >Login</a
+                >
+                <a href="{{ url_for('auth.registrar') }}" class="link-cadastro"
+                    >Cadastrar</a
+                >
+                {% endif %}
+            </nav>
+        </header>
+
+        <form
+            id="form-upload-foto"
+            action="{{ url_for('perfil.upload_foto') }}"
+            method="POST"
+            enctype="multipart/form-data"
+            class="formulario-upload-foto"
+        >
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input
+                type="file"
+                name="foto"
+                id="input-foto"
+                accept="image/*"
+                class="input-foto"
+                onchange="document.getElementById('form-upload-foto').submit()"
+            />
+        </form>
+
+        <main class="conteudo">
+            {% with messages = get_flashed_messages(with_categories=true) %} {%
+            if messages %} {% for category, message in messages %}
+            <div class="mensagem-flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %} {% endif %} {% endwith %}
+
+            <section class="card-perfil">
+                <div class="caixa-plano">
+                    {% set assinatura = current_user.assinatura_atual() %} {% if
+                    assinatura %}
+                    <span class="selo-plano selo-premium"
+                        >⭐ {{ assinatura.plano.nome }}</span
+                    >
+                    <span class="texto-validade"
+                        >Expira em: {{ assinatura.dias_restantes }} dias</span
+                    >
+
+                    {% if assinatura.plano.lista_beneficios %}
+                    <ul class="lista-beneficios">
+                        {% for beneficio in assinatura.plano.lista_beneficios %}
+                        <li>{{ beneficio }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %} {% else %}
+                    <span class="selo-plano selo-gratis">Sem plano</span>
+                    {% endif %}
+                </div>
+
+                <div
+                    class="avatar-perfil"
+                    onclick="document.getElementById('input-foto').click()"
+                    title="Clique para alterar a foto"
+                    style="{% if current_user.foto_perfil and current_user.foto_perfil != 'default_profile.png' %}background-image: url('{{ url_for('static', filename='uploads/' + current_user.foto_perfil) }}');{% endif %}"
+                >
+                    {% if not current_user.foto_perfil or
+                    current_user.foto_perfil == 'default_profile.png' %}
+                    <span class="avatar-inicial"
+                        >{{ current_user.nome[0]|upper }}</span
+                    >
+                    {% endif %}
+                    <div class="avatar-acao">📷 Alterar</div>
+                </div>
+
+                <div class="info-perfil">
+                    <h2 class="nome-usuario">{{ current_user.nome }}</h2>
+                    <p class="linha-info">
+                        Cliente desde {{ current_user.data_cadastro.strftime('%b
+                        de %Y') }}
+                    </p>
+                    <p class="linha-info">📧 {{ current_user.email }}</p>
+                    <p class="linha-info">
+                        📍 {{ current_user.cidade or 'Cidade não informada' }}
+                    </p>
+                </div>
+            </section>
+
+            <section class="grade-acoes">
+                <div class="card-acao">
+                    <h3 class="titulo-card">👤 Meus Dados</h3>
+                    <p class="texto-card">
+                        Visualize e edite suas informações pessoais.
+                    </p>
+                    <a
+                        href="{{ url_for('perfil.editar_perfil') }}"
+                        class="botao-card"
+                        >Editar Dados</a
+                    >
+                </div>
+
+                {% set assinatura = current_user.assinatura_atual() %} {% if
+                assinatura and ('produtor' in assinatura.plano.nome.lower() or
+                'premium' in assinatura.plano.nome.lower()) %}
+                <div class="card-acao card-destaque">
+                    <h3 class="titulo-card">📊 Relatório</h3>
+                    <p class="texto-card">
+                        Acompanhe o desempenho dos seus anúncios.
+                    </p>
+                    <a
+                        href="{{ url_for('relatorio.dashboard') }}"
+                        class="botao-card"
+                        >Ver Painel</a
+                    >
+                </div>
+                {% endif %}
+
+                <div class="card-acao">
+                    <h3 class="titulo-card">➕ Adicionar produto</h3>
+                    <p class="texto-card">
+                        Adicione seus produtos para venda na plataforma.
+                    </p>
+                    <a
+                        href="{{ url_for('produto.adicionar_produtos') }}"
+                        class="botao-card"
+                        >Adicionar Produto</a
+                    >
+                </div>
+
+                <div class="card-acao">
+                    <h3 class="titulo-card">💬 Conversas</h3>
+                    <p class="texto-card">
+                        Acesse suas conversas com outros produtores.
+                    </p>
+                    <a
+                        href="{{ url_for('chat.meus_chats') }}"
+                        class="botao-card"
+                        >Ver Conversas</a
+                    >
+                </div>
+
+                <div class="card-acao">
+                    <h3 class="titulo-card">⭐ Planos ⭐</h3>
+                    <p class="texto-card">
+                        Gerencie sua assinatura e benefícios.
+                    </p>
+                    <a
+                        href="{{ url_for('planos.minha_assinatura') }}"
+                        class="botao-card"
+                        >Ver Assinatura</a
+                    >
+                </div>
+            </section>
+
+            <section class="secao-produtos">
+                <div class="cabecalho-secao">
+                    <h3 class="titulo-secao">Meus Produtos adicionados</h3>
+
+                    {% set assinatura = current_user.assinatura_atual() %} {% if
+                    assinatura %} {% set nome_plano =
+                    assinatura.plano.nome.lower() %} {% set limite = 0 %} {% if
+                    'básico' in nome_plano or 'basico' in nome_plano %} {% set
+                    limite = 5 %} {% elif 'produtor' in nome_plano %} {% set
+                    limite = 20 %} {% elif 'premium' in nome_plano %} {% set
+                    limite = 9999 %} {% endif %} {% set qtd_destaques = produtos
+                    | selectattr('destaque', 'equalto', true) | list | length %}
+
+                    <span
+                        class="contador-destaques {{ 'contador-limite' if qtd_destaques >= limite and limite < 9999 else '' }}"
+                    >
+                        ⭐ Destaques: <strong>{{ qtd_destaques }}</strong> / {{
+                        'Ilimitado' if limite > 1000 else limite }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                {% if produtos %}
+                <div class="grade-produtos">
+                    {% for produto in produtos %}
+                    <div class="card-produto">
+                        {% if produto.destaque %}
+                        <div class="selo-destaque" title="Produto em Destaque">
+                            ⭐
+                        </div>
+                        {% endif %}
+
+                        <div class="conteudo-produto">
+                            {% if produto.imagem %} {% if
+                            produto.imagem.startswith('http') %} {% set
+                            final_url = produto.imagem %} {% else %} {% set
+                            final_url = url_for('static',
+                            filename=produto.imagem) %} {% endif %} {% else %}
+                            {% set final_url = url_for('static',
+                            filename='img/sem_imagem.png') %} {% endif %}
+
+                            <img
+                                src="{{ final_url }}"
+                                class="imagem-produto"
+                                alt="Foto"
+                                onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/sem_imagem.png') }}';"
+                            />
+
+                            <div class="info-produto">
+                                <h4 class="nome-produto">{{ produto.nome }}</h4>
+                                <div class="preco-produto">
+                                    R$ {{ "%.2f"|format(produto.preco) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="acoes-produto">
+                            <form
+                                action="{{ url_for('produto.destacar_produto', id=produto.id) }}"
+                                method="POST"
+                                class="formulario-acao"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    value="{{ csrf_token() }}"
+                                />
+
+                                {% if produto.destaque %}
+                                <button
+                                    type="submit"
+                                    class="botao-remover-destaque"
+                                >
+                                    Remover Destaque
+                                </button>
+                                {% else %}
+                                <button type="submit" class="botao-destacar">
+                                    ⭐ Destacar
+                                </button>
+                                {% endif %}
+                            </form>
+
+                            <a
+                                href="{{ url_for('produto.pagina_produto', id=produto.id) }}"
+                                class="link-ver"
+                                >Ver</a
+                            >
+                            <a
+                                href="{{ url_for('produto.editar_produto', id=produto.id) }}"
+                                class="link-editar"
+                                >Editar</a
+                            >
+
+                            <form
+                                action="{{ url_for('produto.excluir_produto', id=produto.id) }}"
+                                method="POST"
+                                class="formulario-acao"
+                                onsubmit="return confirm('Tem certeza que deseja excluir?');"
+                            >
+                                <input
+                                    type="hidden"
+                                    name="csrf_token"
+                                    value="{{ csrf_token() }}"
+                                />
+                                <button type="submit" class="botao-excluir">
+                                    Excluir
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="estado-vazio">
+                    <p class="estado-vazio-texto">
+                        Você ainda não cadastrou nenhum produto.
+                    </p>
+                </div>
+                {% endif %}
+            </section>
+        </main>
+
+        <footer class="rodape">
+            <div class="grade-rodape">
+                <div class="coluna-rodape">
+                    <h4>Vale&Feira</h4>
+                    <p>
+                        Conectando produtores e consumidores através da
+                        tecnologia e sustentabilidade.
+                    </p>
+                </div>
+
+                <div class="coluna-rodape">
+                    <h4>Links Rápidos</h4>
+                    <a href="{{ url_for('main.home') }}">Início</a>
+                    <a href="{{ url_for('produto.buscar_produtos') }}"
+                        >Produtos</a
+                    >
+                    <a href="{{ url_for('produto.adicionar_produtos') }}"
+                        >Adicionar Produto</a
+                    >
+                    <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+                    {% endif %}
+                </div>
+
+                <div class="coluna-rodape">
+                    <h4>Suporte/Ajuda</h4>
+                    <a href="#">Central de Ajuda</a>
+                    <a href="#" onclick="abrirModalTermos(); return false;"
+                        >Termos de Uso</a
+                    >
+                </div>
+
+                <div class="coluna-rodape">
+                    <h4>Contatos</h4>
+                    <a>📧contato@valefeira.com.br </a>
+                    <a>📧suportevaleefeira@gmail.com</a>
+                    <a href="#">📱 (38) 3333-4444</a>
+                    <p>📍 Vale do Jequitinhonha, MG</p>
+                </div>
+            </div>
+
+            <div class="rodape-inferior">
+                &copy; 2026 Vale&Feira. Todos os direitos reservados.
+            </div>
+        </footer>
+
+        <div id="modalTermos" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="fecharModalTermos()"
+                    >&times;</span
+                >
+                <div class="modal-body">
+                    <h3>Termos e Condições de Uso</h3>
+
+                    <h4>1. Objeto e Definição</h4>
+                    <p>
+                        A plataforma Vale & Feira é um ambiente digital
+                        destinado à divulgação, promoção e facilitação da
+                        comercialização de produtos cultivados e produzidos no
+                        Vale do Jequitinhonha. O site atua como uma "feira
+                        virtual", conectando produtores locais (agricultores
+                        familiares e artesãos) a potenciais compradores.
+                    </p>
+
+                    <h4>2. Natureza do Serviço (Intermediação de Contato)</h4>
+                    <ul>
+                        <li>
+                            <strong>Divulgação:</strong> A plataforma oferece
+                            espaço para que o produtor cadastre produtos com
+                            fotos, descrição e preço.
+                        </li>
+                        <li>
+                            <strong>Ausência de Intermediários:</strong> O Vale
+                            & Feira não realiza a venda direta nem processa
+                            pagamentos (nesta versão MVP). A plataforma facilita
+                            o contato via WhatsApp ou e-mail, sendo a transação
+                            comercial de inteira responsabilidade das partes
+                            envolvidas.
+                        </li>
+                    </ul>
+
+                    <h4>3. Responsabilidades do Produtor (Vendedor)</h4>
+                    <p>
+                        Ao cadastrar um produto, o usuário produtor garante que:
+                    </p>
+                    <ul>
+                        <li>
+                            As informações sobre o produto (origem, peso, tipo
+                            de cultivo) são verdadeiras.
+                        </li>
+                        <li>
+                            As imagens postadas correspondem fielmente ao
+                            produto ofertado.
+                        </li>
+                        <li>
+                            Possui autorização legal para comercializar os itens
+                            listados.
+                        </li>
+                        <li>
+                            Compromete-se a manter seus dados de contato
+                            atualizados para viabilizar a negociação.
+                        </li>
+                    </ul>
+
+                    <h4>4. Responsabilidades do Consumidor (Comprador)</h4>
+                    <p>
+                        O usuário interessado em adquirir produtos reconhece
+                        que:
+                    </p>
+                    <ul>
+                        <li>
+                            A plataforma não garante a logística de entrega, que
+                            deve ser combinada diretamente com o produtor.
+                        </li>
+                        <li>
+                            A verificação da qualidade e procedência do produto
+                            no ato da entrega é de sua responsabilidade.
+                        </li>
+                    </ul>
+
+                    <h4>5. Propriedade Intelectual e Identidade Regional</h4>
+                    <p>
+                        Todo o conteúdo institucional, logotipos e a estrutura
+                        do site são de propriedade da Equipe de Desenvolvimento
+                        Vale & Feira. A plataforma visa valorizar as tradições e
+                        a identidade do Vale do Jequitinhonha; portanto, o uso
+                        indevido da marca para fins que não o apoio ao produtor
+                        local é proibido.
+                    </p>
+
+                    <h4>6. Limitação de Responsabilidade</h4>
+                    <p>A equipe Vale & Feira não se responsabiliza por:</p>
+                    <ul>
+                        <li>
+                            Negociações frustradas ou não concretizadas entre
+                            usuários.
+                        </li>
+                        <li>
+                            Divergências de preços ou qualidade de produtos.
+                        </li>
+                        <li>
+                            Eventuais problemas no transporte ou perecibilidade
+                            de alimentos após a saída da propriedade rural.
+                        </li>
+                    </ul>
+
+                    <h4>7. Proteção de Dados (LGPD)</h4>
+                    <p>
+                        Em conformidade com a Lei Geral de Proteção de Dados, os
+                        dados coletados (nome, e-mail, telefone e localização)
+                        serão utilizados exclusivamente para:
+                    </p>
+                    <ul>
+                        <li>
+                            Criação do perfil de usuário e autenticação
+                            (Flask-Login).
+                        </li>
+                        <li>
+                            Exibição pública (no caso de produtores) para
+                            viabilizar o contato comercial.
+                        </li>
+                        <li>
+                            Segurança da plataforma contra acessos indevidos.
+                        </li>
+                    </ul>
+
+                    <h4>8. Canal de Ética e Denúncias</h4>
+                    <p>
+                        Reservamo-nos o direito de remover anúncios ou suspender
+                        contas que apresentem comportamentos abusivos,
+                        informações falsas ou que desrespeitem os princípios da
+                        agricultura familiar e economia solidária da região.
+                    </p>
+
+                    <div class="modal-actions">
+                        <button
+                            class="btn-modal-close"
+                            onclick="fecharModalTermos()"
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-        {% endfor %}
-    </div>
-    {% else %}
-        <p>Você ainda não cadastrou produtos.</p>
-    {% endif %}
 
-    <a href="{{ url_for('produto.adicionar_produtos') }}" class="botao-add">+ Adicionar Produto</a>
-</div>
-
-</body>
+        <script>
+            function abrirModalTermos() {
+                document.getElementById("modalTermos").style.display = "flex";
+            }
+            function fecharModalTermos() {
+                document.getElementById("modalTermos").style.display = "none";
+            }
+            window.onclick = function (event) {
+                if (event.target == document.getElementById("modalTermos")) {
+                    fecharModalTermos();
+                }
+            };
+        </script>
+    </body>
 </html>

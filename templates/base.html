@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Vale & Feira{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='img/logo.jpeg') }}?v=3"></head>
+<body>
+
+     <header class="topbar">
+        <a href="{{ url_for('main.home') }}" class="logo-container">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" class="logo-img" alt="Logo">
+            <span class="logo-text">Vale&Feira</span>
+        </a>
+
+        <div class="barra-busca">
+            <form method="get" action="{{ url_for('produto.buscar_produtos') }}">
+                <input type="text" name="q" placeholder="Buscar produto..." value="{{ busca|default('') }}">
+                <button type="submit">Buscar</button>
+            </form>
+        </div>
+
+        <nav class="nav-links">
+            <a href="{{ url_for('main.home') }}">Início</a>
+            <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('chat.meus_chats') }}">
+                    Conversas
+                    {% if mensagens_nao_lidas is defined and mensagens_nao_lidas > 0 %}
+                        <span class="bolinha-notificacao">{{ mensagens_nao_lidas }}</span>
+                    {% endif %}
+                </a>
+        <nav class="nav-planoslink">
+                <a href="{{ url_for('planos.lista_planos') }}">🌟Planos🌟</a>
+        </nav>
+            
+                <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+                <a href="{{ url_for('auth.logout') }}" style="color: #ff6b6b;">Sair</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn-login">Login</a>
+                <a href="{{ url_for('auth.registrar') }}" class="btn-cadastro">Cadastrar</a>
+            {% endif %}
+        </nav>
+    </header>
+    <div class="flash-messages" style="margin: 20px 10%;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" style="padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 10px; background: {% if category == 'error' %}#ffebee{% else %}#e8f5e9{% endif %}; color: {% if category == 'error' %}#c62828{% else %}#2e7d32{% endif %}; border: 1px solid {% if category == 'error' %}#ef9a9a{% else %}#a5d6a7{% endif %};">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+   <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Vale&Feira</h4>
+                <p>Conectando produtores e consumidores através da tecnologia e sustentabilidade.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Links Rápidos</h4>
+                <a href="{{ url_for('main.home') }}">Início</a>
+                <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+                <a href="{{ url_for('produto.adicionar_produtos') }}">Adicionar Produto</a> <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+                {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+                {% endif %}
+            </div>
+
+            <div class="footer-col">
+                <h4>Suporte</h4>
+                <a href="#">Central de Ajuda</a>
+                <a href="#">Política de Privacidade</a>
+                <a href="#">Termos de Uso</a>
+            </div>
+
+            <div class="footer-col">
+                <h4>Contato & Suporte</h4>
+                <a>📧contato@valefeira.com.br </a>
+                <a>📧suportevaleefeira@gmail.com</a>
+                <a href="#">📱 (38) 3333-4444</a>
+                <p>📍 Vale do Jequitinhonha, MG</p>
+            </div>
+
+</body>
+</html>

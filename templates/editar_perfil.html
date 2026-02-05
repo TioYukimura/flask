@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Editar Perfil - Vale & Feira</title>
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/editar_perfil.css') }}"
+        />
+    </head>
+
+    <body>
+        <header class="barra-topo">
+            <a href="{{ url_for('main.home') }}" class="area-logo">
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Vale&Feira"
+                    class="imagem-logo"
+                />
+                <span class="texto-logo">Vale&Feira</span>
+            </a>
+
+            <a href="{{ url_for('perfil.perfil') }}" class="link-cancelar">
+                <span>✖</span> Cancelar
+            </a>
+        </header>
+
+        <main class="area-conteudo">
+            <div class="caixa-formulario">
+                <div class="cabecalho-formulario">
+                    <h2 class="titulo-formulario">Editar Perfil</h2>
+                    <p class="subtitulo-formulario">
+                        Selecione abaixo o que você deseja alterar:
+                    </p>
+                </div>
+
+                <div class="area-selecao">
+                    <label class="botao-selecao" id="rotulo-dados">
+                        <input
+                            type="checkbox"
+                            onchange="alternarSecao(this, 'secao-dados', 'rotulo-dados')"
+                        />
+                        👤 Dados Pessoais
+                    </label>
+
+                    <label class="botao-selecao" id="rotulo-email">
+                        <input
+                            type="checkbox"
+                            onchange="alternarSecao(this, 'secao-email', 'rotulo-email')"
+                        />
+                        📧 E-mail
+                    </label>
+
+                    <label class="botao-selecao" id="rotulo-senha">
+                        <input
+                            type="checkbox"
+                            onchange="alternarSecao(this, 'secao-senha', 'rotulo-senha')"
+                        />
+                        🔒 Senha
+                    </label>
+                </div>
+
+                <form method="POST" class="formulario">
+                    {{ form.hidden_tag() }} {% with messages =
+                    get_flashed_messages(with_categories=true) %} {% if messages
+                    %} {% for category, message in messages %}
+                    <div class="mensagem-flash mensagem-flash-erro">
+                        {{ message }}
+                    </div>
+                    {% endfor %} {% endif %} {% endwith %}
+
+                    <div id="secao-dados" class="secao-formulario">
+                        <div class="titulo-secao">✏️ Informações Básicas</div>
+
+                        <div class="grupo-campo">
+                            <label class="rotulo-campo">Nome Completo</label>
+                            {{ form.nomeForm(class="campo-formulario") }} {% if
+                            form.nomeForm.errors %}
+                            <span class="mensagem-erro"
+                                >{{ form.nomeForm.errors[0] }}</span
+                            >
+                            {% endif %}
+                        </div>
+
+                        <div class="grupo-campo">
+                            <label class="rotulo-campo">Cidade</label>
+                            {{ form.cidadeForm(class="campo-formulario") }} {%
+                            if form.cidadeForm.errors %}
+                            <span class="mensagem-erro"
+                                >{{ form.cidadeForm.errors[0] }}</span
+                            >
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div id="secao-email" class="secao-formulario">
+                        <div class="titulo-secao">📧 Alterar E-mail</div>
+
+                        <div class="info-atual">
+                            <span>ℹ️</span>
+                            E-mail atual:
+                            <strong>{{ current_user.email }}</strong>
+                        </div>
+
+                        <div class="grupo-campo">
+                            <label class="rotulo-campo">Novo E-mail</label>
+                            {{ form.emailForm(class="campo-formulario",
+                            placeholder="Digite o novo e-mail") }} {% if
+                            form.emailForm.errors %}
+                            <span class="mensagem-erro"
+                                >{{ form.emailForm.errors[0] }}</span
+                            >
+                            {% endif %}
+                        </div>
+
+                        <div class="grupo-campo">
+                            <label class="rotulo-campo"
+                                >Confirmar Novo E-mail</label
+                            >
+                            {{ form.confirmaEmailForm(class="campo-formulario",
+                            placeholder="Repita o novo e-mail") }} {% if
+                            form.confirmaEmailForm.errors %}
+                            <span class="mensagem-erro"
+                                >{{ form.confirmaEmailForm.errors[0] }}</span
+                            >
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div id="secao-senha" class="secao-formulario">
+                        <div class="titulo-secao">🔒 Alterar Senha</div>
+
+                        <div class="grupo-campo">
+                            <label class="rotulo-campo">Nova Senha</label>
+                            {{ form.novaSenhaForm(class="campo-formulario",
+                            placeholder="Crie uma nova senha forte") }} {% if
+                            form.novaSenhaForm.errors %}
+                            <span class="mensagem-erro"
+                                >{{ form.novaSenhaForm.errors[0] }}</span
+                            >
+                            {% endif %}
+                        </div>
+
+                        <div class="grupo-campo">
+                            <label class="rotulo-campo"
+                                >Confirmar Nova Senha</label
+                            >
+                            {{ form.confirmaSenhaForm(class="campo-formulario",
+                            placeholder="Repita a nova senha") }} {% if
+                            form.confirmaSenhaForm.errors %}
+                            <span class="mensagem-erro"
+                                >{{ form.confirmaSenhaForm.errors[0] }}</span
+                            >
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="caixa-confirmacao">
+                        <div class="titulo-confirmacao">
+                            <span>🔒</span> Confirmação
+                        </div>
+
+                        <p class="texto-confirmacao">
+                            Para salvar a alteração, digite sua senha atual.
+                        </p>
+
+                        <div class="grupo-campo">
+                            {{ form.senha_atual(class="campo-formulario
+                            campo-centralizado", placeholder="Digite sua senha
+                            atual aqui...") }} {% if form.senha_atual.errors %}
+                            <span class="mensagem-erro"
+                                >{{ form.senha_atual.errors[0] }}</span
+                            >
+                            {% endif %}
+                        </div>
+
+                        {{ form.submit(class="botao-enviar") }}
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <footer class="rodape">
+            <div class="grade-rodape">
+                <div class="coluna-rodape">
+                    <h4>Vale&Feira</h4>
+                    <p>
+                        Conectando produtores e consumidores através da
+                        tecnologia e sustentabilidade.
+                    </p>
+                </div>
+
+                <div class="coluna-rodape">
+                    <h4>Links Rápidos</h4>
+                    <a href="{{ url_for('main.home') }}">Início</a>
+                    <a href="{{ url_for('produto.buscar_produtos') }}"
+                        >Produtos</a
+                    >
+                    <a href="{{ url_for('produto.adicionar_produtos') }}"
+                        >Adicionar Produto</a
+                    >
+                    <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+                    {% endif %}
+                </div>
+
+                <div class="coluna-rodape">
+                    <h4>Suporte/Ajuda</h4>
+                    <a href="{{ url_for('main.relatar_bug_page') }}"
+                        >Central de Ajuda</a
+                    >
+                    <a href="#" onclick="abrirModalTermos(); return false;"
+                        >Termos de Uso</a
+                    >
+                </div>
+
+                <div class="coluna-rodape">
+                    <h4>Contatos</h4>
+                    <a>📧contato@valefeira.com.br</a>
+                    <a>📧suportevaleefeira@gmail.com</a>
+                    <a href="#">📱 (38) 3333-4444</a>
+                    <p>📍 Vale do Jequitinhonha, MG</p>
+                </div>
+            </div>
+
+            <div class="rodape-inferior">
+                &copy; 2026 Vale&Feira. Todos os direitos reservados.
+            </div>
+        </footer>
+
+        <div id="modalTermos" class="modal">
+            <div class="conteudo-modal">
+                <span class="botao-fechar-modal-x" onclick="fecharModalTermos()"
+                    >&times;</span
+                >
+                <div class="corpo-modal">
+                    <h3>Termos e Condições de Uso</h3>
+
+                    <h4>1. Objeto e Definição</h4>
+                    <p>
+                        A plataforma Vale & Feira é um ambiente digital
+                        destinado à divulgação, promoção e facilitação da
+                        comercialização de produtos cultivados e produzidos no
+                        Vale do Jequitinhonha. O site atua como uma "feira
+                        virtual", conectando produtores locais (agricultores
+                        familiares e artesãos) a potenciais compradores.
+                    </p>
+
+                    <h4>2. Natureza do Serviço (Intermediação de Contato)</h4>
+                    <ul>
+                        <li>
+                            <strong>Divulgação:</strong> A plataforma oferece
+                            espaço para que o produtor cadastre produtos com
+                            fotos, descrição e preço.
+                        </li>
+                        <li>
+                            <strong>Ausência de Intermediários:</strong> O Vale
+                            & Feira não realiza a venda direta nem processa
+                            pagamentos (nesta versão MVP). A plataforma facilita
+                            o contato via WhatsApp ou e-mail, sendo a transação
+                            comercial de inteira responsabilidade das partes
+                            envolvidas.
+                        </li>
+                    </ul>
+
+                    <h4>3. Responsabilidades do Produtor (Vendedor)</h4>
+                    <p>
+                        Ao cadastrar um produto, o usuário produtor garante que:
+                    </p>
+                    <ul>
+                        <li>
+                            As informações sobre o produto (origem, peso, tipo
+                            de cultivo) são verdadeiras.
+                        </li>
+                        <li>
+                            As imagens postadas correspondem fielmente ao
+                            produto ofertado.
+                        </li>
+                        <li>
+                            Possui autorização legal para comercializar os itens
+                            listados.
+                        </li>
+                        <li>
+                            Compromete-se a manter seus dados de contato
+                            atualizados para viabilizar a negociação.
+                        </li>
+                    </ul>
+
+                    <h4>4. Responsabilidades do Consumidor (Comprador)</h4>
+                    <p>
+                        O usuário interessado em adquirir produtos reconhece
+                        que:
+                    </p>
+                    <ul>
+                        <li>
+                            A plataforma não garante a logística de entrega, que
+                            deve ser combinada diretamente com o produtor.
+                        </li>
+                        <li>
+                            A verificação da qualidade e procedência do produto
+                            no ato da entrega é de sua responsabilidade.
+                        </li>
+                    </ul>
+
+                    <h4>5. Propriedade Intelectual e Identidade Regional</h4>
+                    <p>
+                        Todo o conteúdo institucional, logotipos e a estrutura
+                        do site são de propriedade da Equipe de Desenvolvimento
+                        Vale & Feira. A plataforma visa valorizar as tradições e
+                        a identidade do Vale do Jequitinhonha; portanto, o uso
+                        indevido da marca para fins que não o apoio ao produtor
+                        local é proibido.
+                    </p>
+
+                    <h4>6. Limitação de Responsabilidade</h4>
+                    <p>A equipe Vale & Feira não se responsabiliza por:</p>
+                    <ul>
+                        <li>
+                            Negociações frustradas ou não concretizadas entre
+                            usuários.
+                        </li>
+                        <li>
+                            Divergências de preços ou qualidade de produtos.
+                        </li>
+                        <li>
+                            Eventuais problemas no transporte ou perecibilidade
+                            de alimentos após a saída da propriedade rural.
+                        </li>
+                    </ul>
+
+                    <h4>7. Proteção de Dados (LGPD)</h4>
+                    <p>
+                        Em conformidade com a Lei Geral de Proteção de Dados, os
+                        dados coletados (nome, e-mail, telefone e localização)
+                        serão utilizados exclusivamente para:
+                    </p>
+                    <ul>
+                        <li>
+                            Criação do perfil de usuário e autenticação
+                            (Flask-Login).
+                        </li>
+                        <li>
+                            Exibição pública (no caso de produtores) para
+                            viabilizar o contato comercial.
+                        </li>
+                        <li>
+                            Segurança da plataforma contra acessos indevidos.
+                        </li>
+                    </ul>
+
+                    <h4>8. Canal de Ética e Denúncias</h4>
+                    <p>
+                        Reservamo-nos o direito de remover anúncios ou suspender
+                        contas que apresentem comportamentos abusivos,
+                        informações falsas ou que desrespeitem os princípios da
+                        agricultura familiar e economia solidária da região.
+                    </p>
+
+                    <div class="area-botao-modal">
+                        <button
+                            class="botao-fechar-modal"
+                            onclick="fecharModalTermos()"
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function alternarSecao(checkbox, idSecao, idRotulo) {
+                var secao = document.getElementById(idSecao);
+                var rotulo = document.getElementById(idRotulo);
+
+                if (checkbox.checked) {
+                    secao.classList.add("visivel");
+                    rotulo.classList.add("ativo");
+                } else {
+                    secao.classList.remove("visivel");
+                    rotulo.classList.remove("ativo");
+                }
+            }
+
+            function abrirModalTermos() {
+                document.getElementById("modalTermos").style.display = "flex";
+            }
+
+            function fecharModalTermos() {
+                document.getElementById("modalTermos").style.display = "none";
+            }
+
+            window.onclick = function (event) {
+                if (event.target == document.getElementById("modalTermos")) {
+                    fecharModalTermos();
+                }
+            };
+        </script>
+    </body>
+</html>

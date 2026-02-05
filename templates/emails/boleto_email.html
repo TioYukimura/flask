@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Boleto Vale & Feira</title>
+    <style>
+        body {
+            font-family: 'Helvetica', Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .header {
+            background-color: #2d5a4c;
+            padding: 35px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .header h2 {
+            color: #a3c6b8;
+            margin: 8px 0 0;
+            font-size: 16px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .content {
+            padding: 40px 30px;
+            color: #444444;
+        }
+        .texto-ola {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333333;
+        }
+        .box-boleto {
+            background-color: #f8fcf8;
+            border: 2px dashed #c8e6c9;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .valor-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #888888;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .valor-grande {
+            font-size: 38px;
+            color: #2d5a4c;
+            font-weight: 800;
+            margin-bottom: 25px;
+            letter-spacing: -1px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eef6ee;
+            padding-bottom: 12px;
+        }
+        .info-label {
+            font-size: 14px;
+            color: #666666;
+        }
+        .info-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333333;
+        }
+        .linha-digitavel-container {
+            text-align: left;
+            margin-top: 20px;
+        }
+        .linha-digitavel {
+            background: #eef1f3;
+            border: 1px solid #d1d5db;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: bold;
+            color: #333333;
+            letter-spacing: 0.5px;
+            border-radius: 6px;
+            margin-top: 8px;
+            word-break: break-all;
+        }
+        .small-note {
+            font-size: 13px;
+            color: #7a7a7a;
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+        .btn-container {
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #2d5a4c;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(45, 90, 76, 0.2);
+            transition: background-color 0.3s;
+        }
+        .footer {
+            background-color: #eef6ee;
+            padding: 25px;
+            text-align: center;
+            font-size: 12px;
+            color: #7a7a7a;
+            border-top: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Vale & Feira</h1>
+            <h2>Boleto Bancário</h2>
+        </div>
+        
+        <div class="content">
+            <p class="texto-ola">Olá, <strong>{{ usuario.nome }}</strong>!</p>
+            <p style="line-height: 1.6;">O seu pedido de assinatura do plano <strong>{{ plano.nome }}</strong> foi confirmado. Para ativar seus benefícios, por favor realize o pagamento.</p>
+            
+            <div class="box-boleto">
+                <div class="valor-label">Valor Total</div>
+                <div class="valor-grande">R$ {{ "%.2f"|format(plano.preco)|replace('.', ',') }}</div>
+                
+                <div class="info-row">
+                    <span class="info-label">Vencimento</span>
+                    <span class="info-value">{{ data_vencimento }}</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-label">Beneficiário</span>
+                    <span class="info-value">Vale & Feira Ltda.</span>
+                </div>
+
+                <div class="linha-digitavel-container">
+                    <span class="valor-label">Linha Digitável:</span>
+                    <div class="linha-digitavel">{{ codigo_barras }}</div>
+                </div>
+            </div>
+
+            <p class="small-note">
+                A liberação do seu plano ocorrerá automaticamente em até <strong>3 dias úteis</strong> após a compensação bancária.
+            </p>
+            
+            <div class="btn-container">
+                <a href="#" class="btn">Baixar Boleto em PDF</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            &copy; 2026 Vale & Feira. Todos os direitos reservados.<br>
+            Este é um e-mail automático, por favor não responda.
+        </div>
+    </div>
+</body>
+</html>

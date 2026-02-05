@@ -1,0 +1,250 @@
+:root {
+    --verde-fundo: #edf7ed;
+    --verde-escuro: #2d5a4c;
+    --verde-primario: #3a6351;
+    --branco: #ffffff;
+    --texto-cor: #4a4a4a;
+    --cinza-texto: #7a7a7a;
+    --borda: #e0eee0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Montserrat", sans-serif;
+    background-color: var(--verde-fundo);
+    color: var(--texto-cor);
+    line-height: 1.6;
+}
+
+.barra-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 10%;
+}
+
+.texto-logo {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--verde-escuro);
+    text-decoration: none;
+}
+
+.link-voltar {
+    color: #666;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.container-principal {
+    max-width: 850px;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+}
+
+.titulo-pagina {
+    text-align: center;
+    margin: 20px 0 10px;
+}
+
+.titulo-pagina h1 {
+    color: var(--verde-escuro);
+}
+
+.card-formulario {
+    background: var(--branco);
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
+}
+
+.titulo-secao {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--verde-escuro);
+    margin: 30px 0 20px;
+}
+
+.grid-formulario {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.largura-total {
+    grid-column: span 2;
+}
+
+.grupo-campo label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--verde-escuro);
+    margin-bottom: 8px;
+}
+
+.grupo-campo input,
+.grupo-campo select,
+.grupo-campo textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    outline: none;
+    font-family: inherit;
+}
+
+.campo-padrao {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--borda);
+    border-radius: 12px;
+    outline: none;
+}
+
+.area-upload {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.campo-upload {
+    width: 100%;
+}
+
+.texto-imagem-atual {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.resultado-calculo {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #2e7d32;
+    font-weight: 900;
+    display: none;
+}
+
+.grid-caracteristicas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.item-check {
+    background: #f9fdf9;
+    border: 1px solid var(--borda);
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    color: #2f3f39;
+}
+
+.item-check input {
+    transform: scale(1.05);
+}
+
+.botao-salvar {
+    background: var(--verde-escuro);
+    color: white;
+    padding: 12px 40px;
+    border-radius: 15px;
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+    display: block;
+    margin: 40px auto 0;
+    transition: 0.3s;
+}
+
+.botao-salvar:hover {
+    background: var(--verde-primario);
+    transform: translateY(-1px);
+}
+
+/* ✅ PREVIEW DA IMAGEM + X */
+.preview-imagem-wrapper {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.preview-imagem-box {
+    position: relative;
+    width: 160px;
+    height: 120px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid var(--borda);
+    background: #f6fbf6;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.preview-imagem {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.btn-remover-imagem {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    font-weight: 900;
+    background: rgba(255, 255, 255, 0.92);
+    color: #b71c1c;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transition: 0.2s;
+}
+
+.btn-remover-imagem:hover {
+    transform: scale(1.06);
+    background: #b71c1c;
+    color: #fff;
+}
+
+.preview-legenda {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 800px) {
+    .barra-topo {
+        padding: 20px;
+    }
+
+    .card-formulario {
+        padding: 25px;
+    }
+
+    .grid-formulario {
+        grid-template-columns: 1fr;
+    }
+
+    .largura-total {
+        grid-column: auto;
+    }
+
+    .grid-caracteristicas {
+        grid-template-columns: 1fr;
+    }
+}

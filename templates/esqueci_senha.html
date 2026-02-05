@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Recuperar Senha - Vale & Feira</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/esqueci_senha.css') }}"
+        />
+    </head>
+
+    <body>
+        <header class="barra-topo">
+            <a href="{{ url_for('main.home') }}" class="logo-area">
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    alt="Vale&Feira"
+                    class="logo-img"
+                />
+                <span class="logo-texto">Vale&Feira</span>
+            </a>
+
+            <a href="{{ url_for('auth.login') }}" class="link-voltar">Voltar</a>
+        </header>
+
+        <main class="container">
+            <div class="form-box">
+                <h2>Esqueci minha senha</h2>
+                <p class="subtitulo">
+                    Informe seu e-mail. Enviaremos um código de autorização para
+                    o seu email.
+                </p>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %} {% for category, message in messages %}
+                <div class="flash-msg flash-{{ category }}">{{ message }}</div>
+                {% endfor %} {% endif %} {% endwith %}
+
+                <form method="POST" class="formulario">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group">
+                        <label>E-mail Cadastrado</label>
+                        {{ form.emailForm(class="form-control",
+                        placeholder="seu@email.com") }} {% if
+                        form.emailForm.errors %}
+                        <span class="error-msg"
+                            >{{ form.emailForm.errors[0] }}</span
+                        >
+                        {% endif %}
+                    </div>
+
+                    {{ form.submit(class="btn-submit") }}
+                </form>
+            </div>
+        </main>
+
+        <footer class="footer">&copy; 2026 Vale&Feira.</footer>
+    </body>
+</html>

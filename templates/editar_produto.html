@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Produto - Vale & Feira</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/editar_produto.css') }}" />
+  </head>
+
+  <body>
+    <header class="barra-topo">
+      <a href="{{ url_for('main.home') }}" class="texto-logo">Vale&Feira</a>
+      <a href="{{ url_for('perfil.perfil') }}" class="link-voltar">Cancelar</a>
+    </header>
+
+    <main class="container-principal">
+      <div class="titulo-pagina">
+        <h1>Editar Produto</h1>
+      </div>
+
+      <div class="card-formulario">
+        <form method="POST" enctype="multipart/form-data" class="formulario">
+          {{ form.hidden_tag() }}
+
+          <input type="hidden" name="remover_imagem_atual" id="remover_imagem_atual" value="0" />
+
+          <div class="titulo-secao">👨‍🌾 Dados do Produtor</div>
+
+          <div class="grid-formulario">
+            <div class="grupo-campo">
+              <label>Nome do Produtor/Propriedade</label>
+              <input type="text" name="nome_produtor" value="{{ produto.nome_produtor or '' }}" required />
+            </div>
+
+            <div class="grupo-campo">
+              <label>Tempo de Experiência</label>
+              <select name="tempo_experiencia">
+                <option value="">Selecione</option>
+                <option value="Iniciante" {% if produto.tempo_experiencia == 'Iniciante' %}selected{% endif %}>Iniciante</option>
+                <option value="1-2 anos" {% if produto.tempo_experiencia == '1-2 anos' %}selected{% endif %}>1-2 anos</option>
+                <option value="Tradição Familiar" {% if produto.tempo_experiencia == 'Tradição Familiar' %}selected{% endif %}>Tradição Familiar</option>
+                <option value="Mais de 10 anos" {% if produto.tempo_experiencia == 'Mais de 10 anos' %}selected{% endif %}>Mais de 10 anos</option>
+              </select>
+            </div>
+
+            <div class="grupo-campo">
+              <label>Cidade/Região</label>
+              {{ form.cidadeForm(value=produto.cidade, class="campo-padrao") }}
+            </div>
+
+            <div class="grupo-campo">
+              <label>WhatsApp</label>
+              <input type="text" name="whatsapp" value="{{ produto.whatsapp or '' }}" required />
+            </div>
+
+            <div class="grupo-campo largura-total">
+              <label>História (Opcional)</label>
+              <textarea name="historia_produtor" rows="3">{{ produto.historia_produtor or '' }}</textarea>
+            </div>
+          </div>
+
+          <div class="titulo-secao">🛍️ Informações do Produto</div>
+
+          <div class="grid-formulario">
+            <div class="grupo-campo largura-total">
+              <label>Nome do Produto</label>
+              {{ form.nomeForm(value=produto.nome, class="campo-padrao") }}
+            </div>
+
+            <div class="grupo-campo">
+              <label>Categoria</label>
+              <select name="categoriaForm" required>
+                <option value="">Selecione...</option>
+                {% for cat in ['Vegetais e Verduras', 'Frutas Frescas', 'Mel e Derivados', 'Grãos e Cereais', 'Queijos e Laticínios', 'Conservas e Doces', 'Artesanato Local', 'Outros'] %}
+                  <option value="{{ cat }}" {% if produto.categoria == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="grupo-campo">
+              <label>Disponibilidade</label>
+              <select name="disponibilidade">
+                <option value="disponivel" {% if produto.disponibilidade == 'disponivel' %}selected{% endif %}>✅ Disponível</option>
+                <option value="sob_encomenda" {% if produto.disponibilidade == 'sob_encomenda' %}selected{% endif %}>📦 Sob Encomenda</option>
+              </select>
+            </div>
+
+            <div class="grupo-campo">
+              <label>Quantidade</label>
+              <input type="number" name="quantidade" value="{{ produto.quantidade or '' }}" min="1" required />
+            </div>
+
+            <div class="grupo-campo">
+              <label>Unidade</label>
+              <select name="unidade" required>
+                {% for uni in ['Quilograma', 'Grama', 'Litro', 'Mililitro', 'Unidade', 'Maço', 'Caixa', 'Saca', 'Duzia'] %}
+                  <option value="{{ uni }}" {% if produto.unidade == uni %}selected{% endif %}>{{ uni }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="grupo-campo largura-total">
+              <label>Descrição</label>
+              {{ form.descricaoForm(class="campo-padrao") }}
+            </div>
+
+            <div class="grupo-campo">
+              <label>Preço Original (R$)</label>
+              {{ form.precoForm(id="precoInput", class="campo-padrao") }}
+            </div>
+
+            <div class="grupo-campo">
+              <label>Desconto (%)</label>
+              {{ form.descontoForm(id="descontoInput", class="campo-padrao") }}
+              <div id="resultadoCalculo" class="resultado-calculo">
+                Vender por: R$ <span id="precoFinalDisplay">--,--</span>
+              </div>
+            </div>
+
+            <div class="grupo-campo largura-total">
+              <label>Alterar Foto (Deixe vazio para manter a atual)</label>
+
+              <div class="area-upload">
+                {{ form.imagem(class="campo-upload", id="inputImagem") }}
+              </div>
+
+              {% if produto.imagem %}
+              <div class="preview-imagem-wrapper" id="previewAtualWrapper">
+                <div class="preview-imagem-box">
+                  <img class="preview-imagem" id="imgAtual" src="{{ produto.imagem }}" alt="Foto atual" />
+                  <button type="button" class="btn-remover-imagem" title="Remover foto atual" onclick="removerImagemAtual()">×</button>
+                </div>
+                <div class="preview-legenda">Foto atual (clique no X para excluir)</div>
+              </div>
+              {% endif %}
+
+              <div class="preview-imagem-wrapper" id="previewNovaWrapper" style="display:none;">
+                <div class="preview-imagem-box">
+                  <img class="preview-imagem" id="imgNova" src="" alt="Nova foto" />
+                  <button type="button" class="btn-remover-imagem" title="Remover nova foto" onclick="removerNovaImagem()">×</button>
+                </div>
+                <div class="preview-legenda">Nova foto selecionada</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="titulo-secao">🏷️ Características</div>
+
+          <div class="grid-caracteristicas">
+            <label class="item-check">
+              <input type="checkbox" name="c1" {% if 'Orgânico' in (produto.caracteristicas or '') %}checked{% endif %} />
+              🌿 Orgânico
+            </label>
+
+            <label class="item-check">
+              <input type="checkbox" name="c2" {% if 'Artesanal' in (produto.caracteristicas or '') %}checked{% endif %} />
+              🏆 Artesanal
+            </label>
+
+            <label class="item-check">
+              <input type="checkbox" name="c3" {% if 'Fresco' in (produto.caracteristicas or '') %}checked{% endif %} />
+              🌱 Fresco
+            </label>
+
+            <label class="item-check">
+              <input type="checkbox" name="c4" {% if 'Local' in (produto.caracteristicas or '') %}checked{% endif %} />
+              🏠 Local
+            </label>
+
+            <label class="item-check">
+              <input type="checkbox" name="c5" {% if 'Sustentável' in (produto.caracteristicas or '') %}checked{% endif %} />
+              ♻️ Sustentável
+            </label>
+
+            <label class="item-check">
+              <input type="checkbox" name="c6" {% if 'Tradicional' in (produto.caracteristicas or '') %}checked{% endif %} />
+              📜 Tradicional
+            </label>
+          </div>
+
+          <button type="submit" class="botao-salvar">Salvar Alterações</button>
+        </form>
+      </div>
+    </main>
+
+    <script>
+      const precoInput = document.getElementById("precoInput");
+      const descontoInput = document.getElementById("descontoInput");
+      const resultadoDiv = document.getElementById("resultadoCalculo");
+      const precoFinalSpan = document.getElementById("precoFinalDisplay");
+
+      function calcularPreco() {
+        let precoStr = (precoInput.value || "").toString().replace(",", ".");
+        let preco = parseFloat(precoStr);
+        let desconto = parseInt(descontoInput.value);
+
+        if (!isNaN(preco) && !isNaN(desconto) && desconto > 0) {
+          let precoFinal = preco * (1 - desconto / 100);
+          precoFinalSpan.innerText = precoFinal.toFixed(2).replace(".", ",");
+          resultadoDiv.style.display = "block";
+        } else if (!isNaN(preco)) {
+          precoFinalSpan.innerText = preco.toFixed(2).replace(".", ",");
+          resultadoDiv.style.display = "block";
+        } else {
+          resultadoDiv.style.display = "none";
+        }
+      }
+
+      if (precoInput) precoInput.addEventListener("input", calcularPreco);
+      if (descontoInput) descontoInput.addEventListener("input", calcularPreco);
+      window.addEventListener("load", calcularPreco);
+
+      const inputImagem = document.getElementById("inputImagem");
+      const previewNovaWrapper = document.getElementById("previewNovaWrapper");
+      const imgNova = document.getElementById("imgNova");
+
+      let novaObjectUrl = null;
+
+      if (inputImagem) {
+        inputImagem.addEventListener("change", function () {
+          const file = this.files && this.files[0];
+          if (!file) return;
+
+          if (novaObjectUrl) URL.revokeObjectURL(novaObjectUrl);
+          novaObjectUrl = URL.createObjectURL(file);
+
+          imgNova.src = novaObjectUrl;
+          previewNovaWrapper.style.display = "flex";
+        });
+      }
+
+      function removerNovaImagem() {
+        if (inputImagem) inputImagem.value = "";
+        if (novaObjectUrl) {
+          URL.revokeObjectURL(novaObjectUrl);
+          novaObjectUrl = null;
+        }
+        previewNovaWrapper.style.display = "none";
+        imgNova.src = "";
+      }
+
+      function removerImagemAtual() {
+        const flag = document.getElementById("remover_imagem_atual");
+        if (flag) flag.value = "1";
+
+        const wrapper = document.getElementById("previewAtualWrapper");
+        if (wrapper) wrapper.style.display = "none";
+      }
+    </script>
+  </body>
+</html>

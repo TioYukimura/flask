@@ -1,47 +1,61 @@
 from database import db
 from flask_login import UserMixin
 import hashlib
-
-from database import db
-from flask_login import UserMixin
-import hashlib
+from datetime import datetime
 
 class Usuario(UserMixin, db.Model):
-    """Model for user authentication and management"""
+    __tablename__ = 'usuario'
+
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(80), unique=True, nullable=False)
-    senha_hash = db.Column(db.String(256), nullable=False)  # SHA-256 hash
+    email = db.Column(db.String(120), unique=True, nullable=False) # Adicionado para corrigir o login
+    senha_hash = db.Column(db.String(256), nullable=False)
+    cidade = db.Column(db.String(100), nullable=True)
+    foto_perfil = db.Column(db.String(200), nullable=True, default='default_perfil.png')
 
-    def __init__(self, nome, senha):
+    # Relacionamentos
+    produtos = db.relationship('Produto', backref='dono', lazy=True)
+
+    def __init__(self, nome, email, senha, cidade=None):
         self.nome = nome
-        # gera e salva o hash da senha diretamente no campo da tabela
+        self.email = email # Agora inicializa o email
+        self.cidade = cidade
+        # Cria o hash da senha no momento da criação
         self.senha_hash = hashlib.sha256(senha.encode()).hexdigest()
 
-    def get_id(self):
-        """Required by Flask-Login"""
-        return str(self.id)
+    def verificar_senha(self, senha):
+        """Compara a senha digitada com o hash salvo no banco."""
+        hash_digitado = hashlib.sha256(senha.encode()).hexdigest()
+        return self.senha_hash == hash_digitado
 
     def __repr__(self):
         return f'<Usuario {self.nome}>'
 
+
 class Produto(db.Model):
-    """Model for products in the marketplace"""
+    __tablename__ = 'produto'
+
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(120), nullable=False)
     preco = db.Column(db.Float, nullable=False)
     descricao = db.Column(db.Text, nullable=True)
-    imagem = db.Column(db.String(255), nullable=True)  # Path to image file
-    
-    def __init__(self, nome, preco, descricao=None, imagem=None):
+    imagem = db.Column(db.String(255), nullable=True)
+    data_cadastro = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Chave estrangeira para o usuário
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+
+    def __init__(self, nome, preco, usuario_id, descricao=None, imagem=None):
         self.nome = nome
         self.preco = preco
+        self.usuario_id = usuario_id
         self.descricao = descricao
         self.imagem = imagem
-    
+
     @property
     def preco_formatado(self):
-        """Return formatted price in Brazilian Real"""
+        """Retorna o preço formatado em Real (Ex: R$ 10,50)."""
         return f"R$ {self.preco:.2f}".replace('.', ',')
-    
+
     def __repr__(self):
         return f'<Produto {self.nome}>'

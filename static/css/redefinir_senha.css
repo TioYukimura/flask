@@ -1,0 +1,229 @@
+:root {
+    --verde-fundo: #eef6ee;
+    --verde-topo: #eef7ee;
+    --verde-escuro: #1f5c4d;
+    --verde-hover: #164238;
+    --texto: #4a4a4a;
+    --cinza: #666;
+    --borda: #ddd;
+    --branco: #ffffff;
+
+    --flash-erro-bg: #ffebee;
+    --flash-erro-borda: #ef9a9a;
+    --flash-erro-txt: #c62828;
+
+    --flash-sucesso-bg: #e8f5e9;
+    --flash-sucesso-borda: #a5d6a7;
+    --flash-sucesso-txt: #2e7d32;
+
+    --flash-info-bg: #e3f2fd;
+    --flash-info-borda: #90caf9;
+    --flash-info-txt: #0d47a1;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat", sans-serif;
+}
+
+body {
+    background: var(--verde-fundo);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.topo-recuperacao {
+    background: var(--verde-topo);
+    padding: 18px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--borda);
+}
+
+.area-logo-recuperacao {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--verde-escuro);
+    text-decoration: none;
+}
+
+.logo-imagem-recuperacao {
+    width: 35px;
+    height: 35px;
+}
+
+.logo-texto-recuperacao {
+    color: var(--verde-escuro);
+}
+
+.link-cancelar-recuperacao {
+    color: var(--cinza);
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.link-cancelar-recuperacao:hover {
+    text-decoration: underline;
+}
+
+.container-recuperacao {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.caixa-form-recuperacao {
+    background: var(--branco);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 450px;
+}
+
+.passos-recuperacao {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    color: #ccc;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+}
+
+.passo-recuperacao {
+    color: #ccc;
+}
+
+.passo-ativo-recuperacao {
+    color: var(--verde-escuro);
+    font-weight: bold;
+    border-bottom: 2px solid var(--verde-escuro);
+    padding-bottom: 2px;
+}
+
+.seta-passos-recuperacao {
+    color: #ccc;
+}
+
+.titulo-recuperacao {
+    color: var(--verde-escuro);
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+}
+
+.texto-ajuda-recuperacao {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--cinza);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.formulario-recuperacao {
+    width: 100%;
+}
+
+.grupo-campo-recuperacao {
+    margin-bottom: 20px;
+}
+
+.rotulo-campo-recuperacao {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--texto);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.campo-recuperacao {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    background: #fdfdfd;
+}
+
+.campo-recuperacao:focus {
+    border-color: var(--verde-escuro);
+    background: white;
+}
+
+.botao-recuperacao {
+    width: 100%;
+    padding: 14px;
+    background: var(--verde-escuro);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.botao-recuperacao:hover {
+    background: var(--verde-hover);
+}
+
+.mensagem-flash-recuperacao {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.flash-error {
+    background-color: var(--flash-erro-bg);
+    color: var(--flash-erro-txt);
+    border: 1px solid var(--flash-erro-borda);
+}
+
+.flash-success {
+    background-color: var(--flash-sucesso-bg);
+    color: var(--flash-sucesso-txt);
+    border: 1px solid var(--flash-sucesso-borda);
+}
+
+.flash-info {
+    background-color: var(--flash-info-bg);
+    color: var(--flash-info-txt);
+    border: 1px solid var(--flash-info-borda);
+}
+
+.rodape-recuperacao {
+    background: #2d5a4c;
+    color: #c2d6cf;
+    padding: 30px 10%;
+    margin-top: auto;
+    text-align: center;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 600px) {
+    .topo-recuperacao {
+        padding: 16px 20px;
+    }
+
+    .caixa-form-recuperacao {
+        padding: 28px;
+    }
+
+    .area-logo-recuperacao {
+        font-size: 20px;
+    }
+}

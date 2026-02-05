@@ -1,165 +1,298 @@
-"""
-Rotas de planos de assinatura
-"""
 import uuid
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, flash, redirect, url_for, request, jsonify
-from flask_login import login_required, current_user
+from io import BytesIO
+
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
+from flask_mail import Message
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import mm
+from reportlab.pdfgen import canvas
+
 from database import db
-from models.plano import Plano, AssinaturaUsuario, PagamentoSimulado
-from forms.pagamento import FormularioPagamentoPix, FormularioPagamentoCartao
+from extensions import mail
+from models.plano import AssinaturaUsuario, PagamentoSimulado, Plano
 
-planos_bp = Blueprint('planos', __name__)
+planos_bp = Blueprint("planos", __name__)
 
-@planos_bp.route('/')
+
+def gerar_boleto_pdf(usuario, plano, valor, data_vencimento, cpf_pagador=None):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(20 * mm, height - 30 * mm, "VALE & FEIRA - Pagamento de Assinatura")
+
+    c.setFont("Helvetica", 10)
+    c.drawString(20 * mm, height - 40 * mm, "Recibo do Pagador")
+
+    c.setLineWidth(1)
+    c.line(20 * mm, height - 45 * mm, width - 20 * mm, height - 45 * mm)
+
+    y = height - 60 * mm
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(20 * mm, y, "Beneficiário:")
+    c.setFont("Helvetica", 10)
+    c.drawString(50 * mm, y, "Vale & Feira Ltda - CNPJ: 00.000.000/0001-99")
+
+    y -= 10 * mm
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(20 * mm, y, "Pagador:")
+    c.setFont("Helvetica", 10)
+
+    cpf_texto = cpf_pagador if cpf_pagador else getattr(usuario, "cpf", "Não informado")
+    c.drawString(50 * mm, y, f"{usuario.nome} (CPF: {cpf_texto})")
+
+    y -= 10 * mm
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(20 * mm, y, "Vencimento:")
+    c.setFont("Helvetica", 10)
+    c.drawString(50 * mm, y, data_vencimento.strftime("%d/%m/%Y"))
+
+    y -= 10 * mm
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(20 * mm, y, "Valor:")
+    c.setFont("Helvetica", 12)
+    c.drawString(50 * mm, y, f"R$ {valor:.2f}")
+
+    y -= 10 * mm
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(20 * mm, y, "Referência:")
+    c.setFont("Helvetica", 10)
+    c.drawString(50 * mm, y, f"Assinatura Plano {plano.nome}")
+
+    y -= 30 * mm
+    c.setFont("Helvetica", 8)
+    c.drawString(20 * mm, y + 15 * mm, "Autenticação Mecânica / Ficha de Compensação")
+
+    c.setFillColorRGB(0, 0, 0)
+    c.rect(20 * mm, y, width - 40 * mm, 12 * mm, fill=1)
+
+    c.setFillColorRGB(1, 1, 1)
+    c.setFillColorRGB(0, 0, 0)
+    c.setFont("Courier-Bold", 11)
+    c.drawString(
+        20 * mm, y - 5 * mm, "23790.50400 90000.120004 01000.439080 1 89000000015000"
+    )
+
+    y -= 25 * mm
+    c.setFont("Helvetica", 9)
+    c.drawString(20 * mm, y, "Instruções:")
+    c.drawString(20 * mm, y - 5 * mm, "- Pagável em qualquer banco até o vencimento.")
+    c.drawString(
+        20 * mm, y - 10 * mm, "- Após o vencimento, atualize o boleto no site."
+    )
+    c.drawString(
+        20 * mm,
+        y - 15 * mm,
+        "- A liberação do plano ocorrerá em até 3 dias úteis após o pagamento.",
+    )
+
+    c.showPage()
+    c.save()
+
+    buffer.seek(0)
+    return buffer
+
+
+@planos_bp.route("/")
 def lista_planos():
-    """Mostra os planos de assinatura disponíveis"""
-    planos_disponiveis = Plano.query.filter_by(ativo=True).order_by(Plano.preco.asc()).all()
-    
+    planos_disponiveis = (
+        Plano.query.filter_by(ativo=True).order_by(Plano.preco.asc()).all()
+    )
     assinatura_usuario = None
     if current_user.is_authenticated:
         assinatura_usuario = current_user.assinatura_atual()
-    
-    return render_template('planos/lista_planos.html', 
-                         planos=planos_disponiveis, 
-                         assinatura_usuario=assinatura_usuario)
+    return render_template(
+        "planos/lista_planos.html",
+        planos=planos_disponiveis,
+        assinatura_usuario=assinatura_usuario,
+    )
 
-@planos_bp.route('/assinar/<int:id_plano>')
+
+@planos_bp.route("/assinar/<int:id_plano>", methods=["GET", "POST"])
 @login_required
 def escolher_pagamento(id_plano):
-    """Escolher método de pagamento para assinatura"""
-    plano_escolhido = Plano.query.get_or_404(id_plano)
-    
-    # Verifica se usuário já possui assinatura ativa
-    if current_user.tem_plano_ativo():
-        flash('Você já possui um plano ativo', 'warning')
-        return redirect(url_for('planos.minha_assinatura'))
-    
-    return render_template('planos/escolher_pagamento.html', plano=plano_escolhido)
+    plano = Plano.query.get_or_404(id_plano)
+    ass_atual = current_user.assinatura_atual()
+    if ass_atual and ass_atual.plano_id == plano.id:
+        flash("Você já possui este plano ativo.", "info")
+        return redirect(url_for("perfil.perfil"))
 
-@planos_bp.route('/pagar/pix/<int:id_plano>', methods=['GET', 'POST'])
-@login_required
-def pagar_pix(id_plano):
-    """Simulação de pagamento PIX"""
-    plano_escolhido = Plano.query.get_or_404(id_plano)
-    formulario = FormularioPagamentoPix()
-    
-    if formulario.validate_on_submit():
-        # Gera pagamento PIX simulado
-        codigo_transacao = f"PIX_{uuid.uuid4().hex[:8].upper()}"
-        dados_qr_code = f"00020126580014br.gov.bcb.pix0136{uuid.uuid4()}5204000053039865802BR5925VALE E FEIRA MARKETPLACE6009SAO PAULO62070503***6304"
-        
-        # Cria registro de pagamento com informações do plano
+    if request.method == "POST":
+        metodo = request.form.get("metodo_pagamento")
+
+        pix_code_fake = f"00020126580014BR.GOV.BCB.PIX0136{uuid.uuid4()}5204000053039865802BR5913VALE E FEIRA6008BRASILIA62070503***6304"
+
         novo_pagamento = PagamentoSimulado(
             usuario_id=current_user.id,
-            valor=plano_escolhido.preco,
-            metodo='pix',
-            codigo_transacao=f"PIX_{plano_escolhido.id}_{uuid.uuid4().hex[:8].upper()}",
-            dados_qr_code=dados_qr_code,
-            status='pendente'
+            valor=plano.preco,
+            metodo=metodo,
+            status="pendente",
+            dados_qr_code=pix_code_fake,
+            codigo_transacao=str(uuid.uuid4()),
         )
-        
         db.session.add(novo_pagamento)
         db.session.commit()
-        
-        return render_template('planos/pagamento_pix.html', 
-                             plano=plano_escolhido, 
-                             pagamento=novo_pagamento)
-    
-    return render_template('planos/pagar_pix.html', plano=plano_escolhido, formulario=formulario)
 
-@planos_bp.route('/pagar/cartao/<int:id_plano>', methods=['GET', 'POST'])
-@login_required
-def pagar_cartao(id_plano):
-    """Simulação de pagamento com cartão de crédito"""
-    plano_escolhido = Plano.query.get_or_404(id_plano)
-    formulario = FormularioPagamentoCartao()
-    
-    if formulario.validate_on_submit():
-        # Simula processamento do pagamento com cartão
-        numero_mascarado = f"****-****-****-{formulario.numero.data[-4:]}"
-        
-        # Cria registro de pagamento com informações do plano
-        novo_pagamento = PagamentoSimulado(
-            usuario_id=current_user.id,
-            valor=plano_escolhido.preco,
-            metodo='cartao',
-            codigo_transacao=f"CARTAO_{plano_escolhido.id}_{uuid.uuid4().hex[:8].upper()}",
-            numero_cartao_mascarado=numero_mascarado,
-            status='pendente'
-        )
-        
-        db.session.add(novo_pagamento)
-        db.session.commit()
-        
-        # Simula aprovação imediata para pagamentos com cartão
-        return redirect(url_for('planos.processar_pagamento', id_pagamento=novo_pagamento.id))
-    
-    return render_template('planos/pagar_cartao.html', plano=plano_escolhido, formulario=formulario)
+        if metodo == "cartao":
+            return redirect(
+                url_for(
+                    "planos.simular_aprovacao_banco", id_pagamento=novo_pagamento.id
+                )
+            )
 
-@planos_bp.route('/confirmar_pix/<int:id_pagamento>')
+        elif metodo == "boleto":
+            cpf_digitado = request.form.get("cpf_boleto")
+            vencimento = datetime.now() + timedelta(days=3)
+
+            pdf_buffer = gerar_boleto_pdf(
+                current_user, plano, plano.preco, vencimento, cpf_pagador=cpf_digitado
+            )
+
+            try:
+                msg = Message(
+                    subject=f"Boleto para Pagamento - Plano {plano.nome}",
+                    sender="suportevaleefeira@gmail.com",
+                    recipients=[current_user.email],
+                )
+                msg.body = f"Olá {current_user.nome},\n\nSegue em anexo o boleto para pagamento da sua assinatura.\nO plano será liberado assim que o banco confirmar o pagamento (até 3 dias úteis)."
+
+                msg.attach(
+                    f"boleto_valefeira_{novo_pagamento.id}.pdf",
+                    "application/pdf",
+                    pdf_buffer.getvalue(),
+                )
+
+                mail.send(msg)
+                print("📧 Boleto enviado com sucesso!")
+            except Exception as e:
+                print(f"❌ Erro ao enviar boleto: {e}")
+
+            return render_template(
+                "planos/boleto_enviado.html", email=current_user.email
+            )
+
+        else:
+            return redirect(
+                url_for("planos.pix_payment", id_pagamento=novo_pagamento.id)
+            )
+
+    return render_template("planos/escolher_pagamento.html", plano=plano)
+
+
+@planos_bp.route("/pagamento/pix/<int:id_pagamento>")
 @login_required
-def confirmar_pix(id_pagamento):
-    """Simula confirmação de pagamento PIX"""
+def pix_payment(id_pagamento):
     pagamento = PagamentoSimulado.query.get_or_404(id_pagamento)
-    
-    if pagamento.usuario_id != current_user.id or pagamento.status != 'pendente':
-        flash('Pagamento inválido', 'error')
-        return redirect(url_for('planos.lista_planos'))
-    
-    # Simula aprovação do pagamento PIX
-    return redirect(url_for('planos.processar_pagamento', id_pagamento=id_pagamento))
+    if pagamento.status == "aprovado":
+        flash("Pagamento já confirmado!", "success")
+        return redirect(url_for("perfil.perfil"))
+    plano = (
+        Plano.query.filter(Plano.preco <= pagamento.valor)
+        .order_by(Plano.preco.desc())
+        .first()
+    )
+    if not plano:
+        plano = Plano.query.first()
+    return render_template("planos/pix_payment.html", pagamento=pagamento, plano=plano)
 
-@planos_bp.route('/processar_pagamento/<int:id_pagamento>')
+
+@planos_bp.route("/api/verificar_status/<int:id_pagamento>")
 @login_required
-def processar_pagamento(id_pagamento):
-    """Processa e aprova o pagamento"""
+def verificar_status_api(id_pagamento):
     pagamento = PagamentoSimulado.query.get_or_404(id_pagamento)
-    
-    if pagamento.usuario_id != current_user.id:
-        flash('Acesso negado', 'error')
-        return redirect(url_for('planos.lista_planos'))
-    
-    if pagamento.status == 'aprovado':
-        flash('Pagamento já processado', 'info')
-        return redirect(url_for('planos.minha_assinatura'))
-    
-    # Aprova o pagamento
-    pagamento.status = 'aprovado'
+    resposta = {
+        "status": pagamento.status,
+        "aprovado": pagamento.status == "aprovado",
+        "data_vencimento": "",
+    }
+    if pagamento.status == "aprovado" and pagamento.assinatura_id:
+        assinatura = AssinaturaUsuario.query.get(pagamento.assinatura_id)
+        if assinatura:
+            resposta["data_vencimento"] = assinatura.data_fim.strftime("%d/%m/%Y")
+    return jsonify(resposta)
+
+
+@planos_bp.route("/simular_aprovacao/<int:id_pagamento>")
+@login_required
+def simular_aprovacao_banco(id_pagamento):
+    pagamento = PagamentoSimulado.query.get_or_404(id_pagamento)
+    if pagamento.status == "aprovado":
+        assinatura = AssinaturaUsuario.query.get(pagamento.assinatura_id)
+        if assinatura:
+            return render_template(
+                "planos/pagamento_aprovado.html",
+                plano=assinatura.plano,
+                data_vencimento=assinatura.data_fim,
+            )
+        return "Pagamento já processado."
+
+    pagamento.status = "aprovado"
     pagamento.data_processamento = datetime.utcnow()
-    
-    # Extrai o ID do plano do código de transação (formato: METODO_IDPLANO_CODIGO)
-    try:
-        id_plano = int(pagamento.codigo_transacao.split('_')[1])
-        plano_escolhido = Plano.query.get(id_plano) or Plano.query.first()
-    except:
-        plano_escolhido = Plano.query.first()
-    
-    # Cria a assinatura
-    data_vencimento = datetime.utcnow() + timedelta(days=plano_escolhido.duracao_dias)
+    plano = (
+        Plano.query.filter(Plano.preco <= pagamento.valor)
+        .order_by(Plano.preco.desc())
+        .first()
+    )
+    if not plano:
+        plano = Plano.query.first()
+    data_hoje = datetime.utcnow()
+    data_vencimento = data_hoje + timedelta(days=30)
     nova_assinatura = AssinaturaUsuario(
-        usuario_id=current_user.id,
-        plano_id=plano_escolhido.id,
+        usuario_id=pagamento.usuario_id,
+        plano_id=plano.id,
+        data_inicio=data_hoje,
         data_fim=data_vencimento,
         valor_pago=pagamento.valor,
-        metodo_pagamento=pagamento.metodo
+        metodo_pagamento=pagamento.metodo,
+        ativo=True,
     )
-    
-    pagamento.assinatura = nova_assinatura
-    
     db.session.add(nova_assinatura)
+    db.session.flush()
+    pagamento.assinatura_id = nova_assinatura.id
     db.session.commit()
-    
-    flash('Pagamento aprovado! Seu plano foi ativado.', 'success')
-    return redirect(url_for('planos.minha_assinatura'))
 
-@planos_bp.route('/minha_assinatura')
+    try:
+        html_email = render_template(
+            "emails/pagamento_confirmado.html",
+            usuario=current_user,
+            plano=plano,
+            valor=pagamento.valor,
+            data_hoje=data_hoje.strftime("%d/%m/%Y"),
+            data_vencimento=data_vencimento.strftime("%d/%m/%Y"),
+            codigo_transacao=pagamento.codigo_transacao,
+        )
+        msg = Message(
+            subject=f"✅ Pagamento Confirmado - Plano {plano.nome}",
+            sender="suportevaleefeira@gmail.com",
+            recipients=[current_user.email],
+            html=html_email,
+        )
+        mail.send(msg)
+    except Exception as e:
+        print(f"❌ Erro ao enviar e-mail: {e}")
+
+    return render_template(
+        "planos/pagamento_aprovado.html", plano=plano, data_vencimento=data_vencimento
+    )
+
+
+@planos_bp.route("/minha_assinatura")
 @login_required
 def minha_assinatura():
-    """Mostra a assinatura atual do usuário"""
-    assinatura_ativa = current_user.assinatura_atual()
-    historico_assinaturas = AssinaturaUsuario.query.filter_by(usuario_id=current_user.id).order_by(AssinaturaUsuario.data_inicio.desc()).all()
-    
-    return render_template('planos/minha_assinatura.html', 
-                         assinatura=assinatura_ativa, 
-                         historico=historico_assinaturas)
+    assinatura = current_user.assinatura_atual()
+    return render_template(
+        "planos/minha_assinatura.html", assinatura_usuario=assinatura
+    )
+
+
+@planos_bp.route("/cancelar_assinatura", methods=["POST"])
+@login_required
+def cancelar_assinatura():
+    assinatura = current_user.assinatura_atual()
+    if assinatura:
+        data_fmt = assinatura.data_fim.strftime("%d/%m/%Y")
+        flash(f"Assinatura cancelada. Acesso até {data_fmt}.", "info")
+    return redirect(url_for("planos.minha_assinatura"))

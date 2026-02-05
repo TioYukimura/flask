@@ -1,0 +1,338 @@
+:root {
+    --verde-fundo: #edf7ed;
+    --verde-escuro: #2d5a4c;
+    --verde-primario: #3a6351;
+    --branco: #ffffff;
+    --texto-cor: #4a4a4a;
+    --cinza-texto: #7a7a7a;
+    --vermelho-notificacao: #ff6b6b;
+    --amarelo-fundo: #fdf5d7;
+    --amarelo-texto: #b08d57;
+    --borda-clara: #e0eee0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Montserrat", sans-serif;
+    background-color: var(--verde-fundo);
+    color: var(--texto-cor);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.barra-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 10%;
+    background: transparent;
+}
+
+.container-logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.imagem-logo {
+    height: 55px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.texto-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--verde-escuro);
+}
+
+.links-navegacao {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.links-navegacao a {
+    text-decoration: none;
+    color: #adaaa6;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.links-navegacao a:hover {
+    color: var(--verde-escuro);
+}
+
+.secao-denuncia {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+}
+
+.card-denuncia {
+    background: white;
+    width: 100%;
+    max-width: 550px;
+    padding: 40px;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.cabecalho-denuncia {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.cabecalho-denuncia h2 {
+    color: var(--vermelho-notificacao);
+    margin-bottom: 10px;
+    font-size: 1.6rem;
+}
+
+.cabecalho-denuncia p {
+    color: var(--cinza-texto);
+    font-size: 0.9rem;
+}
+
+.destaque-produto {
+    background-color: var(--amarelo-fundo);
+    color: var(--amarelo-texto);
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    text-align: center;
+    font-weight: 700;
+    border: 1px solid #f0e6c5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.grupo-campo {
+    margin-bottom: 20px;
+}
+
+.rotulo-campo {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--verde-escuro);
+    font-size: 0.9rem;
+}
+
+.campo-input,
+.campo-select,
+.campo-textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--borda-clara);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    outline: none;
+    transition: 0.3s;
+    background: #fdfdfd;
+    color: var(--texto-cor);
+}
+
+.campo-input:focus,
+.campo-select:focus,
+.campo-textarea:focus {
+    border-color: var(--verde-primario);
+    background: white;
+}
+
+.botao-enviar-denuncia {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--vermelho-notificacao);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.botao-enviar-denuncia:hover {
+    background-color: #ff5252;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+}
+
+.botao-cancelar {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: var(--cinza-texto);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.botao-cancelar:hover {
+    color: var(--texto-cor);
+}
+
+.alerta {
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.alerta-sucesso {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.alerta-erro {
+    background: #ffebee;
+    color: #b71c1c;
+    border: 1px solid #ffcdd2;
+}
+
+.rodape {
+    background: #2d5a4c;
+    color: #c2d6cf;
+    padding: 60px 10% 20px;
+    margin-top: auto;
+}
+
+.grade-rodape {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 40px;
+}
+
+.coluna-rodape h4 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.coluna-rodape a {
+    display: block;
+    color: #c2d6cf;
+    text-decoration: none;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+}
+
+.rodape-inferior {
+    text-align: center;
+    padding-top: 20px;
+    font-size: 0.75rem;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+.conteudo-modal {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 30px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 700px;
+    border-radius: 15px;
+    position: relative;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.conteudo-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.conteudo-modal::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.botao-fechar-modal-x {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.corpo-modal h3 {
+    color: #1f5c4d;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eef7ee;
+    padding-bottom: 10px;
+}
+
+.corpo-modal p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    color: #444;
+    font-size: 0.95rem;
+    text-align: justify;
+}
+
+.corpo-modal h4 {
+    color: #2d5a4c;
+    margin: 20px 0 10px 0;
+    font-size: 1.1rem;
+}
+
+.corpo-modal ul {
+    margin-bottom: 15px;
+    padding-left: 20px;
+    color: #444;
+    font-size: 0.95rem;
+}
+
+.corpo-modal li {
+    margin-bottom: 5px;
+}
+
+.area-botao-modal {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.botao-fechar-modal {
+    background: #2d5a4c;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 15px;
+}

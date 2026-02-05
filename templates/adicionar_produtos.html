@@ -1,115 +1,635 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-br">
     <head>
         <meta charset="UTF-8" />
-        <title>Adicionar Produto</title>
-        <style>
-            body {
-                background-color: rgb(20, 99, 95);
-                font-family: Arial, sans-serif;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-            }
-            .form-box {
-                background-color: white;
-                padding: 30px;
-                border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-                width: 350px;
-            }
-            label {
-                display: block;
-                margin-top: 15px;
-                font-weight: bold;
-            }
-            input,
-            textarea,
-            select {
-                width: 100%;
-                margin-top: 10px;
-                padding: 8px;
-                border-radius: 4px;
-                border: 1px solid #ccc;
-                box-sizing: border-box;
-            }
-            button {
-                margin-top: 15px;
-                padding: 10px;
-                background-color: rgb(20, 99, 95);
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                width: 100%;
-            }
-            button:hover {
-                background-color: rgb(15, 80, 76);
-            }
-            .erro {
-                color: red;
-                margin-top: 5px;
-                font-size: 14px;
-            }
-        </style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Adicionar Novo Produto - Vale & Feira</title>
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+            rel="stylesheet"
+        />
+
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/adicionar_produto.css') }}"
+        />
     </head>
+
     <body>
-        <div class="form-box">
-            <h2>Adicionar Produto</h2>
+        <header class="topbar">
+            <a href="{{ url_for('main.home') }}" class="logo-container">
+                <img
+                    src="{{ url_for('static', filename='img/logo.png') }}"
+                    class="logo-img"
+                    alt="Logo"
+                />
+                <span class="logo-text">Vale&Feira</span>
+            </a>
 
-            {% with messages = get_flashed_messages(with_categories=true) %} {%
-            if messages %}
-            <ul>
-                {% for category, message in messages %}
-                <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %} {% endwith %}
+            <nav class="nav-links">
+                <a href="{{ url_for('main.home') }}">Início</a>
+                <a href="{{ url_for('produto.buscar_produtos') }}">Produtos</a>
+                <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+                <nav class="nav-planoslink">
+                    <a href="{{ url_for('planos.lista_planos') }}"
+                        >🌟Planos🌟</a
+                    >
+                </nav>
+                <a href="{{ url_for('perfil.perfil') }}">Perfil</a>
+                <a href="{{ url_for('auth.logout') }}" class="sair">Sair</a>
+            </nav>
+        </header>
 
-           <form method="POST" enctype="multipart/form-data" action="{{ url_for('produto.adicionar_produtos') }}">
-    {{ form.hidden_tag() }}
-
-    <label for="nomeForm">Nome do Produto:</label>
-    {{ form.nomeForm() }}
-    {% for error in form.nomeForm.errors %}
-        <span class="erro">{{ error }}</span>
-    {% endfor %}
-
-    <label for="precoForm">Preço:</label>
-    {{ form.precoForm() }}
-    {% for error in form.precoForm.errors %}
-        <span class="erro">{{ error }}</span>
-    {% endfor %}
-
-    <label for="descricaoForm">Descrição:</label>
-    {{ form.descricaoForm(rows=4) }}
-    {% for error in form.descricaoForm.errors %}
-        <span class="erro">{{ error }}</span>
-    {% endfor %}
-
-    <label for="categoriaForm">Categoria:</label>
-    {{ form.categoriaForm() }}
-    {% for error in form.categoriaForm.errors %}
-        <span class="erro">{{ error }}</span>
-    {% endfor %}
-
-    <label for="cidadeForm">Cidade:</label>
-    {{ form.cidadeForm() }}
-    {% for error in form.cidadeForm.errors %}
-        <span class="erro">{{ error }}</span>
-    {% endfor %}
-
-    <label for="imagem">Imagem do Produto:</label>
-    {{ form.imagem() }}
-    {% for error in form.imagem.errors %}
-        <span class="erro">{{ error }}</span>
-    {% endfor %}
-
-    {{ form.submit() }}
-</form>
-
+        <div class="page-header">
+            <h1>Adicionar Novo Produto</h1>
+            <p>
+                Compartilhe seus produtos com toda a comunidade do Vale do
+                Jequitinhonha.
+            </p>
         </div>
+
+        <main class="container">
+            {% if form and form.errors %}
+            <div
+                style="
+                    background: #ffebee;
+                    border: 1px solid #ffcdd2;
+                    color: #b71c1c;
+                    padding: 15px;
+                    border-radius: 15px;
+                    margin-bottom: 20px;
+                "
+            >
+                <strong>🛑 Ops! Verifique os campos abaixo:</strong>
+                <ul style="margin-left: 20px; margin-top: 5px">
+                    {% for field, errors in form.errors.items() %} {% for error
+                    in errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %} {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <div class="form-card">
+                <form
+                    method="POST"
+                    enctype="multipart/form-data"
+                    id="produtoForm"
+                >
+                    {% if form %} {{ form.hidden_tag() }} {% else %}
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    />
+                    {% endif %}
+
+                    <div class="section-title">👨‍🌾 Dados do Produtor</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome do Produtor/Propriedade *</label>
+                            <input
+                                type="text"
+                                name="nome_produtor"
+                                placeholder="Ex: João Silva ou Sítio Boa Vista"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tempo de Experiência</label>
+                            <select name="tempo_experiencia">
+                                <option value="">Selecione</option>
+                                <option value="Iniciante">Iniciante</option>
+                                <option value="1-2 anos">1-2 anos</option>
+                                <option value="Tradição Familiar">
+                                    Tradição Familiar
+                                </option>
+                                <option value="Mais de 10 anos">
+                                    Mais de 10 anos
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cidade/Região *</label>
+                            <input
+                                type="text"
+                                name="cidadeForm"
+                                placeholder="Ex: Diamantina, MG"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label>WhatsApp (Opcional)</label>
+                            <input
+                                type="tel"
+                                name="whatsapp"
+                                id="whatsappInput"
+                                inputmode="numeric"
+                                autocomplete="tel"
+                                placeholder="(11) 98888-7777"
+                                maxlength="15"
+                            />
+                            <small class="helper-text">
+                                Apenas números (11 dígitos). Ex: 11988887777
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>E-mail de Contato (Opcional)</label>
+                            <input
+                                type="email"
+                                name="email_contato"
+                                id="emailContatoInput"
+                                placeholder="contato@exemplo.com"
+                                pattern="^[^\s@]+@[^\s@]+\.[^\s@]{2,}$"
+                                title="Digite um e-mail válido. Ex: contato@exemplo.com"
+                            />
+                            <small class="helper-text">
+                                Digite um e-mail válido (ex:
+                                contato@exemplo.com).
+                            </small>
+                        </div>
+
+                        <div
+                            class="form-group full-width"
+                            style="grid-column: span 2"
+                        >
+                            <label>História do Produtor (Opcional)</label>
+                            <textarea
+                                name="historia_produtor"
+                                rows="4"
+                                placeholder="Conte um pouco sobre quem produz..."
+                            ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                for="link_mapa"
+                                style="font-weight: bold; color: #2d5a4c"
+                            >
+                                📍 Localização no Google Maps (Opcional)
+                            </label>
+                            <input
+                                type="url"
+                                class="form-control"
+                                id="link_mapa"
+                                name="link_mapa"
+                                placeholder="Cole o link de compartilhamento do Maps aqui"
+                            />
+                            <small style="color: #666; font-size: 0.8rem">
+                                Dica: Abra o Google Maps, marque seu local,
+                                clique em "Compartilhar" e copie o link.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="section-title">🛍️ Informações do Produto</div>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Nome do Produto *</label>
+                            <input
+                                type="text"
+                                name="nomeForm"
+                                placeholder="Ex: Mel Artesanal do Jequitinhonha"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Categoria *</label>
+                            <select name="categoriaForm" required>
+                                <option value="">Selecione...</option>
+                                <option value="Vegetais e Verduras">
+                                    Vegetais e Verduras
+                                </option>
+                                <option value="Frutas Frescas">
+                                    Frutas Frescas
+                                </option>
+                                <option value="Mel e Derivados">
+                                    Mel e Derivados
+                                </option>
+                                <option value="Grãos e Cereais">
+                                    Grãos e Cereais
+                                </option>
+                                <option value="Queijos e Laticínios">
+                                    Queijos e Laticínios
+                                </option>
+                                <option value="Conservas e Doces">
+                                    Conservas e Doces
+                                </option>
+                                <option value="Artesanato Local">
+                                    Artesanato Local
+                                </option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Disponibilidade *</label>
+                            <select name="disponibilidade" required>
+                                <option value="disponivel">
+                                    ✅ Disponível
+                                </option>
+                                <option value="sob_encomenda">
+                                    📦 Sob Encomenda
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Quantidade Disponível *</label>
+                            <input
+                                type="number"
+                                name="quantidade"
+                                placeholder="Ex: 10"
+                                min="1"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Unidade de Medida *</label>
+                            <select name="unidade" required>
+                                <option value="">Selecione...</option>
+                                <option value="Quilograma">
+                                    Quilograma (kg)
+                                </option>
+                                <option value="Grama">Grama (g)</option>
+                                <option value="Litro">Litro (L)</option>
+                                <option value="Mililitro">
+                                    Mililitro (ml)
+                                </option>
+                                <option value="Unidade">Unidade</option>
+                                <option value="Maço">Maço</option>
+                                <option value="Caixa">Caixa</option>
+                                <option value="Saca">Saca</option>
+                                <option value="Duzia">Dúzia</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Descrição Detalhada *</label>
+                            <textarea
+                                name="descricaoForm"
+                                rows="4"
+                                placeholder="Descreva seu produto..."
+                                required
+                            ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Preço (R$) *</label>
+                            <input
+                                type="text"
+                                id="precoInput"
+                                name="precoForm"
+                                placeholder="0,00"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Fotos do Produto *</label>
+                            <input
+                                type="file"
+                                id="imagensInput"
+                                name="imagens"
+                                accept="image/*"
+                                multiple
+                                required
+                            />
+                            <small class="helper-text">
+                                Dica: você pode selecionar várias fotos
+                                (Ctrl/Shift).
+                            </small>
+
+                            <div class="preview-wrap" id="previewWrap">
+                                <div class="preview-title">
+                                    🖼️ Prévia das fotos selecionadas
+                                </div>
+                                <div
+                                    class="preview-grid"
+                                    id="previewGrid"
+                                ></div>
+                                <div class="preview-hint">
+                                    Você pode remover uma foto clicando no “×”
+                                    em cima dela.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-title">🏷️ Características</div>
+                    <div class="characteristics-grid">
+                        <label class="check-item">
+                            <input
+                                type="checkbox"
+                                name="caracteristicas"
+                                value="🌿 Orgânico"
+                            />
+                            🌿 Orgânico
+                        </label>
+
+                        <label class="check-item">
+                            <input
+                                type="checkbox"
+                                name="caracteristicas"
+                                value="🏆 Artesanal"
+                            />
+                            🏆 Artesanal
+                        </label>
+
+                        <label class="check-item">
+                            <input
+                                type="checkbox"
+                                name="caracteristicas"
+                                value="🌱 Fresco"
+                            />
+                            🌱 Fresco
+                        </label>
+
+                        <label class="check-item">
+                            <input
+                                type="checkbox"
+                                name="caracteristicas"
+                                value="🏠 Local"
+                            />
+                            🏠 Local
+                        </label>
+
+                        <label class="check-item">
+                            <input
+                                type="checkbox"
+                                name="caracteristicas"
+                                value="♻️ Sustentável"
+                            />
+                            ♻️ Sustentável
+                        </label>
+
+                        <label class="check-item">
+                            <input
+                                type="checkbox"
+                                name="caracteristicas"
+                                value="📜 Tradicional"
+                            />
+                            📜 Tradicional
+                        </label>
+                    </div>
+
+                    <div class="action-btns">
+                        <button type="submit" class="btn-publish">
+                            Publicar Produto
+                        </button>
+                    </div>
+                </form>
+
+                <div class="tips-box">
+                    <div class="tip-item">
+                        <span class="tip-icon">📸</span>
+                        <strong>Fotos:</strong> Use fotos claras.
+                    </div>
+                    <div class="tip-item">
+                        <span class="tip-icon">💰</span>
+                        <strong>Preço:</strong> Preço justo atrai mais.
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Vale&Feira</h4>
+                    <p>
+                        Conectando produtores e consumidores através da
+                        tecnologia e sustentabilidade.
+                    </p>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Links Rápidos</h4>
+                    <a href="{{ url_for('main.home') }}">Início</a>
+                    <a href="{{ url_for('produto.buscar_produtos') }}"
+                        >Produtos</a
+                    >
+                    <a href="{{ url_for('produto.adicionar_produtos') }}"
+                        >Adicionar Produto</a
+                    >
+                    <a href="{{ url_for('chat.meus_chats') }}">Conversas</a>
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.registrar') }}">Cadastrar</a>
+                    {% endif %}
+                </div>
+
+                <div class="footer-col">
+                    <h4>Suporte/Ajuda</h4>
+                    <a href="{{ url_for('main.relatar_bug_page') }}"
+                        >Central de Ajuda</a
+                    >
+                    <a href="#" onclick="abrirModalTermos(); return false;"
+                        >Termos de Uso</a
+                    >
+                </div>
+
+                <div class="footer-col">
+                    <h4>Contatos</h4>
+                    <a>📧contato@valefeira.com.br</a>
+                    <a>📧suportevaleefeira@gmail.com</a>
+                    <a href="#">📱 (38) 3333-4444</a>
+                    <p>📍 Vale do Jequitinhonha, MG</p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                &copy; 2026 Vale&Feira. Todos os direitos reservados.
+            </div>
+        </footer>
+
+        <div id="modalTermos" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="fecharModalTermos()"
+                    >&times;</span
+                >
+                <div class="modal-body">
+                    <h3>Termos e Condições de Uso</h3>
+
+                    <h4>1. Objeto e Definição</h4>
+                    <p>
+                        A plataforma Vale & Feira é um ambiente digital
+                        destinado à divulgação, promoção e facilitação da
+                        comercialização de produtos cultivados e produzidos no
+                        Vale do Jequitinhonha. O site atua como uma "feira
+                        virtual", conectando produtores locais (agricultores
+                        familiares e artesãos) a potenciais compradores.
+                    </p>
+
+                    <div style="text-align: center; margin-top: 20px">
+                        <button
+                            class="btn-modal-close"
+                            onclick="fecharModalTermos()"
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function abrirModalTermos() {
+                document.getElementById("modalTermos").style.display = "flex";
+            }
+            function fecharModalTermos() {
+                document.getElementById("modalTermos").style.display = "none";
+            }
+            window.onclick = function (event) {
+                if (event.target == document.getElementById("modalTermos")) {
+                    fecharModalTermos();
+                }
+            };
+
+            const imagensInput = document.getElementById("imagensInput");
+            const previewWrap = document.getElementById("previewWrap");
+            const previewGrid = document.getElementById("previewGrid");
+            const produtoForm = document.getElementById("produtoForm");
+
+            let arquivosSelecionados = [];
+
+            function atualizarInputFiles() {
+                const dt = new DataTransfer();
+                arquivosSelecionados.forEach((f) => dt.items.add(f));
+                imagensInput.files = dt.files;
+            }
+
+            function renderPreview() {
+                previewGrid.innerHTML = "";
+
+                if (!arquivosSelecionados.length) {
+                    previewWrap.style.display = "none";
+                    return;
+                }
+
+                previewWrap.style.display = "block";
+
+                arquivosSelecionados.forEach((file, index) => {
+                    const item = document.createElement("div");
+                    item.className = "preview-item";
+
+                    const img = document.createElement("img");
+                    img.alt = "Prévia da foto";
+                    img.src = URL.createObjectURL(file);
+
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "remove-preview";
+                    btn.textContent = "×";
+                    btn.title = "Remover esta foto";
+                    btn.onclick = () => {
+                        arquivosSelecionados.splice(index, 1);
+                        atualizarInputFiles();
+                        renderPreview();
+                    };
+
+                    item.appendChild(img);
+                    item.appendChild(btn);
+                    previewGrid.appendChild(item);
+                });
+            }
+
+            imagensInput.addEventListener("change", (e) => {
+                const novos = Array.from(e.target.files || []);
+                arquivosSelecionados = novos;
+                atualizarInputFiles();
+                renderPreview();
+            });
+
+            const whatsappInput = document.getElementById("whatsappInput");
+            const emailContatoInput =
+                document.getElementById("emailContatoInput");
+
+            function pegarApenas11Digitos(valor) {
+                return (valor || "").replace(/\D/g, "").slice(0, 11);
+            }
+
+            function aplicarMascaraTelefoneBR(digits11) {
+                const d = (digits11 || "").slice(0, 11);
+                const dd = d.slice(0, 2);
+                const parte1 = d.slice(2, 7);
+                const parte2 = d.slice(7, 11);
+
+                if (d.length <= 2) return dd ? `(${dd}` : "";
+                if (d.length <= 7) return `(${dd}) ${d.slice(2)}`;
+                return `(${dd}) ${parte1}-${parte2}`;
+            }
+
+            if (whatsappInput) {
+                whatsappInput.addEventListener("input", () => {
+                    const digits = pegarApenas11Digitos(whatsappInput.value);
+                    whatsappInput.value = aplicarMascaraTelefoneBR(digits);
+                });
+
+                whatsappInput.addEventListener("paste", (e) => {
+                    e.preventDefault();
+                    const texto =
+                        (e.clipboardData || window.clipboardData).getData(
+                            "text",
+                        ) || "";
+                    const digits = pegarApenas11Digitos(texto);
+                    whatsappInput.value = aplicarMascaraTelefoneBR(digits);
+                });
+
+                whatsappInput.addEventListener("keydown", (e) => {
+                    const liberadas = [
+                        "Backspace",
+                        "Delete",
+                        "ArrowLeft",
+                        "ArrowRight",
+                        "Tab",
+                        "Home",
+                        "End",
+                    ];
+                    if (liberadas.includes(e.key)) return;
+                    if (/^\d$/.test(e.key)) return;
+                    e.preventDefault();
+                });
+            }
+
+            produtoForm.addEventListener("submit", (e) => {
+                if (!imagensInput.files || imagensInput.files.length === 0) {
+                    e.preventDefault();
+                    alert("Selecione pelo menos uma foto do produto.");
+                    return;
+                }
+
+                if (whatsappInput && whatsappInput.value) {
+                    const digits = pegarApenas11Digitos(whatsappInput.value);
+
+                    if (digits.length > 0 && digits.length < 11) {
+                        e.preventDefault();
+                        alert(
+                            "O WhatsApp precisa ter 11 números (DDD + número). Ex: 11988887777",
+                        );
+                        return;
+                    }
+
+                    whatsappInput.value = digits;
+                }
+
+                if (emailContatoInput && emailContatoInput.value) {
+                    if (!emailContatoInput.checkValidity()) {
+                        e.preventDefault();
+                        alert(
+                            "Digite um e-mail válido. Ex: contato@exemplo.com",
+                        );
+                        emailContatoInput.focus();
+                        return;
+                    }
+                }
+            });
+        </script>
     </body>
 </html>
